@@ -82,6 +82,12 @@
       "allowElevation": true,
       "warningsAsErrors": true
     },
-    "publish": null
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Summuryy",
+        "repo": "EMS-COMMAND"
+      }
+    ]
   }
 }
