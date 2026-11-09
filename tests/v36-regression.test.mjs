@@ -57,3 +57,13 @@ test('desktop localhost server rejects foreign Host headers',()=>{
  assert.match(server,/req.headers.host.toLowerCase\(\)!==expectedHost/);
  assert.match(server,/res.writeHead\(421/);
 });
+
+test('desktop only accepts authenticated per-launch backend readiness',()=>{
+ const desktop=read('desktop/main.cjs');
+ const server=read('server/index.mjs');
+ assert.match(desktop,/crypto.randomBytes\(32\).toString\('hex'\)/);
+ assert.match(desktop,/EMS_HEALTH_TOKEN:healthToken/);
+ assert.match(desktop,/path:'\/__ems\/ready'/);
+ assert.match(server,/url.pathname==='\/__ems\/ready'/);
+ assert.match(server,/req.headers\['x-ems-health-token'\]!==expected/);
+});
