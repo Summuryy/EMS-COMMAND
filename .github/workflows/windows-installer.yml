@@ -22,6 +22,18 @@ jobs:
         run: npm test
       - name: Build installer (unsigned test artifact)
         run: npm run dist:win
+      - name: Verify updater metadata and installer hashes
+        shell: pwsh
+        run: |
+          $metadata = Get-Content dist/latest.yml -Raw
+          $installers = @(Get-ChildItem dist -Filter '*.exe')
+          if ($installers.Count -ne 1) { throw "Expected exactly one Windows installer, got $($installers.Count)" }
+          $installer = $installers[0]
+          $hash = (Get-FileHash $installer.FullName -Algorithm SHA512).Hash.ToLower()
+          $hashBase64 = [Convert]::ToBase64String([Convert]::FromHexString($hash))
+          if (-not $metadata.Contains($hashBase64)) { throw 'latest.yml SHA-512 does not match installer' }
+          if (-not $metadata.Contains($installer.Name)) { throw 'latest.yml does not reference installer' }
+          Write-Host "Updater metadata verified for $($installer.Name)"
       - name: Write SHA-256 checksum
         shell: pwsh
         run: |
@@ -37,5 +49,6 @@ jobs:
             dist/*.exe
             dist/*.sha256
             dist/latest.yml
+            dist/*.blockmap
           if-no-files-found: error
           retention-days: 14
