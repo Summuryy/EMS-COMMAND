@@ -14,7 +14,7 @@ function log(line){
 }
 function error(title,details){log(title+': '+details);dialog.showErrorBox(title, String(details)+'\n\nЛог: '+join(app.getPath('userData'),'logs','desktop.log'));}
 function freePort(){return new Promise((resolve,reject)=>{const s=net.createServer();s.once('error',reject);s.listen(0,'127.0.0.1',()=>{const port=s.address().port;s.close(()=>resolve(port));});});}
-function health(port){return new Promise(resolve=>{const req=http.get({host:'127.0.0.1',port,path:'/api/health',timeout:1200},res=>{let txt='';res.on('data',c=>txt+=c);res.on('end',()=>{try{resolve(res.statusCode===200&&JSON.parse(txt).ok===true);}catch{resolve(false);}});});req.on('error',()=>resolve(false));req.on('timeout',()=>{req.destroy();resolve(false);});});}
+function health(port,token){return new Promise(resolve=>{const req=http.get({host:'127.0.0.1',port,path:'/__ems/ready',timeout:1200,headers:{'X-EMS-Health-Token':token}},res=>{let txt='';res.on('data',c=>txt+=c);res.on('end',()=>{try{resolve(res.statusCode===200&&JSON.parse(txt).ok===true);}catch{resolve(false);}});});req.on('error',()=>resolve(false));req.on('timeout',()=>{req.destroy();resolve(false);});});}
 function splash(){
  mainWindow=new BrowserWindow({width:1320,height:860,minWidth:960,minHeight:640,backgroundColor:'#10151c',title:'EMS COMMAND v3.6 — Госбольница RP',autoHideMenuBar:true,show:false,webPreferences:{sandbox:true,contextIsolation:true,nodeIntegration:false,webSecurity:true,webviewTag:false,preload:join(__dirname,'setup-preload.cjs')}});
  mainWindow.removeMenu();
@@ -28,7 +28,8 @@ function splash(){
 async function launchServer(){
  try{
   activePort=await freePort();
-  const env={...engineEnv,EMS_PORT:String(activePort),EMS_HOST:'127.0.0.1',EMS_ORIGIN:`http://127.0.0.1:${activePort}`};
+  const healthToken=crypto.randomBytes(32).toString('hex');
+  const env={...engineEnv,EMS_PORT:String(activePort),EMS_HOST:'127.0.0.1',EMS_ORIGIN:`http://127.0.0.1:${activePort}`,EMS_HEALTH_TOKEN:healthToken};
   backend=spawn(process.execPath,[join(root,'server','index.mjs')],{cwd:root,env:{...env,ELECTRON_RUN_AS_NODE:'1'},stdio:['ignore','pipe','pipe'],windowsHide:true});
   backend.stdout.on('data',x=>log('server: '+String(x).trim()));
   backend.stderr.on('data',x=>log('server error: '+String(x).trim()));
@@ -37,7 +38,7 @@ async function launchServer(){
   let ready=false;
   for(let i=0;i<100;i++){
     if(!backend||backend.exitCode!==null)break;
-    if(await health(activePort)){ready=true;break;}
+    if(await health(activePort,healthToken)){ready=true;break;}
     await new Promise(r=>setTimeout(r,180));
   }
   if(!ready)throw Error('Локальный сервер не ответил. Проверьте desktop.log.');
