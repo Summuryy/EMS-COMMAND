@@ -63,7 +63,7 @@ async function start(){
  root=join(__dirname,'..');dataDir=join(app.getPath('userData'),'database');mkdirSync(dataDir,{recursive:true});
  engineEnv={...process.env,EMS_DATA_DIR:dataDir};
  splash();
- initUpdates(()=>mainWindow,log);
+ initUpdates(()=>mainWindow,log,(url)=>{try{const parsed=new URL(url);return parsed.protocol==='http:'&&parsed.hostname==='127.0.0.1'&&parsed.port===String(activePort)&&parsed.pathname==='/';}catch{return false;}});
  const has=await runNode('tools/has-admin.mjs');
  if(!has.ok){error('Ошибка базы данных',has.error);app.quit();return;}
  if(has.out.trim()!=='YES'){
