@@ -42,6 +42,9 @@ jobs:
           fs.appendFileSync(process.env.GITHUB_ENV,'EMS_MANIFEST_SIGNING_KEY_PEM_B64='+Buffer.from(priv).toString('base64')+'\n');
           fs.appendFileSync(process.env.GITHUB_ENV,'EMS_LAUNCHER_PUBLIC_KEY_PEM_B64='+Buffer.from(pub).toString('base64')+'\n');
           '@ | node
+      - name: Sign QA release and verify metadata
+        shell: pwsh
+        run: |
           $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
           node launcher/create-release.cjs dist/win-unpacked "dist/EMS-COMMAND-App-$version-win-x64.zip"
           @'
