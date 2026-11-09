@@ -24,6 +24,25 @@ jobs:
           npm test
       - name: Build unpacked Electron application
         run: npm run dist:dir
+      - name: Reject secrets and development artifacts in public payload
+        shell: pwsh
+        run: |
+          $payload = 'dist/win-unpacked'
+          if (-not (Test-Path $payload)) { throw 'Missing unpacked Windows app' }
+          $blockedNames = @('.env', '.env.local', '.env.production', '.npmrc', '.git', '.github', 'id_rsa', 'id_ed25519', 'ed25519-release-private.pem', 'setup-portable-signing.cjs')
+          $blockedExtensions = @('.pem', '.key', '.p12', '.pfx', '.map')
+          foreach ($item in (Get-ChildItem -LiteralPath $payload -Recurse -Force)) {
+            if ($blockedNames -contains $item.Name -or ($item.Extension -and $blockedExtensions -contains $item.Extension.ToLowerInvariant())) {
+              throw "Private or development file in Windows payload: $($item.FullName)"
+            }
+          }
+          $appRoot = Join-Path $payload 'resources/app'
+          if (Test-Path $appRoot) {
+            foreach ($name in @('tests', '.github', 'docs', 'tools/setup-portable-signing.cjs')) {
+              if (Test-Path (Join-Path $appRoot $name)) { throw "Unexpected development artifact: $name" }
+            }
+          }
+          Write-Host 'Windows payload secret/development-file checks passed'
       - name: Archive application payload (not an installer)
         shell: pwsh
         run: |
