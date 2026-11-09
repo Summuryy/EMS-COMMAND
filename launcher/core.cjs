@@ -193,4 +193,4 @@ class LauncherManager{
  }
 }
 function compareVersions(a,b){const x=safeVersion(a).split(/[.-]/).slice(0,3).map(Number),y=safeVersion(b).split(/[.-]/).slice(0,3).map(Number);for(let i=0;i<3;i++)if(x[i]!==y[i])return Math.sign(x[i]-y[i]);return 0;}
-module.exports={LauncherManager,readState,verifyFiles,request,compareVersions};
+module.exports={LauncherManager,readState,verifyFiles,extractVerified,request,compareVersions};
