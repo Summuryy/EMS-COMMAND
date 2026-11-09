@@ -54,7 +54,8 @@ function initUpdates(getWindow,log,isTrustedSender=()=>false){
       updater.on('download-progress',p=>set('downloading','Загрузка '+Math.round(p.percent)+'%',Math.round(p.percent)));
       updater.on('update-downloaded',()=>set('ready','Файл загружен. Сохраните работу перед установкой.',100));
       updater.on('error',e=>set('error','Ошибка канала обновлений: '+e.message,0));
-      set('idle','Нажмите «Проверить обновления».');
+      set('idle','Проверка при запуске включена. Также можно проверить вручную.');
+      setTimeout(()=>{if(state.status==='idle')updater.checkForUpdates().catch(err=>set('error',err.message,0));},2600);
     }catch(err){set('error','Модуль обновлений недоступен: '+err.message);}
   }
   ipcMain.handle('ems:updates:status',guard(async()=>snapshot()));
