@@ -60,3 +60,10 @@ test('on-disk files are hashed and extra/modified files rejected',async()=>{
   assert.deepEqual(await readState(dir),{current:null,previous:null});
  }finally{await fs.rm(dir,{recursive:true,force:true});}
 });
+
+test('launcher only accepts canonical stable version identifiers',()=>{
+ for(const value of ['3.6.0-beta.1','03.6.0','3.06.0','3.6.00','../../3.6.0']){
+  assert.throws(()=>safeVersion(value),value);
+ }
+ assert.equal(safeVersion('3.6.0'),'3.6.0');
+});
