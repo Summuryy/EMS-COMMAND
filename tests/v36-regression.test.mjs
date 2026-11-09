@@ -50,3 +50,10 @@ test('local static serving blocks symlinks escaping public directory',()=>{
  assert.match(server,/fs\.realpathSync\(absolute\)/);
  assert.match(server,/resolvedFile\.startsWith\(publicRealDir\+path\.sep\)/);
 });
+
+test('desktop localhost server rejects foreign Host headers',()=>{
+ const server=read('server/index.mjs');
+ assert.match(server,/expectedHost=new URL\(config.origin\).host/);
+ assert.match(server,/req.headers.host.toLowerCase\(\)!==expectedHost/);
+ assert.match(server,/res.writeHead\(421/);
+});
