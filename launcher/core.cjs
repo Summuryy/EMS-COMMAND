@@ -175,7 +175,7 @@ class LauncherManager{
    report(this.progress,'verifying','Проверяем установленную версию…',0);
    await verifyFiles(dir,manifest,this.progress);
    const binary=path.join(dir,manifest.entry);
-   const child=spawn(binary,[],{cwd:dir,windowsHide:false,stdio:'ignore',detached:false});
+   const child=spawn(binary,[],{cwd:dir,windowsHide:false,stdio:'ignore',detached:false,env:{...process.env,EMS_MANAGED_BY_LAUNCHER:'1'}});
    this.child=child;
    return new Promise((resolve,reject)=>{
      child.once('error',reject);
