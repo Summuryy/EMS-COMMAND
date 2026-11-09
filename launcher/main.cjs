@@ -51,7 +51,6 @@ async function start(){
  handle('repair',()=>run('repair',()=>manager.update({repair:true})));
  handle('launch',()=>run('launch',()=>manager.launch()));
  handle('rollback',()=>run('rollback',()=>manager.rollback()));
- handle('set-auto',async e=>({ok:false,error:'Unsupported'}));
  if((await prefs()).autoUpdate!==false&&manager.trust.publicKeyPem){
    setTimeout(()=>{run('auto-update',async()=>{
      const result=await manager.check();
