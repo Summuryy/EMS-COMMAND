@@ -183,6 +183,7 @@ class LauncherManager{
    });
  }
  async rollback(){
+   if(this.busy||this.child&&this.child.exitCode===null)throw Error('Закройте EMS COMMAND и завершите обновления перед откатом');
    const state=await readState(this.base);
    if(!state.previous)throw Error('Нет предыдущей версии');
    const {manifest}=await readRecord(this.base,state.previous,this.trust);
