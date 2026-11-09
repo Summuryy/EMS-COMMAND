@@ -8,6 +8,7 @@ files:
   - main.cjs
   - preload.cjs
   - core.cjs
+  - security.cjs
   - index.html
   - ui.js
   - trust.json
