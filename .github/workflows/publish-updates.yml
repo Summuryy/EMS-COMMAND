@@ -1,0 +1,65 @@
+name: Publish signed EMS COMMAND update
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release tag, e.g. v3.4.0"
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  publish:
+    if: ${{ vars.EMS_UPDATE_FEED_URL != '' && vars.EMS_RELEASE_REPO != '' }}
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify publishing prerequisites
+        shell: pwsh
+        env:
+          RELEASE_TOKEN: ${{ secrets.EMS_RELEASES_TOKEN }}
+          SIGNING_CERT: ${{ secrets.CSC_LINK }}
+          SIGNING_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          RELEASE_REPO: ${{ vars.EMS_RELEASE_REPO }}
+          FEED: ${{ vars.EMS_UPDATE_FEED_URL }}
+          RELEASE_TAG: ${{ inputs.version }}
+        run: |
+          if (-not $env:RELEASE_TOKEN -or -not $env:SIGNING_CERT -or -not $env:SIGNING_PASSWORD) { throw 'Configure release token and Windows signing certificate secrets first.' }
+          if ($env:RELEASE_REPO -notmatch '^[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+$') { throw 'Invalid releases repository.' }
+          if ($env:FEED -ne "https://github.com/$($env:RELEASE_REPO)/releases/latest/download/") { throw 'Update feed must point to the public GitHub Releases latest-download URL.' }
+          $pkg = Get-Content package.json -Raw | ConvertFrom-Json
+          if ($env:RELEASE_TAG -ne "v$($pkg.version)") { throw 'Package version and release tag mismatch.' }
+      - name: Install and run tests
+        run: |
+          npm install --no-audit --no-fund
+          npm run check
+          npm test
+      - name: Configure installed updater
+        shell: pwsh
+        env:
+          EMS_UPDATE_FEED_URL: ${{ vars.EMS_UPDATE_FEED_URL }}
+        run: |
+          $config = @{ feedUrl=$env:EMS_UPDATE_FEED_URL; channel='stable' } | ConvertTo-Json
+          Set-Content -Path desktop/release-config.json -Value $config -Encoding utf8
+      - name: Build signed Windows installer
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+        run: npm run dist:win
+      - name: Verify release files
+        shell: pwsh
+        run: |
+          if (-not (Test-Path dist/latest.yml)) { throw 'Missing updater metadata latest.yml' }
+          if (-not (Get-ChildItem dist -Filter '*.exe')) { throw 'Missing Windows installer' }
+      - name: Publish stable release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.EMS_RELEASES_TOKEN }}
+          EMS_RELEASE_REPO: ${{ vars.EMS_RELEASE_REPO }}
+          RELEASE_TAG: ${{ inputs.version }}
+        run: |
+          $files = @(Get-ChildItem dist -File | Where-Object { $_.Extension -in '.exe','.yml','.blockmap' } | ForEach-Object FullName)
+          gh release create $env:RELEASE_TAG $files --repo $env:EMS_RELEASE_REPO --title "EMS COMMAND $env:RELEASE_TAG" --notes "Signed stable Windows release" --latest
