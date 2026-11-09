@@ -55,3 +55,21 @@ On startup, the launcher automatically checks for a signed release. If a newer s
 - Rolling back switches to an existing verified version of the executable; it does not downgrade or migrate a newer user database schema.
 - If rollback is needed after a database schema migration, a separate tested backup/migration strategy is required.
 - The source repository's previous Windows NSIS workflow is retained as a compatibility fallback, not the new primary distribution method.
+
+
+## Permanent release signing: maintainer-only setup
+
+The **public binary-only** repository `Summuryy/EMS-COMMAND-RELEASES` already exists. No repository creation is necessary. Never upload source files or signing keys to it.
+
+1. On your own Windows computer, install Node.js 22+ and GitHub CLI (`gh`), then run `gh auth login` with your GitHub account.
+2. In the **private source repository**, create an Actions environment called `production` at **Settings → Environments**. Enable required reviewers and restrict the environment to the protected release branch. These security controls require your own GitHub administrator interaction; this project does not create or weaken them automatically.
+3. From a local checkout of the private source repository, run `node tools/setup-portable-signing.cjs` **without flags**. It generates the persistent Ed25519 private/public pair (unless one already exists), performs a cryptographic self-test, shows a *public-key fingerprint only*, and does **not** upload anything.
+4. Securely back up `%LOCALAPPDATA%\\EMS-COMMAND-SIGNING\\ed25519-release-private.pem` **offline**, separately from the computer. This is a private key: do not share it in chats, tickets, GitHub repositories, or public releases. Use Windows disk encryption and a private user account. Treat any key compromise as an incident requiring a deliberate key rotation and launcher trust update.
+5. Run `node tools/setup-portable-signing.cjs --upload`. This reuses the SAME persistent key, uploads its base64 representation through **stdin** into the GitHub Actions **production environment secret** `EMS_MANIFEST_SIGNING_KEY_PEM_B64`, and uploads the **public** key to production environment variable `EMS_LAUNCHER_PUBLIC_KEY_PEM_B64`. No private bytes are printed or passed as command-line arguments.
+6. Create a **fine-grained GitHub personal access token** scoped to `Summuryy/EMS-COMMAND-RELEASES` with the minimum repository Contents: Read/Write permission required to create releases. In the same `production` environment, add the token as secret `EMS_RELEASES_TOKEN`. Do not commit or paste it into this chat. If your GitHub account requires additional permission approval, complete that in GitHub.
+7. Make sure the release workflow is on the **default branch** (GitHub's manual `workflow_dispatch` requires that workflow to exist on the default branch). Merge the reviewed PRs only after passing CI and security review. Then trigger **Publish signed portable EMS COMMAND** with `version=3.6.0` only if the application/package version is unchanged and no release with that tag already exists.
+8. Review the resulting public Release: it should contain only `EMS-COMMAND-Launcher-3.6.0-win-x64.exe`, `EMS-COMMAND-App-3.6.0-win-x64.zip` and `ems-manifest.json`. Do not treat earlier ephemeral-key QA artifacts as production update packages.
+
+**Key boundary:** a long-lived Ed25519 identity is a free application-level update integrity mechanism, **not** a paid Windows Authenticode certificate. Users can still see Windows SmartScreen warnings. The launcher binary itself does not yet self-update and needs manual replacement for launcher releases.
+
+**Security note:** a successful GitHub Actions run proves build and file-integrity tests. It does **not** prove GUI launch, crash recovery, end-user usability, or release delivery from the public channel. Test these on a disposable Windows machine before making a production release.
