@@ -35,6 +35,16 @@ const server=http.createServer(async(req,res)=>{
   }
   try{
     const url=new URL(req.url,config.origin);
+    // Desktop launcher readiness check uses a per-launch secret, not a forgeable public /api/health response.
+    if(url.pathname==='/__ems/ready'){
+      const expected=process.env.EMS_HEALTH_TOKEN;
+      if(!expected||req.headers['x-ems-health-token']!==expected){
+        res.writeHead(403,{'Cache-Control':'no-store'});res.end();return;
+      }
+      res.setHeader('Cache-Control','no-store');
+      res.setHeader('Content-Type','application/json; charset=utf-8');
+      res.end(JSON.stringify({ok:true}));return;
+    }
     if(url.pathname==='/api/health'){
       res.setHeader('Cache-Control','no-store');res.setHeader('Content-Type','application/json; charset=utf-8');
       res.end(JSON.stringify({ok:true,version:'3.6.0',ocrAvailable,mode:config.host==='127.0.0.1'?'local':'server'}));return;
