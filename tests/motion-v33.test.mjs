@@ -17,8 +17,8 @@ test('Launcher exposes live progress messages without fabricated percentage',()=
  assert.match(splash,/id="launcher-status"/);
  assert.match(splash,/Новая версия найдена/);
 });
-test('Updater downloads automatically only with configured feed, installation is confirmed',()=>{
- assert.match(updater,/autoDownload=true/);
+test('Updater downloads only after explicit user action; installation is confirmed',()=>{
+ assert.match(updater,/autoDownload=false/);
  assert.match(updater,/autoInstallOnAppQuit=false/);
  assert.match(updater,/dialog\.showMessageBox/);
 });
