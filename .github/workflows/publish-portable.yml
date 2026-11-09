@@ -67,11 +67,24 @@ jobs:
           if (-not $pkg.build.asar -and $env:EMS_PUBLIC_BINARY_REVIEWED -ne 'true') {
             throw 'Public release blocked: asar:false distributes readable JavaScript source. Review your app package, then explicitly approve client-code distribution using protected production variable EMS_PUBLIC_BINARY_REVIEWED=true.'
           }
-          $paths = @('dist/win-unpacked/.git', 'dist/win-unpacked/.env', 'dist/win-unpacked/resources/app/.env', 'dist/win-unpacked/resources/app/tools/setup-portable-signing.cjs')
-          foreach ($candidate in $paths) {
-            if (Test-Path $candidate) { throw "Private/internal file present in Windows payload: $candidate" }
+          $payload = 'dist/win-unpacked'
+          if (-not (Test-Path $payload)) { throw 'Windows payload directory missing' }
+          $blockedNames = @('.env', '.env.local', '.env.production', '.npmrc', '.git', '.github', 'id_rsa', 'id_ed25519', 'ed25519-release-private.pem', 'setup-portable-signing.cjs')
+          $blockedExtensions = @('.pem', '.key', '.p12', '.pfx', '.map')
+          $all = @(Get-ChildItem -LiteralPath $payload -Recurse -Force)
+          foreach ($item in $all) {
+            if ($blockedNames -contains $item.Name -or ($item.Extension -and $blockedExtensions -contains $item.Extension.ToLowerInvariant())) {
+              throw "Blocked sensitive/internal artifact in public payload: $($item.FullName)"
+            }
           }
-          Write-Host 'Release source/privacy review gate passed; no private keys or source Git metadata intentionally included.'
+          $appRoot = Join-Path $payload 'resources/app'
+          if (Test-Path $appRoot) {
+            foreach ($name in @('tests', '.github', 'docs', 'tools/setup-portable-signing.cjs')) {
+              if (Test-Path (Join-Path $appRoot $name)) { throw "Unexpected development artifact in public app: $name" }
+            }
+          }
+          Write-Host "Checked $($all.Count) payload entries for forbidden private/development files."
+          Write-Host 'WARNING: Client JavaScript remains inspectable; explicit public binary review is not source-code protection.'
       - name: Publish files to the public binary-only GitHub repository
         shell: pwsh
         env:
