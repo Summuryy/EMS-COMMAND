@@ -52,6 +52,23 @@ jobs:
           verifyEnvelope(signed,key);
           console.log('Signed QA metadata successfully verified');
           '@ | node
+      - name: Verify ZIP actually extracts into exactly the signed file inventory
+        shell: pwsh
+        run: |
+          @'
+          (async()=>{
+            const fs=require('node:fs'),fsp=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
+            const {verifyEnvelope}=require('./launcher/security.cjs');
+            const {extractVerified}=require('./launcher/core.cjs');
+            const manifest=JSON.parse(fs.readFileSync('dist/ems-manifest.json','utf8'));
+            const trust=JSON.parse(fs.readFileSync('launcher/trust.json','utf8'));
+            const signed=verifyEnvelope(manifest,trust.publicKeyPem);
+            const zip=path.resolve('dist/EMS-COMMAND-App-'+signed.version+'-win-x64.zip');
+            const dir=await fsp.mkdtemp(path.join(os.tmpdir(),'ems-archive-test-'));
+            try{await extractVerified(zip,dir,signed);console.log('Payload extraction and every signed file hash: OK');}
+            finally{await fsp.rm(dir,{recursive:true,force:true});}
+          })().catch(err=>{console.error(err);process.exitCode=1;});
+          '@ | node
       - name: Build portable independent launcher
         run: npm run dist:launcher -- --publish never
       - name: Verify launcher executable and payload
