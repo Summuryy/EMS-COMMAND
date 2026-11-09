@@ -1,4 +1,4 @@
 {
   "feedUrl": "",
-  "note": "Only enable this after setting up HTTPS public signed release feed."
+  "note": "Only HTTPS public signed generic update feed. A private GitHub repository does not provide anonymous downloads."
 }

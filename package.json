@@ -1,9 +1,9 @@
 {
   "name": "ems-command-desktop",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "private": true,
   "type": "module",
-  "description": "EMS COMMAND — protected desktop hospital terminal and installer studio",
+  "description": "EMS COMMAND — RP hospital desktop launcher and motion system",
   "main": "desktop/main.cjs",
   "engines": {
     "node": ">=22.13.0"

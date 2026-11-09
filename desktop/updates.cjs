@@ -14,16 +14,16 @@ function initUpdates(getWindow,log){
   else{
     try{
       const {autoUpdater}=require('electron-updater');
-      updater=autoUpdater;updater.autoDownload=false;updater.autoInstallOnAppQuit=false;
+      updater=autoUpdater;updater.autoDownload=true;updater.autoInstallOnAppQuit=false;updater.allowDowngrade=false;
       updater.setFeedURL({provider:'generic',url:feed});
       updater.on('checking-for-update',()=>set('checking','Проверяем наличие новой версии…'));
-      updater.on('update-available',info=>set('available',`Доступна версия ${info.version}.`));
+      updater.on('update-available',info=>set('available',`Найдена версия ${info.version}. Загружаем в лаунчере…`));
       updater.on('update-not-available',()=>set('current','Установлена последняя версия.'));
       updater.on('download-progress',p=>set('downloading',`Загрузка ${Math.round(p.percent)}%`,Math.round(p.percent)));
-      updater.on('update-downloaded',()=>set('ready','Обновление загружено. Можно установить после смены.',100));
+      updater.on('update-downloaded',()=>set('ready','Обновление загружено. Установи его после завершения смены.',100));
       updater.on('error',e=>set('error',e.message));
-      set('idle','Проверка обновлений доступна.');
-      setTimeout(()=>{updater.checkForUpdates().catch(e=>set('error',e.message));},4500);
+      set('idle','Лаунчер проверяет обновления при запуске.');
+      setTimeout(()=>{updater.checkForUpdates().catch(e=>set('error',e.message));},1800);
     }catch(e){set('error','Не удалось подключить модуль обновлений: '+e.message);}
   }
   ipcMain.handle('ems:updates:status',()=>({...state,version:app.getVersion()}));

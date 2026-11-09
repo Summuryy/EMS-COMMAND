@@ -35,3 +35,39 @@ html[data-motion="off"] .v3-reveal{opacity:1!important;transform:none!important}
 html[data-motion="off"] .ecg-trace{stroke-dasharray:none;stroke-dashoffset:0;filter:none}
 html[data-motion="off"] .v3-toast-timer{display:none}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.v3-reveal{opacity:1!important;transform:none!important}.ecg-trace{stroke-dasharray:none;filter:none}}
+
+/* 3.3: visible moving cardiogram, layered glow and active surfaces. */
+.ems-ecg-live {display:block; height:43px; overflow:hidden; filter:drop-shadow(0 0 5px #f74f7480)}
+.ems-ecg-line {fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none}
+.ems-ecg-moving {animation:ems-heart-scroll 5s linear infinite;transform-box:fill-box;will-change:transform}
+@keyframes ems-heart-scroll {from{transform:translateX(0)}to{transform:translateX(-280px)}}
+.ems-ecg-sensor {fill:#fff0f2;filter:drop-shadow(0 0 6px #ff607d);animation:ems-sensor 2s ease-in-out infinite}
+@keyframes ems-sensor{0%,100%{opacity:.28}50%{opacity:.95}}
+.rail-tip.v3-rail-heartbeat{background:linear-gradient(132deg,#342331,#1a2230 76%);border-color:#fa69844c;box-shadow:inset 0 1px 0 #ffffff1a,0 15px 40px #00000024}
+.rail-tip.v3-rail-heartbeat .ecg {height:38px;max-width:116px}
+.rail-tip.v3-rail-heartbeat:before{content:'';position:absolute;width:150px;height:150px;right:-70px;top:-70px;background:radial-gradient(circle,#e54b6920,transparent 70%);animation:ems-ambient-drift 7s ease-in-out infinite;pointer-events:none}
+@keyframes ems-ambient-drift{0%,100%{transform:translate(-9px,6px);opacity:.45}50%{transform:translate(6px,-8px);opacity:.95}}
+.v3-crumb-line .station-dot,.v3-nav-pulse{animation:ems-beacon-heart 2.1s ease-in-out infinite}
+@keyframes ems-beacon-heart{0%,100%{box-shadow:0 0 0 0 #fa607d30,0 0 5px #fa607d;opacity:.75}50%{box-shadow:0 0 0 5px #fa607d0c,0 0 16px #fa607daa;opacity:1}}
+.nav-link.active::after{content:'';position:absolute;right:9px;width:4px;height:4px;border-radius:50%;background:#ff8796;box-shadow:0 0 10px #fe748c;animation:ems-sensor 2.3s infinite}
+.v3-home-hero,.v3-pro-hero,.v3-shift-hero,.v3-evidence-hero,.v3-id-card{isolation:isolate}
+.v3-home-hero:after,.v3-pro-hero:after{pointer-events:none}
+.v3-home-hero .v3-hero-content,.v3-pro-hero .v3-pro-copy{position:relative;z-index:2}
+.v3-home-hero .v3-hud-label:before{content:'';display:inline-block;vertical-align:middle;width:6px;height:6px;background:#ff7284;border-radius:50%;margin-right:5px;animation:ems-beacon-heart 2s infinite}
+.v3-progress-ring {filter:drop-shadow(0 0 14px #f15c7417)}
+.v3-card-lift,.v3-number-card,.panel,.v3-id-card {backface-visibility:hidden}
+.v3-number-card{transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+.v3-number-card:hover{transform:translateY(-4px);border-color:#fb6c8c45;box-shadow:0 22px 50px #060a1244}
+.v3-pro-illustration .ecg,.v3-shift-wave .ecg,.v3-academy-mark .ecg{opacity:.95}
+.v3-home-hero .ecg{opacity:.92}
+.v3-shift-hero .ecg{filter:drop-shadow(0 0 8px #f7638b5c)}
+.btn-primary {position:relative;overflow:hidden}
+.btn-primary:after{content:'';position:absolute;inset:0;transform:translateX(-130%);background:linear-gradient(102deg,transparent 30%,#ffffff21 48%,transparent 70%);transition:transform .65s;pointer-events:none}
+.btn-primary:hover:after{transform:translateX(130%)}
+.v3-evidence-drop{position:relative;overflow:hidden}
+.v3-evidence-drop.dragover:after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 10%,#ff688314 50%,transparent 90%);animation:ems-selection-sweep 1s linear infinite;pointer-events:none}
+@keyframes ems-selection-sweep{0%{transform:translateX(-110%)}100%{transform:translateX(110%)}}
+.ems-update-hub .ems-update-track>span {transition:width .35s ease}
+.ems-connection-aura{position:absolute;inset:-6px;border:1px solid #5ae2a03b;border-radius:40px;animation:v3-online 2.1s ease-out infinite;pointer-events:none}
+html[data-motion="off"] .ems-ecg-moving,html[data-motion="off"] .ems-ecg-sensor{animation:none!important}
+@media (prefers-reduced-motion:reduce){.ems-ecg-moving,.ems-ecg-sensor{animation:none!important}}
