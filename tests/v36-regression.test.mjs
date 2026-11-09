@@ -30,3 +30,23 @@ test('cinematic motion retains reduced-motion option and stateful navigation',()
  const app=read('public/js/app.js');
  for(const view of ['renderHome','renderEvidence','renderShift','renderCareer','renderAcademy','renderProfile','renderPro','renderAdmin'])assert.ok(app.includes(view),view);
 });
+
+test('the original EMS cinematic art is the active home and login scene',()=>{
+ const css=read('public/styles/v3/cinematic36.css');
+ const scene=read('public/assets/ems-cinematic-hospital.svg');
+ assert.match(css,/url\('\/assets\/ems-cinematic-hospital\.svg'\)/);
+ assert.match(scene,/ГОСУДАРСТВЕННАЯ/);
+ assert.match(scene,/aria-label=/);
+ assert.doesNotMatch(css,/https?:\/\//);
+});
+test('first-run administrator creation cannot be called from subframes or other windows',()=>{
+ const main=read('desktop/main.cjs');
+ assert.match(main,/event\.sender!==mainWindow\.webContents/);
+ assert.match(main,/event\.senderFrame!==event\.sender\.mainFrame/);
+ assert.match(main,/pathToFileURL\(join\(__dirname,'setup\.html'\)\)/);
+});
+test('local static serving blocks symlinks escaping public directory',()=>{
+ const server=read('server/index.mjs');
+ assert.match(server,/fs\.realpathSync\(absolute\)/);
+ assert.match(server,/resolvedFile\.startsWith\(publicRealDir\+path\.sep\)/);
+});
