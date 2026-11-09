@@ -58,6 +58,20 @@ jobs:
           node launcher/create-release.cjs dist/win-unpacked "dist/EMS-COMMAND-App-$version-win-x64.zip"
       - name: Build launcher pinned to the persistent release public key
         run: npm run dist:launcher -- --publish never
+      - name: Block accidental publication of unreviewed plaintext source
+        shell: pwsh
+        env:
+          EMS_PUBLIC_BINARY_REVIEWED: ${{ vars.EMS_PUBLIC_BINARY_REVIEWED }}
+        run: |
+          $pkg = Get-Content package.json -Raw | ConvertFrom-Json
+          if (-not $pkg.build.asar -and $env:EMS_PUBLIC_BINARY_REVIEWED -ne 'true') {
+            throw 'Public release blocked: asar:false distributes readable JavaScript source. Review your app package, then explicitly approve client-code distribution using protected production variable EMS_PUBLIC_BINARY_REVIEWED=true.'
+          }
+          $paths = @('dist/win-unpacked/.git', 'dist/win-unpacked/.env', 'dist/win-unpacked/resources/app/.env', 'dist/win-unpacked/resources/app/tools/setup-portable-signing.cjs')
+          foreach ($candidate in $paths) {
+            if (Test-Path $candidate) { throw "Private/internal file present in Windows payload: $candidate" }
+          }
+          Write-Host 'Release source/privacy review gate passed; no private keys or source Git metadata intentionally included.'
       - name: Publish files to the public binary-only GitHub repository
         shell: pwsh
         env:
