@@ -48,7 +48,8 @@
       "!**/*.bat",
       "!**/*.ps1",
       "!**/capture*",
-      "!**/node_modules/.cache/**"
+      "!**/node_modules/.cache/**",
+      "!tools/setup-portable-signing.cjs"
     ],
     "extraMetadata": {
       "main": "desktop/main.cjs"
