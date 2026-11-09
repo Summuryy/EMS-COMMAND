@@ -3,7 +3,7 @@
 :root{--ems-spot:#ff7489;--ems-night:#080f19}
 .page{animation:ems36-page-enter .48s cubic-bezier(.2,.7,.2,1) both}
 @keyframes ems36-page-enter{from{opacity:.45;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.v3-home-hero{min-height:370px;background-position:calc(50% + var(--ems-scene-x, 0px)) calc(55% + var(--ems-scene-y, 0px));background-size:cover;contain:paint}
+.v3-home-hero{background-image:url('/assets/ems-cinematic-hospital.svg');min-height:370px;background-position:calc(50% + var(--ems-scene-x, 0px)) calc(55% + var(--ems-scene-y, 0px));background-size:cover;contain:paint}
 .v3-home-hero:before{
  background:linear-gradient(90deg,#07111dfc 0%,#081421e8 35%,#0b15289b 58%,#1015234d 100%),
  linear-gradient(0deg,#0a101dc9,transparent 54%);
@@ -47,3 +47,11 @@ html[data-motion=off] .page{animation:none!important}
 
 html[data-motion=off] .v3-home-hero{background-position:center 55%!important}
 @media(prefers-reduced-motion:reduce){.v3-home-hero{background-position:center 55%!important}}
+
+/* Consistent commissioned scene in login and desktop workspaces; no external network assets. */
+.auth-art{background-image:radial-gradient(circle at 25% 65%,#08101b88,transparent 66%),linear-gradient(90deg,#0a121bd4,#111829b8),url('/assets/ems-cinematic-hospital.svg')}
+.v3-home-hero{background-color:#101927;background-repeat:no-repeat;backface-visibility:hidden}
+.v3-home-hero:before{z-index:1}
+.v3-home-hero::after{z-index:2}
+.v3-home-hero .v3-hero-content,.v3-home-hero .v3-hero-data{z-index:3}
+@media(max-width:650px){.v3-home-hero{background-position:68% center}}
