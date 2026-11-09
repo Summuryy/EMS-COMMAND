@@ -147,3 +147,30 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# EMS COMMAND: secrets and local user data
+.env
+.env.*
+!.env.example
+var/*
+!var/.gitkeep
+*.sqlite
+*.sqlite3
+*.db
+*.db-wal
+*.db-shm
+captures/
+screenshots/
+uploads/
+desktop.log
+
+# Electron distribution artifacts
+dist/
+release/
+out/
+build/
+*.zip
+*.exe
+*.msi
+*.dmg
+*.AppImage
