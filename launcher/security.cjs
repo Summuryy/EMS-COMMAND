@@ -2,7 +2,7 @@
 const crypto=require('node:crypto');
 const path=require('node:path');
 const REPO='https://github.com/Summuryy/EMS-COMMAND-RELEASES/releases/download/';
-const VERSION=/^[0-9]+\.[0-9]+\.[0-9]+(?:-[a-zA-Z0-9.-]+)?$/;
+const VERSION=/^(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$/;
 const HEX=/^[a-f0-9]{64}$/;
 const MAX_FILES=12000,MAX_UNPACKED=3*1024**3,MAX_ARCHIVE=2*1024**3;
 function safeVersion(v){if(typeof v!=='string'||!VERSION.test(v)||v.length>80)throw Error('Invalid release version');return v;}
