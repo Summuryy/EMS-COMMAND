@@ -1,0 +1,43 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; img-src 'self'; base-uri 'none'; form-action 'none'; connect-src 'none'">
+<title>EMS COMMAND Launcher</title><style>
+:root{color-scheme:dark;font-family:Bahnschrift,'Segoe UI',sans-serif}*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#0a111d;color:#f4f6fa;overflow-x:hidden}
+body:before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 84% 12%,#c6385328,transparent 45%),linear-gradient(120deg,#121e2d,#09111c 70%);pointer-events:none}
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:100vh;position:relative}
+aside{border-right:1px solid #ffffff1b;padding:30px 20px;background:#101a28a8;display:flex;flex-direction:column;gap:26px}
+.brand{display:flex;align-items:center;gap:12px}.cross{width:47px;height:47px;border-radius:13px;background:linear-gradient(130deg,#fa7a8a,#c42d53);display:grid;place-items:center;font-size:30px;box-shadow:0 0 30px #ec486652}
+.brand strong{font-size:16px;letter-spacing:.07em}.brand small{display:block;color:#9facba;font-size:10px;margin-top:4px;letter-spacing:.13em}
+.nav{border:1px solid #ff7a974b;border-radius:12px;background:#e84a6322;color:#fff;padding:13px;font-weight:750}
+aside p{font-size:12px;color:#96a6b6;line-height:1.65;margin-top:auto}
+main{padding:35px clamp(24px,4vw,52px);max-width:1100px}
+.kicker{font-size:11px;color:#ff8398;letter-spacing:.17em;font-weight:900}
+h1{font-size:clamp(32px,4vw,51px);letter-spacing:-.04em;line-height:1.1;margin:13px 0 10px}
+.sub{color:#adbdcc;font-size:14px;line-height:1.6;max-width:520px}
+.hero{padding:26px 28px;border:1px solid #ffffff20;border-radius:17px;background:linear-gradient(120deg,#1e2b3b,#132031);position:relative;overflow:hidden;margin-top:24px}
+.hero:before{content:'';position:absolute;inset:0;opacity:.18;background:repeating-linear-gradient(120deg,transparent 0 33px,#ff99ac11 35px 36px);pointer-events:none}
+.hero>*{position:relative}h2{font-size:24px;margin:0 0 11px}.version{display:flex;flex-wrap:wrap;gap:9px;margin:14px 0;color:#bdcbd7;font-size:12px}
+.pill{border:1px solid #ffffff27;border-radius:99px;padding:7px 10px;background:#ffffff08}
+.progress{height:10px;overflow:hidden;background:#070f19;border-radius:20px;margin:18px 0 8px;border:1px solid #ffffff19}
+.progress span{display:block;background:linear-gradient(90deg,#cf375a,#ff8b9a);height:100%;width:0;transition:width .2s}
+#message{font-size:13px;color:#d6e0ec;min-height:22px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin:19px 0}
+button{font:750 13px Bahnschrift,'Segoe UI',sans-serif;padding:12px 16px;border-radius:10px;border:1px solid #ffffff27;background:#263344;color:#f5f6fa;cursor:pointer}
+button.primary{background:linear-gradient(115deg,#f36d81,#c93152);box-shadow:0 10px 28px #c83b5555;border-color:#f7a1aa55}
+button:hover:not(:disabled){filter:brightness(1.14)}button:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible{outline:2px solid #ffb5c4;outline-offset:3px}
+.note{font-size:12px;color:#98aab8;line-height:1.6}#error{color:#ffa6b1;white-space:pre-wrap;font-size:12px;min-height:18px}
+@media(max-width:760px){.layout{grid-template-columns:1fr}aside{padding:15px;gap:9px}.nav,aside p{display:none}main{padding:24px}.hero{padding:18px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style></head><body><div class="layout"><aside>
+<div class="brand"><div class="cross">✚</div><div><strong>EMS COMMAND</strong><small>LAUNCHER / RP</small></div></div>
+<div class="nav">Центр запуска</div><p>Ваши доказательства, смены и профиль хранятся отдельно от обновляемых файлов приложения.</p>
+</aside><main><div class="kicker">ГОСУДАРСТВЕННАЯ БОЛЬНИЦА · КУТУЗОВСКИЙ</div>
+<h1>Готов к смене.</h1><p class="sub">Проверяем актуальность EMS COMMAND, загружаем только проверенные версии и восстанавливаем файлы при повреждении.</p>
+<section class="hero"><h2>EMS COMMAND</h2><div class="version"><span class="pill" id="installed">Установлено: —</span><span class="pill" id="available">Доступно: —</span><span class="pill" id="trust">Проверка подписи: —</span></div>
+<div class="progress" role="progressbar" aria-label="Загрузка файлов" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="progress"></span></div>
+<p id="message" role="status">Подключение к локальной службе…</p>
+<div id="error" role="alert"></div>
+<div class="actions"><button id="launch" class="primary">▶ Запустить</button><button id="check">↻ Проверить обновления</button><button id="update">↓ Скачать / обновить</button><button id="repair">⛨ Проверить и восстановить</button><button id="rollback">Предыдущая версия</button></div>
+<div class="note">Загрузка выполняется только из официального канала после проверки цифровой подписи Ed25519 и SHA-256. Приложение не вмешивается в процесс GTA RP.</div>
+</section></main></div><script src="ui.js"></script></body></html>
