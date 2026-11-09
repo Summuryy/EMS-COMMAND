@@ -34,6 +34,6 @@ async function action(name){
  }catch(e){$('error').textContent=e.message;}
  finally{busy=false;await sync().catch(e=>{$('error').textContent=e.message;});}
 }
-window.emsLauncher.onProgress(showProgress);
+window.emsLauncher.onProgress(s=>{showProgress(s);if(['ready','checked','running'].includes(s.stage))sync().catch(()=>{});});
 for(const name of buttons)$(name).addEventListener('click',()=>action(name));
 sync().catch(e=>{$('error').textContent=e.message;});
