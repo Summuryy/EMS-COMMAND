@@ -1,0 +1,82 @@
+name: Portable EMS Launcher (Windows QA)
+on:
+  workflow_dispatch:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install app and launcher dependencies
+        shell: pwsh
+        run: |
+          npm install --no-audit --no-fund
+          npm --prefix launcher install --no-audit --no-fund
+      - name: Source and security tests
+        shell: pwsh
+        run: |
+          npm run check
+          npm test
+      - name: Build unpacked Electron application
+        run: npm run dist:dir
+      - name: Archive application payload (not an installer)
+        shell: pwsh
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $zip = "dist/EMS-COMMAND-App-$version-win-x64.zip"
+          Compress-Archive -Path 'dist/win-unpacked/*' -DestinationPath $zip -CompressionLevel Optimal
+          if (-not (Test-Path $zip)) { throw "Application ZIP not created" }
+      - name: Create ephemeral QA signature and verify release metadata
+        shell: pwsh
+        run: |
+          @'
+          const fs=require('fs'),crypto=require('crypto');
+          const keys=crypto.generateKeyPairSync('ed25519');
+          const priv=keys.privateKey.export({format:'pem',type:'pkcs8'});
+          const pub=keys.publicKey.export({format:'pem',type:'spki'});
+          fs.appendFileSync(process.env.GITHUB_ENV,'EMS_MANIFEST_SIGNING_KEY_PEM_B64='+Buffer.from(priv).toString('base64')+'\n');
+          fs.appendFileSync(process.env.GITHUB_ENV,'EMS_LAUNCHER_PUBLIC_KEY_PEM_B64='+Buffer.from(pub).toString('base64')+'\n');
+          '@ | node
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          node launcher/create-release.cjs dist/win-unpacked "dist/EMS-COMMAND-App-$version-win-x64.zip"
+          @'
+          const fs=require('fs');
+          const {verifyEnvelope}=require('./launcher/security.cjs');
+          const key=JSON.parse(fs.readFileSync('launcher/trust.json','utf8')).publicKeyPem;
+          const signed=JSON.parse(fs.readFileSync('dist/ems-manifest.json','utf8'));
+          verifyEnvelope(signed,key);
+          console.log('Signed QA metadata successfully verified');
+          '@ | node
+      - name: Build portable independent launcher
+        run: npm run dist:launcher -- --publish never
+      - name: Verify launcher executable and payload
+        shell: pwsh
+        run: |
+          $launcher = @(Get-ChildItem dist-launcher -Filter 'EMS-COMMAND-Launcher-*-win-x64.exe')
+          if ($launcher.Count -ne 1) { throw "Expected one launcher executable; found $($launcher.Count)" }
+          $stream = [System.IO.File]::OpenRead($launcher[0].FullName)
+          try { if ($stream.ReadByte() -ne 77 -or $stream.ReadByte() -ne 90) { throw 'Not a Windows PE launcher executable' } }
+          finally { $stream.Close() }
+          Get-ChildItem dist -Filter '*.zip' | ForEach-Object {
+            $digest = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()
+            "$digest  $($_.Name)" | Set-Content "dist/$($_.Name).sha256" -Encoding ascii
+          }
+          $digest = (Get-FileHash $launcher[0].FullName -Algorithm SHA256).Hash.ToLower()
+          "$digest  $($launcher[0].Name)" | Set-Content "dist-launcher/$($launcher[0].Name).sha256" -Encoding ascii
+      - name: Upload QA artifacts (ephemeral signing key; not production)
+        uses: actions/upload-artifact@v4
+        with:
+          name: EMS-COMMAND-PORTABLE-QA-NOT-FOR-RELEASE
+          path: |
+            dist-launcher/*.exe
+            dist-launcher/*.sha256
+            dist/*.zip
+            dist/*.sha256
+            dist/ems-manifest.json
+          if-no-files-found: error
+          retention-days: 14
