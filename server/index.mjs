@@ -27,7 +27,7 @@ const server=http.createServer(async(req,res)=>{
     const url=new URL(req.url,config.origin);
     if(url.pathname==='/api/health'){
       res.setHeader('Cache-Control','no-store');res.setHeader('Content-Type','application/json; charset=utf-8');
-      res.end(JSON.stringify({ok:true,version:'3.0.0',ocrAvailable,mode:config.host==='127.0.0.1'?'local':'server'}));return;
+      res.end(JSON.stringify({ok:true,version:'3.6.0',ocrAvailable,mode:config.host==='127.0.0.1'?'local':'server'}));return;
     }
     if(await api(req,res,url))return;
     if(req.method!=='GET'&&req.method!=='HEAD'){res.writeHead(405);res.end();return;}
@@ -56,7 +56,7 @@ server.keepAliveTimeout=5000;
 server.maxRequestsPerSocket=100;
 server.listen(config.port,config.host,()=>{
   const users=db.prepare('SELECT COUNT(*) AS n FROM users').get().n;
-  console.log(`\nEMS COMMAND v3.0 · ${config.origin}\nПользователей: ${users} | OCR: ${ocrAvailable?'доступен':'недоступен'}\n`);
+  console.log(`\nEMS COMMAND v3.6 · ${config.origin}\nПользователей: ${users} | OCR: ${ocrAvailable?'доступен':'недоступен'}\n`);
   if(!users)console.log('Сначала остановите сервер и запустите: npm run setup');
 });
 process.on('SIGINT',()=>server.close(()=>{db.close();process.exit(0);}));
