@@ -21,7 +21,7 @@ jobs:
       - name: Test
         run: npm test
       - name: Build installer (unsigned test artifact)
-        run: npm run dist:win
+        run: npm run dist:win -- --publish never
       - name: Verify updater metadata and installer hashes
         shell: pwsh
         run: |
