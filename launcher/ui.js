@@ -34,6 +34,16 @@ async function action(name){
  }catch(e){$('error').textContent=e.message;}
  finally{busy=false;await sync().catch(e=>{$('error').textContent=e.message;});}
 }
-window.emsLauncher.onProgress(s=>{showProgress(s);if(['ready','checked','running'].includes(s.stage))sync().catch(()=>{});});
-for(const name of buttons)$(name).addEventListener('click',()=>action(name));
-sync().catch(e=>{$('error').textContent=e.message;});
+function showFatal(detail){
+ $('message').textContent='Ошибка подключения к внутреннему процессу лаунчера';
+ $('error').textContent=detail;
+ buttons.forEach(id=>$(id).disabled=true);
+}
+buttons.forEach(id=>$(id).disabled=true);
+if(!window.emsLauncher||typeof window.emsLauncher.status!=='function'){
+ showFatal('Не загрузился защищённый мост Electron (preload.cjs). Закройте лаунчер, обновите ветку в GitHub Desktop и запустите снова. Если ошибка повторится, откройте DevTools (Ctrl+Shift+I) и пришлите текст из Console.');
+}else{
+ window.emsLauncher.onProgress(s=>{showProgress(s);if(['ready','checked','running'].includes(s.stage))sync().catch(e=>showFatal(e.message));});
+ for(const name of buttons)$(name).addEventListener('click',()=>action(name));
+ sync().then(()=>{$('message').textContent='Лаунчер готов. '+($('trust').textContent==='Канал не настроен'?'Канал обновлений ещё не настроен.':'Можно проверить обновления.');}).catch(e=>showFatal(e.message));
+}
