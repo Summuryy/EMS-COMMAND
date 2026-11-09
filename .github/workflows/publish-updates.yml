@@ -22,8 +22,8 @@ jobs:
           RELEASE_TOKEN: ${{ secrets.EMS_RELEASES_TOKEN }}
           SIGNING_CERT: ${{ secrets.CSC_LINK }}
           SIGNING_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-          RELEASE_REPO: ${{ vars.EMS_RELEASE_REPO }}
-          FEED: ${{ vars.EMS_UPDATE_FEED_URL }}
+          RELEASE_REPO: Summuryy/EMS-COMMAND-RELEASES
+          FEED: https://github.com/Summuryy/EMS-COMMAND-RELEASES/releases/latest/download/
           RELEASE_TAG: ${{ inputs.version }}
         run: |
           if (-not $env:RELEASE_TOKEN -or -not $env:SIGNING_CERT -or -not $env:SIGNING_PASSWORD) { throw 'Configure release token and Windows signing certificate secrets first.' }
@@ -39,7 +39,7 @@ jobs:
       - name: Configure installed updater
         shell: pwsh
         env:
-          EMS_UPDATE_FEED_URL: ${{ vars.EMS_UPDATE_FEED_URL }}
+          EMS_UPDATE_FEED_URL: https://github.com/Summuryy/EMS-COMMAND-RELEASES/releases/latest/download/
         run: |
           $config = @{ feedUrl=$env:EMS_UPDATE_FEED_URL; channel='stable' } | ConvertTo-Json
           Set-Content -Path desktop/release-config.json -Value $config -Encoding utf8
@@ -60,7 +60,7 @@ jobs:
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.EMS_RELEASES_TOKEN }}
-          EMS_RELEASE_REPO: ${{ vars.EMS_RELEASE_REPO }}
+          EMS_RELEASE_REPO: Summuryy/EMS-COMMAND-RELEASES
           RELEASE_TAG: ${{ inputs.version }}
         run: |
           $files = @(Get-ChildItem dist -File | Where-Object { $_.Extension -in '.exe','.yml','.blockmap' } | ForEach-Object FullName)
