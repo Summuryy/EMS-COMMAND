@@ -21,7 +21,23 @@ The source repository **Summuryy/EMS-COMMAND** is private. Its GitHub Actions te
 
 Do NOT commit signing keys, tokens or passwords, and do NOT put GitHub access tokens in the installer.
 
-**Current limitation:** A public releases repository and signing credentials have not been connected, so the test GitHub Actions installers are not automatically delivered. Workflows will not release anything without those prerequisites.
+**Current limitation:** The public releases repository is connected, but signing credentials are not configured, so the test GitHub Actions installers are not automatically delivered. Workflows will not release anything without those prerequisites.
 
 ## Motion diagnostics
 Open Profile → Animations and turn them ON. If Windows has reduced-motion accessibility preferences enabled, continuous ECG movement is intentionally disabled. The ECG should move in the sidebar and the launcher after installing v3.4.
+
+
+## Бесплатный тестовый цикл (без сертификата)
+
+**Важно:** неподписанный тестовый установщик не является доверенным стабильным обновлением. Не публикуйте его в публичный `latest`-канал и не отключайте проверку подписи в установленном лаунчере.
+
+1. Откройте **Actions → Windows installer (test build) → Run workflow** в приватном репозитории.
+2. Дождитесь зелёного статуса и скачайте `EMS-COMMAND-Windows-Installer-UNSIGNED` из **Artifacts**.
+3. CI проверяет `latest.yml`: SHA-512 и имя EXE должны совпасть с собранным установщиком. Также создаётся отдельный `.sha256` для ручной проверки.
+4. На отдельной тестовой Windows-машине (или в виртуальной машине) сравните SHA-256: `Get-FileHash .\\EMS-COMMAND-Setup-*.exe -Algorithm SHA256`. Сравните значение с файлом `.sha256`.
+5. Проверьте запуск и сохранение пользовательских данных, используя тестовый профиль. Тестовый установщик может показывать предупреждение Windows о неизвестном издателе.
+6. **Автоматическая установка из лаунчера пока не тестируется:** существующий `electron-updater` рассчитан на подписанный стабильный канал. Для испытания обновления без сертификата потребуется отдельная тестовая сборка с явным согласием пользователя и изолированным каналом, без отключения защит стабильного приложения.
+
+Публичный канал уже зафиксирован в workflow: `Summuryy/EMS-COMMAND-RELEASES`. Секрет `EMS_RELEASES_TOKEN` используется только в workflow публикации подписанного релиза. `CSC_LINK` и `CSC_KEY_PASSWORD` пока отсутствуют, поэтому стабильная публикация должна завершаться отказом.
+
+Нельзя считать SHA-256 подписью издателя: хеш проверяет целостность только относительно доверенного эталона.
