@@ -1,4 +1,5 @@
 {
   "feedUrl": "",
-  "note": "Only HTTPS public signed generic update feed. A private GitHub repository does not provide anonymous downloads."
+  "channel": "stable",
+  "note": "Gated public signed feed configured by publish-updates.yml build from EMS_UPDATE_FEED_URL Actions variable."
 }
