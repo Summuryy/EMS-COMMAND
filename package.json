@@ -1,9 +1,9 @@
 {
   "name": "ems-command-desktop",
-  "version": "3.4.0",
+  "version": "3.6.0",
   "private": true,
   "type": "module",
-  "description": "EMS COMMAND - live ECG and protected desktop update channel",
+  "description": "EMS COMMAND - cinematic desktop and controlled release updates",
   "main": "desktop/main.cjs",
   "engines": {
     "node": ">=22.13.0"
