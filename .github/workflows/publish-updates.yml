@@ -56,6 +56,10 @@ jobs:
         run: |
           if (-not (Test-Path dist/latest.yml)) { throw 'Missing updater metadata latest.yml' }
           if (-not (Get-ChildItem dist -Filter '*.exe')) { throw 'Missing Windows installer' }
+          Get-ChildItem dist -Filter '*.exe' | ForEach-Object {
+            $signature = Get-AuthenticodeSignature $_.FullName
+            if ($signature.Status -ne 'Valid') { throw "Windows executable is not signed with a trusted certificate: $($_.Name) ($($signature.Status))" }
+          }
       - name: Publish stable release
         shell: pwsh
         env:
