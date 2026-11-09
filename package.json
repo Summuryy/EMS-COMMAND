@@ -1,0 +1,87 @@
+{
+  "name": "ems-command-desktop",
+  "version": "3.2.0",
+  "private": true,
+  "type": "module",
+  "description": "EMS COMMAND — protected desktop hospital terminal and installer studio",
+  "main": "desktop/main.cjs",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "check": "node --check desktop/main.cjs && node --check server/index.mjs && node --check public/js/app.js && node --check public/js/motion.js && node --check public/js/views/home.js && node --check public/js/views/evidence.js && node --check public/js/views/shift.js && node --check public/js/views/career.js && node --check public/js/views/academy.js && node --check public/js/views/profile.js && node --check public/js/views/pro.js && node --check public/js/views/admin.js && node --check desktop/updates.cjs && node --check desktop/setup-preload.cjs && node --check public/js/updater-ui.js && node --check desktop/updates.cjs",
+    "test": "node --test tests/*.test.mjs",
+    "dist:win": "electron-builder --win nsis --x64",
+    "dist:dir": "electron-builder --dir --win --x64"
+  },
+  "devDependencies": {
+    "electron": "^38.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "productName": "EMS COMMAND",
+  "author": "EMS COMMAND Team",
+  "dependencies": {
+    "electron-updater": "^6.6.2"
+  },
+  "build": {
+    "appId": "ru.emscommand.desktop",
+    "productName": "EMS COMMAND",
+    "asar": false,
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "files": [
+      "desktop/**/*",
+      "server/**/*",
+      "public/**/*",
+      "tools/**/*",
+      "package.json",
+      "assets/**/*",
+      "!**/*.sqlite",
+      "!**/*.db",
+      "!**/*.log",
+      "!**/*.bat",
+      "!**/*.ps1",
+      "!**/capture*",
+      "!**/node_modules/.cache/**"
+    ],
+    "extraMetadata": {
+      "main": "desktop/main.cjs"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/ems-command.ico",
+      "artifactName": "EMS-COMMAND-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "EMS COMMAND",
+      "uninstallDisplayName": "EMS COMMAND",
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false,
+      "installerHeader": "assets/installerHeader.bmp",
+      "installerSidebar": "assets/installerSidebar.bmp",
+      "uninstallerSidebar": "assets/installerSidebar.bmp",
+      "installerIcon": "assets/ems-command.ico",
+      "uninstallerIcon": "assets/ems-command.ico",
+      "language": "1049",
+      "perMachine": false,
+      "allowElevation": true,
+      "warningsAsErrors": true
+    },
+    "publish": null
+  }
+}

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520">
+<defs>
+ <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#2b3642"/><stop offset="1" stop-color="#171e28"/></linearGradient>
+ <linearGradient id="glass" x2="0" y2="1"><stop stop-color="#74848e" stop-opacity=".5"/><stop offset="1" stop-color="#222d37" stop-opacity=".25"/></linearGradient>
+ <linearGradient id="road" x2="0" y2="1"><stop stop-color="#242d36"/><stop offset="1" stop-color="#111820"/></linearGradient>
+ <linearGradient id="facade" x2="0" y2="1"><stop stop-color="#79808a"/><stop offset="1" stop-color="#313941"/></linearGradient>
+ <filter id="blur"><feGaussianBlur stdDeviation="18"/></filter>
+</defs>
+<rect width="1200" height="520" fill="url(#sky)"/>
+<path d="M0 270 120 250 170 265 250 233 420 244 520 230 640 255 790 242 940 263 1070 239 1200 250V520H0Z" fill="#171e28"/>
+<path d="M0 348 1200 322V520H0Z" fill="url(#road)"/>
+<g opacity=".52" fill="#141b24"><rect x="28" y="154" width="83" height="194"/><rect x="130" y="191" width="80" height="151"/><rect x="1008" y="174" width="70" height="170"/><rect x="1097" y="115" width="84" height="228"/></g>
+<g transform="translate(390 42)"><rect x="70" y="55" width="608" height="295" rx="2" fill="url(#facade)"/><path d="M67 55h617v34H67z" fill="#a3a4a6"/><rect x="120" y="124" width="510" height="28" rx="3" fill="#333e49"/><text x="375" y="144" fill="#f2f2ef" font-family="Arial,sans-serif" font-weight="700" font-size="16" text-anchor="middle" letter-spacing="4">ГОСУДАРСТВЕННАЯ БОЛЬНИЦА</text><g fill="url(#glass)" stroke="#b6bec3" stroke-opacity=".35" stroke-width="3"><rect x="100" y="169" width="112" height="75"/><rect x="240" y="169" width="112" height="75"/><rect x="380" y="169" width="112" height="75"/><rect x="520" y="169" width="112" height="75"/><rect x="100" y="265" width="112" height="61"/><rect x="240" y="265" width="112" height="61"/><rect x="380" y="265" width="112" height="61"/><rect x="520" y="265" width="112" height="61"/></g><rect x="305" y="17" width="110" height="65" rx="8" fill="#f0eeeb"/><path d="M350 28h19v17h18v18h-18v16h-19V63h-18V45h18Z" fill="#d63743"/></g>
+<g opacity=".85" transform="translate(350 322)"><ellipse cx="165" cy="122" rx="225" ry="17" fill="#060b11" opacity=".8"/><rect x="20" y="55" width="317" height="85" rx="13" fill="#dedfe0"/><rect x="22" y="70" width="315" height="28" fill="#bb2839"/><rect x="201" y="55" width="110" height="42" fill="#2a3743"/><rect x="40" y="60" width="115" height="38" fill="#35454f"/><path d="M88 77h18v-14h12v14h18v12h-18v14h-12V89H88Z" fill="#f4f2ee"/><rect x="13" y="120" width="337" height="13" rx="4" fill="#aeb6be"/><g fill="#0d1219"><circle cx="78" cy="140" r="28"/><circle cx="272" cy="140" r="28"/></g><g fill="#76818d"><circle cx="78" cy="140" r="13"/><circle cx="272" cy="140" r="13"/></g><path d="M340 110h32l10 10v15h-42Z" fill="#e4e8e8"/></g>
+<path d="M0 454 1200 428" stroke="#bfc3bb" stroke-width="2" opacity=".22" stroke-dasharray="28 28"/>
+<circle cx="890" cy="245" r="55" fill="#d43f49" opacity=".15" filter="url(#blur)"/>
+</svg>

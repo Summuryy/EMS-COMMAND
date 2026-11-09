@@ -1,0 +1,7 @@
+.git
+.env
+var/*
+node_modules
+*.zip
+tests/
+**/.DS_Store

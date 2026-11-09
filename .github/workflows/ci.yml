@@ -1,37 +1,19 @@
-name: Verify EMS COMMAND
+name: EMS COMMAND checks
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-  workflow_dispatch:
-
 permissions:
   contents: read
-
 jobs:
-  verify:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Check application sources
-        id: sources
-        shell: bash
-        run: |
-          if [ -f package.json ]; then
-            echo "present=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "::warning::Application sources are not imported yet. CI tests cannot run."
-            echo "present=false" >> "$GITHUB_OUTPUT"
-          fi
-      - name: Set up Node.js
-        if: steps.sources.outputs.present == 'true'
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Run checks
-        if: steps.sources.outputs.present == 'true'
-        run: |
-          npm run check
-          npm test
+      - run: npm install --no-audit --no-fund
+      - run: npm run check
+      - run: npm test
