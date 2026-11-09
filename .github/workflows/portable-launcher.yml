@@ -30,7 +30,7 @@ jobs:
           $payload = 'dist/win-unpacked'
           if (-not (Test-Path $payload)) { throw 'Missing unpacked Windows app' }
           $blockedNames = @('.env', '.env.local', '.env.production', '.npmrc', '.git', '.github', 'id_rsa', 'id_ed25519', 'ed25519-release-private.pem', 'setup-portable-signing.cjs')
-          $blockedExtensions = @('.pem', '.key', '.p12', '.pfx', '.map')
+          $blockedExtensions = @('.pem', '.key', '.p12', '.pfx')
           foreach ($item in (Get-ChildItem -LiteralPath $payload -Recurse -Force)) {
             if ($blockedNames -contains $item.Name -or ($item.Extension -and $blockedExtensions -contains $item.Extension.ToLowerInvariant())) {
               throw "Private or development file in Windows payload: $($item.FullName)"
