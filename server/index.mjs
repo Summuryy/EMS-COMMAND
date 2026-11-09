@@ -7,6 +7,7 @@ import { db } from './db.mjs';
 import { api } from './api.mjs';
 import { resumePending } from './jobs.mjs';
 
+const publicRealDir=fs.realpathSync(config.publicDir);
 const extTypes={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8',
   '.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml',
   '.png':'image/png','.webp':'image/webp','.ico':'image/x-icon'};
@@ -40,11 +41,14 @@ const server=http.createServer(async(req,res)=>{
     if(!fs.existsSync(absolute)||!fs.statSync(absolute).isFile()){
       res.writeHead(404,{'Content-Type':'text/plain; charset=utf-8'});res.end('Не найдено');return;
     }
-    const ext=path.extname(absolute);
+    // Reject symlinks that escape the static asset directory.
+    const resolvedFile=fs.realpathSync(absolute);
+    if(!resolvedFile.startsWith(publicRealDir+path.sep)){res.writeHead(404);res.end();return;}
+    const ext=path.extname(resolvedFile);
     if(!extTypes[ext]){res.writeHead(403);res.end();return;}
     res.setHeader('Content-Type',extTypes[ext]);
     res.setHeader('Cache-Control',ext==='.html'?'no-store':'public,max-age=120');
-    fs.createReadStream(absolute).on('error',()=>res.destroy()).pipe(res);
+    fs.createReadStream(resolvedFile).on('error',()=>res.destroy()).pipe(res);
   }catch(e){
     console.error('[http]',e.message);
     if(!res.headersSent){res.writeHead(400);res.end('Некорректный запрос');}else res.destroy();
