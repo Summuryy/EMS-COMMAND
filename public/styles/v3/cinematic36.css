@@ -3,7 +3,7 @@
 :root{--ems-spot:#ff7489;--ems-night:#080f19}
 .page{animation:ems36-page-enter .48s cubic-bezier(.2,.7,.2,1) both}
 @keyframes ems36-page-enter{from{opacity:.45;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.v3-home-hero{min-height:370px;background-position:center 55%;background-size:cover;contain:paint}
+.v3-home-hero{min-height:370px;background-position:calc(50% + var(--ems-scene-x, 0px)) calc(55% + var(--ems-scene-y, 0px));background-size:cover;contain:paint}
 .v3-home-hero:before{
  background:linear-gradient(90deg,#07111dfc 0%,#081421e8 35%,#0b15289b 58%,#1015234d 100%),
  linear-gradient(0deg,#0a101dc9,transparent 54%);
@@ -44,3 +44,6 @@
 @media(max-width:650px){.v3-home-hero{min-height:380px}.v3-home-hero::after{opacity:.25}}
 html[data-motion=off] .page{animation:none!important}
 @media(prefers-reduced-motion:reduce){.page{animation:none!important}.v3-home-hero:before,.v3-home-hero:after,.v3-admin-banner:after,.v3-pro-hero:after,.v3-shift-hero:after{animation:none!important}}
+
+html[data-motion=off] .v3-home-hero{background-position:center 55%!important}
+@media(prefers-reduced-motion:reduce){.v3-home-hero{background-position:center 55%!important}}
