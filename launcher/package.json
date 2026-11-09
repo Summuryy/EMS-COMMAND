@@ -10,5 +10,9 @@
   },
   "devDependencies": {
     "electron": "^38.0.0"
+  },
+  "scripts": {
+    "start": "electron .",
+    "check": "node --check main.cjs && node --check preload.cjs && node --check core.cjs && node --check security.cjs && node --check ui.js && node --check create-release.cjs"
   }
 }
