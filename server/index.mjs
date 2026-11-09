@@ -24,6 +24,15 @@ if(!ocrAvailable)console.warn('OCR: Tesseract не найден. Скриншо�
 resumePending();
 const server=http.createServer(async(req,res)=>{
   for(const [name,value] of Object.entries(headers))res.setHeader(name,value);
+  // Reject DNS-rebinding / foreign-Host requests to the locally bound API.
+  if(['127.0.0.1','localhost','::1'].includes(config.host)){
+    const expectedHost=new URL(config.origin).host.toLowerCase();
+    if(typeof req.headers.host!=='string'||req.headers.host.toLowerCase()!==expectedHost){
+      res.writeHead(421,{'Cache-Control':'no-store','Content-Type':'text/plain; charset=utf-8'});
+      res.end('Недоверенный адрес запроса');
+      return;
+    }
+  }
   try{
     const url=new URL(req.url,config.origin);
     if(url.pathname==='/api/health'){
