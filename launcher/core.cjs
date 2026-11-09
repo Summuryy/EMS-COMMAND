@@ -6,7 +6,6 @@ const https=require('node:https');
 const crypto=require('node:crypto');
 const {spawn}=require('node:child_process');
 const {safeVersion,safeRel,verifyEnvelope,installedDir,validRedirect,MAX_ARCHIVE,MAX_UNPACKED}=require('./security.cjs');
-const {pipeline}=require('node:stream/promises');
 const MAX_MANIFEST=2*1024*1024;
 function getTrust(){return JSON.parse(fs.readFileSync(path.join(__dirname,'trust.json'),'utf8'));}
 function report(fn,stage,detail='',percent=0){fn?.({stage,detail,percent:Math.max(0,Math.min(100,Math.round(percent)))});}
@@ -27,7 +26,7 @@ async function request(url,{file,limit,progress,signal}={},depth=0){
          for await(const chunk of res){
            received+=chunk.length;
            if(received>limit)throw Error('Release file exceeds safety limit');
-           if(handle)await handle.write(chunk);
+           if(handle){let offset=0;while(offset<chunk.length){const result=await handle.write(chunk,offset,chunk.length-offset);if(result.bytesWritten<=0)throw Error('Failed to write update file');offset+=result.bytesWritten;}}
            else chunks.push(chunk);
            progress?.(received,Number(res.headers['content-length'])||0);
          }
@@ -55,7 +54,7 @@ async function saveState(base,data){
 }
 async function shaFile(p){
  const hash=crypto.createHash('sha256');
- await pipeline(fs.createReadStream(p),async function*(source){for await(const b of source){hash.update(b);yield b;}});
+ for await(const chunk of fs.createReadStream(p))hash.update(chunk);
  return hash.digest('hex');
 }
 async function walk(dir,root=dir,items=[]){
