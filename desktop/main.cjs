@@ -49,9 +49,9 @@ async function launchServer(){
 
 function runNode(script,input){return new Promise((resolve)=>{
  const proc=spawn(process.execPath,[join(root,script)],{cwd:root,env:{...engineEnv,ELECTRON_RUN_AS_NODE:'1'},windowsHide:true,stdio:['pipe','pipe','pipe']});
- let out='',err='';proc.stdout.on('data',x=>out+=x);proc.stderr.on('data',x=>err+=x);
+ let out='',err='';const timeout=setTimeout(()=>proc.kill(),20000);proc.stdout.on('data',x=>{out=(out+String(x)).slice(-8192);});proc.stderr.on('data',x=>{err=(err+String(x)).slice(-8192);});
  proc.on('error',e=>resolve({ok:false,error:e.message}));
- proc.on('close',code=>resolve({ok:code===0,out,error:err.slice(0,500)}));
+ proc.on('close',code=>{clearTimeout(timeout);resolve({ok:code===0,out,error:err.slice(0,500)});});
  proc.stdin.end(input||'');
  });}
 async function start(){
@@ -72,7 +72,7 @@ async function start(){
  }else await launchServer();
 }
 ipcMain.handle('ems:create-admin',async(event,data)=>{
- if(!settingUp || !event.senderFrame.url.startsWith('file:') || !event.senderFrame.url.endsWith('/desktop/setup.html'))return {ok:false,error:'Доступ запрещён'};
+ if(!settingUp || !mainWindow || event.sender!==mainWindow.webContents || event.senderFrame!==event.sender.mainFrame || event.senderFrame.url!==require('node:url').pathToFileURL(join(__dirname,'setup.html')).href)return {ok:false,error:'Доступ запрещён'};
  settingUp=false;
  const result=await runNode('tools/bootstrap-admin.mjs',JSON.stringify({username:data?.username,displayName:data?.displayName,password:data?.password}));
  if(!result.ok){settingUp=true;return {ok:false,error:result.error||'Ошибка создания пользователя'};}
