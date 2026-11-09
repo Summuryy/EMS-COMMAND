@@ -44,6 +44,9 @@ jobs:
         run: |
           $config = @{ feedUrl=$env:EMS_UPDATE_FEED_URL; channel='stable' } | ConvertTo-Json
           Set-Content -Path desktop/release-config.json -Value $config -Encoding utf8
+          $pkg = Get-Content package.json -Raw | ConvertFrom-Json
+          $pkg.build.publish = @(@{provider='generic';url=$env:EMS_UPDATE_FEED_URL})
+          $pkg | ConvertTo-Json -Depth 32 | Set-Content package.json -Encoding utf8
       - name: Build signed Windows installer
         env:
           CSC_LINK: ${{ secrets.CSC_LINK }}
