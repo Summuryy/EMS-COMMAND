@@ -10,7 +10,6 @@ permissions:
   contents: read
 jobs:
   publish:
-    if: ${{ vars.EMS_UPDATE_FEED_URL != '' && vars.EMS_RELEASE_REPO != '' }}
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
