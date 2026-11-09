@@ -38,7 +38,6 @@ async function start(){
  window.webContents.setWindowOpenHandler(()=>({action:'deny'}));
  window.webContents.on('will-navigate',(e,url)=>{if(url!==page)e.preventDefault();});
  window.webContents.on('will-redirect',(e,url)=>{if(url!==page)e.preventDefault();});
- await window.loadFile(join(__dirname,'index.html'));
  manager=new LauncherManager(join(app.getPath('userData'),'managed'),progress);
  await manager.init();
  const allowed=e=>e.sender===window?.webContents&&e.senderFrame===e.sender.mainFrame&&e.senderFrame.url===page;
@@ -51,6 +50,7 @@ async function start(){
  handle('repair',()=>run('repair',()=>manager.update({repair:true})));
  handle('launch',()=>run('launch',()=>manager.launch()));
  handle('rollback',()=>run('rollback',()=>manager.rollback()));
+ await window.loadFile(join(__dirname,'index.html'));
  if((await prefs()).autoUpdate!==false&&manager.trust.publicKeyPem){
    setTimeout(()=>{run('auto-update',async()=>{
      const result=await manager.check();
