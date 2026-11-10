@@ -1,0 +1,57 @@
+/* EMS COMMAND v3.6 / Cinematic motion layer.
+   CSS-composited effects; no fake telemetry or artificial screenshot statistics. */
+:root{--ems-spot:#ff7489;--ems-night:#080f19}
+.page{animation:ems36-page-enter .48s cubic-bezier(.2,.7,.2,1) both}
+@keyframes ems36-page-enter{from{opacity:.45;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.v3-home-hero{background-image:url('/assets/ems-cinematic-hospital.svg');min-height:370px;background-position:calc(50% + var(--ems-scene-x, 0px)) calc(55% + var(--ems-scene-y, 0px));background-size:cover;contain:paint}
+.v3-home-hero:before{
+ background:linear-gradient(90deg,#07111dfc 0%,#081421e8 35%,#0b15289b 58%,#1015234d 100%),
+ linear-gradient(0deg,#0a101dc9,transparent 54%);
+ animation:ems36-lightfall 11s ease-in-out infinite alternate;
+}
+@keyframes ems36-lightfall{from{opacity:.94}to{opacity:.67}}
+.v3-home-hero .v3-hero-content{z-index:4}
+.v3-home-hero .v3-hero-data{z-index:4}
+.v3-home-hero::after{
+ content:'';position:absolute;inset:-35%;width:auto;height:auto;border:none;border-radius:0;right:auto;top:auto;
+ box-shadow:none;background:linear-gradient(108deg,transparent 34%,#e72e4b06 44%,#ef4e7835 49%,#67a7ff1b 55%,transparent 67%);
+ transform:translate3d(-45%,0,0) rotate(-3deg);
+ animation:ems36-beacon-sweep 8s cubic-bezier(.5,0,.5,1) infinite;
+ mix-blend-mode:screen;opacity:.6;z-index:1;pointer-events:none;
+}
+@keyframes ems36-beacon-sweep{0%,100%{transform:translate3d(-55%,0,0) rotate(-3deg);opacity:.2}45%,60%{transform:translate3d(45%,0,0) rotate(-3deg);opacity:.9}}
+.v3-home-hero .v3-hud-label{letter-spacing:.19em;text-shadow:0 0 22px #ff7c9977}
+.v3-home-hero h1{text-shadow:0 4px 25px #03080f,0 12px 55px #03080f}
+.v3-home-hero .v3-hero-actions .btn-primary{box-shadow:0 0 0 1px #ffb5c230,0 15px 42px #e2396869}
+.v3-number-card,.panel,.v3-id-card{transition:transform .28s cubic-bezier(.2,.7,.2,1),border-color .28s,box-shadow .28s}
+.v3-number-card:hover,.panel.v3-card-lift:hover{transform:translateY(-4px);border-color:#f57c9c60;box-shadow:0 20px 56px #0007}
+.v3-number-card:before{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 25%,#fff1 48%,transparent 65%);transform:translateX(-125%);pointer-events:none}
+.v3-number-card:hover:before{animation:ems36-card-sheen .8s ease-out both}
+@keyframes ems36-card-sheen{to{transform:translateX(125%)}}
+.v3-admin-banner,.v3-pro-hero,.v3-shift-hero{position:relative;isolation:isolate}
+.v3-admin-banner:after,.v3-pro-hero:after,.v3-shift-hero:after{
+ content:'';position:absolute;inset:0;pointer-events:none;z-index:-1;
+ background:radial-gradient(circle at 76% 35%,#e8466521,transparent 45%);
+ animation:ems36-ambient 7s ease-in-out infinite alternate
+}
+@keyframes ems36-ambient{from{opacity:.35}to{opacity:1}}
+.ems-ecg-moving{animation-duration:2.45s}
+.v3-online-ring:after{animation-duration:1.55s}
+.ems-update-orbit.is-running{box-shadow:0 0 38px #ef416785,0 0 0 8px #ef41670f}
+.ems-update-track>span{box-shadow:0 0 16px #ec577888}
+.ems-update-version{background:radial-gradient(circle at 50% 52%,#a6345140,transparent 67%),linear-gradient(125deg,#1d2734,#10151f)}
+.btn:focus-visible,.nav-link:focus-visible,.v3-text-action:focus-visible{outline:2px solid #ffa5b8;outline-offset:3px}
+@media(max-width:650px){.v3-home-hero{min-height:380px}.v3-home-hero::after{opacity:.25}}
+html[data-motion=off] .page{animation:none!important}
+@media(prefers-reduced-motion:reduce){.page{animation:none!important}.v3-home-hero:before,.v3-home-hero:after,.v3-admin-banner:after,.v3-pro-hero:after,.v3-shift-hero:after{animation:none!important}}
+
+html[data-motion=off] .v3-home-hero{background-position:center 55%!important}
+@media(prefers-reduced-motion:reduce){.v3-home-hero{background-position:center 55%!important}}
+
+/* Consistent commissioned scene in login and desktop workspaces; no external network assets. */
+.auth-art{background-image:radial-gradient(circle at 25% 65%,#08101b88,transparent 66%),linear-gradient(90deg,#0a121bd4,#111829b8),url('/assets/ems-cinematic-hospital.svg')}
+.v3-home-hero{background-color:#101927;background-repeat:no-repeat;backface-visibility:hidden}
+.v3-home-hero:before{z-index:1}
+.v3-home-hero::after{z-index:2}
+.v3-home-hero .v3-hero-content,.v3-home-hero .v3-hero-data{z-index:3}
+@media(max-width:650px){.v3-home-hero{background-position:68% center}}

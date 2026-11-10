@@ -1,0 +1,22 @@
+appId: ru.emscommand.launcher
+productName: EMS COMMAND Launcher
+asar: true
+directories:
+  output: ../dist-launcher
+  buildResources: ../assets
+files:
+  - main.cjs
+  - preload.cjs
+  - core.cjs
+  - security.cjs
+  - index.html
+  - ui.js
+  - trust.json
+  - package.json
+  - node_modules/**/*
+win:
+  target:
+    - target: portable
+      arch: [x64]
+  icon: ../assets/ems-command.ico
+  artifactName: EMS-COMMAND-Launcher-${version}-win-x64.${ext}

@@ -11,7 +11,7 @@ import {renderAcademy} from './views/academy.js';
 import {renderProfile} from './views/profile.js';
 import {renderAdmin} from './views/admin.js';
 import {renderPro} from './views/pro.js';
-import {applyMotion,setMotionPreference} from './motion.js';
+import {applyMotion,setMotionPreference,installCinematicPointer} from './motion.js';
 import {ecg} from './views/visual.js';
 const $=sel=>document.querySelector(sel);
 const state={user:null,page:'home',filter:'all',dashboard:null,evidence:null,shifts:null,career:null,charter:[],charterSearch:'',queue:[],admin:{},adminTab:'reviews',inviteCode:null,mobile:false,notices:[],authMode:'login',busy:false,health:null,motionEnabled:localStorage.getItem('ems-motion-enabled')!=='false'};
@@ -134,4 +134,5 @@ window.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();if(e.ctrl
 let lastNotices=null;
 setInterval(async()=>{if(!state.user)return;try{const r=await request('/api/notices');const items=r.items||[];const newer=lastNotices===null?[]:items.filter(n=>!n.read_at&&!lastNotices.has(n.id));lastNotices=new Set(items.map(n=>n.id));state.notices=items;for(const n of newer.slice(0,2))toast(n.title,n.message);const bell=document.querySelector('[data-action=notices]');if(bell&&items.some(n=>!n.read_at)&&!bell.querySelector('.icon-count'))bell.insertAdjacentHTML('beforeend','<span class="icon-count"></span>');}catch{}},20000);
 setInterval(()=>{const el=$('#shift-clock');const shift=state.shifts?.shifts?.find(x=>!x.end_at);if(el&&shift)el.textContent=duration(shift.start_at);const home=$('#home-shift-clock');if(home&&state.dashboard?.shift&&!state.dashboard.shift.end_at)home.textContent=duration(state.dashboard.shift.start_at);},1000);
+installCinematicPointer();
 (async function start(){try{state.health=await request('/api/health');const r=await request('/api/auth/me');state.user=r.user;setCsrf(r.csrf);if(state.user){await refreshPage();if(state.user.mustChangePassword)toast('Обнови пароль','Пароль необходимо сменить в профиле.');}else render();}catch(e){render();toast('Не удалось связаться с сервером',e.message,true);}})();

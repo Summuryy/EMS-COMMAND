@@ -14,9 +14,9 @@ function log(line){
 }
 function error(title,details){log(title+': '+details);dialog.showErrorBox(title, String(details)+'\n\nЛог: '+join(app.getPath('userData'),'logs','desktop.log'));}
 function freePort(){return new Promise((resolve,reject)=>{const s=net.createServer();s.once('error',reject);s.listen(0,'127.0.0.1',()=>{const port=s.address().port;s.close(()=>resolve(port));});});}
-function health(port){return new Promise(resolve=>{const req=http.get({host:'127.0.0.1',port,path:'/api/health',timeout:1200},res=>{let txt='';res.on('data',c=>txt+=c);res.on('end',()=>{try{resolve(res.statusCode===200&&JSON.parse(txt).ok===true);}catch{resolve(false);}});});req.on('error',()=>resolve(false));req.on('timeout',()=>{req.destroy();resolve(false);});});}
+function health(port,token){return new Promise(resolve=>{const req=http.get({host:'127.0.0.1',port,path:'/__ems/ready',timeout:1200,headers:{'X-EMS-Health-Token':token}},res=>{let txt='';res.on('data',c=>txt+=c);res.on('end',()=>{try{resolve(res.statusCode===200&&JSON.parse(txt).ok===true);}catch{resolve(false);}});});req.on('error',()=>resolve(false));req.on('timeout',()=>{req.destroy();resolve(false);});});}
 function splash(){
- mainWindow=new BrowserWindow({width:1320,height:860,minWidth:960,minHeight:640,backgroundColor:'#10151c',title:'EMS COMMAND v3 — Госбольница',autoHideMenuBar:true,show:false,webPreferences:{sandbox:true,contextIsolation:true,nodeIntegration:false,webSecurity:true,webviewTag:false,preload:join(__dirname,'setup-preload.cjs')}});
+ mainWindow=new BrowserWindow({width:1320,height:860,minWidth:960,minHeight:640,backgroundColor:'#10151c',title:'EMS COMMAND v3.6 — Госбольница RP',autoHideMenuBar:true,show:false,webPreferences:{sandbox:true,contextIsolation:true,nodeIntegration:false,webSecurity:true,webviewTag:false,preload:join(__dirname,'setup-preload.cjs')}});
  mainWindow.removeMenu();
  mainWindow.once('ready-to-show',()=>mainWindow.show());
  mainWindow.loadFile(join(__dirname,'splash.html'));
@@ -28,7 +28,8 @@ function splash(){
 async function launchServer(){
  try{
   activePort=await freePort();
-  const env={...engineEnv,EMS_PORT:String(activePort),EMS_HOST:'127.0.0.1',EMS_ORIGIN:`http://127.0.0.1:${activePort}`};
+  const healthToken=crypto.randomBytes(32).toString('hex');
+  const env={...engineEnv,EMS_PORT:String(activePort),EMS_HOST:'127.0.0.1',EMS_ORIGIN:`http://127.0.0.1:${activePort}`,EMS_HEALTH_TOKEN:healthToken};
   backend=spawn(process.execPath,[join(root,'server','index.mjs')],{cwd:root,env:{...env,ELECTRON_RUN_AS_NODE:'1'},stdio:['ignore','pipe','pipe'],windowsHide:true});
   backend.stdout.on('data',x=>log('server: '+String(x).trim()));
   backend.stderr.on('data',x=>log('server error: '+String(x).trim()));
@@ -37,7 +38,7 @@ async function launchServer(){
   let ready=false;
   for(let i=0;i<100;i++){
     if(!backend||backend.exitCode!==null)break;
-    if(await health(activePort)){ready=true;break;}
+    if(await health(activePort,healthToken)){ready=true;break;}
     await new Promise(r=>setTimeout(r,180));
   }
   if(!ready)throw Error('Локальный сервер не ответил. Проверьте desktop.log.');
@@ -49,9 +50,9 @@ async function launchServer(){
 
 function runNode(script,input){return new Promise((resolve)=>{
  const proc=spawn(process.execPath,[join(root,script)],{cwd:root,env:{...engineEnv,ELECTRON_RUN_AS_NODE:'1'},windowsHide:true,stdio:['pipe','pipe','pipe']});
- let out='',err='';proc.stdout.on('data',x=>out+=x);proc.stderr.on('data',x=>err+=x);
+ let out='',err='';const timeout=setTimeout(()=>proc.kill(),20000);proc.stdout.on('data',x=>{out=(out+String(x)).slice(-8192);});proc.stderr.on('data',x=>{err=(err+String(x)).slice(-8192);});
  proc.on('error',e=>resolve({ok:false,error:e.message}));
- proc.on('close',code=>resolve({ok:code===0,out,error:err.slice(0,500)}));
+ proc.on('close',code=>{clearTimeout(timeout);resolve({ok:code===0,out,error:err.slice(0,500)});});
  proc.stdin.end(input||'');
  });}
 async function start(){
@@ -63,7 +64,7 @@ async function start(){
  root=join(__dirname,'..');dataDir=join(app.getPath('userData'),'database');mkdirSync(dataDir,{recursive:true});
  engineEnv={...process.env,EMS_DATA_DIR:dataDir};
  splash();
- initUpdates(()=>mainWindow,log);
+ initUpdates(()=>mainWindow,log,(url)=>{try{const parsed=new URL(url);return parsed.protocol==='http:'&&parsed.hostname==='127.0.0.1'&&parsed.port===String(activePort)&&parsed.pathname==='/';}catch{return false;}});
  const has=await runNode('tools/has-admin.mjs');
  if(!has.ok){error('Ошибка базы данных',has.error);app.quit();return;}
  if(has.out.trim()!=='YES'){
@@ -72,7 +73,7 @@ async function start(){
  }else await launchServer();
 }
 ipcMain.handle('ems:create-admin',async(event,data)=>{
- if(!settingUp || !event.senderFrame.url.startsWith('file:') || !event.senderFrame.url.endsWith('/desktop/setup.html'))return {ok:false,error:'Доступ запрещён'};
+ if(!settingUp || !mainWindow || event.sender!==mainWindow.webContents || event.senderFrame!==event.sender.mainFrame || event.senderFrame.url!==require('node:url').pathToFileURL(join(__dirname,'setup.html')).href)return {ok:false,error:'Доступ запрещён'};
  settingUp=false;
  const result=await runNode('tools/bootstrap-admin.mjs',JSON.stringify({username:data?.username,displayName:data?.displayName,password:data?.password}));
  if(!result.ok){settingUp=true;return {ok:false,error:result.error||'Ошибка создания пользователя'};}

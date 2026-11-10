@@ -7,6 +7,7 @@ import { db } from './db.mjs';
 import { api } from './api.mjs';
 import { resumePending } from './jobs.mjs';
 
+const publicRealDir=fs.realpathSync(config.publicDir);
 const extTypes={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8',
   '.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml',
   '.png':'image/png','.webp':'image/webp','.ico':'image/x-icon'};
@@ -23,11 +24,30 @@ if(!ocrAvailable)console.warn('OCR: Tesseract не найден. Скриншо�
 resumePending();
 const server=http.createServer(async(req,res)=>{
   for(const [name,value] of Object.entries(headers))res.setHeader(name,value);
+  // Reject DNS-rebinding / foreign-Host requests to the locally bound API.
+  if(['127.0.0.1','localhost','::1'].includes(config.host)){
+    const expectedHost=new URL(config.origin).host.toLowerCase();
+    if(typeof req.headers.host!=='string'||req.headers.host.toLowerCase()!==expectedHost){
+      res.writeHead(421,{'Cache-Control':'no-store','Content-Type':'text/plain; charset=utf-8'});
+      res.end('Недоверенный адрес запроса');
+      return;
+    }
+  }
   try{
     const url=new URL(req.url,config.origin);
+    // Desktop launcher readiness check uses a per-launch secret, not a forgeable public /api/health response.
+    if(url.pathname==='/__ems/ready'){
+      const expected=process.env.EMS_HEALTH_TOKEN;
+      if(!expected||req.headers['x-ems-health-token']!==expected){
+        res.writeHead(403,{'Cache-Control':'no-store'});res.end();return;
+      }
+      res.setHeader('Cache-Control','no-store');
+      res.setHeader('Content-Type','application/json; charset=utf-8');
+      res.end(JSON.stringify({ok:true}));return;
+    }
     if(url.pathname==='/api/health'){
       res.setHeader('Cache-Control','no-store');res.setHeader('Content-Type','application/json; charset=utf-8');
-      res.end(JSON.stringify({ok:true,version:'3.0.0',ocrAvailable,mode:config.host==='127.0.0.1'?'local':'server'}));return;
+      res.end(JSON.stringify({ok:true,version:'3.6.0',ocrAvailable,mode:config.host==='127.0.0.1'?'local':'server'}));return;
     }
     if(await api(req,res,url))return;
     if(req.method!=='GET'&&req.method!=='HEAD'){res.writeHead(405);res.end();return;}
@@ -40,11 +60,14 @@ const server=http.createServer(async(req,res)=>{
     if(!fs.existsSync(absolute)||!fs.statSync(absolute).isFile()){
       res.writeHead(404,{'Content-Type':'text/plain; charset=utf-8'});res.end('Не найдено');return;
     }
-    const ext=path.extname(absolute);
+    // Reject symlinks that escape the static asset directory.
+    const resolvedFile=fs.realpathSync(absolute);
+    if(!resolvedFile.startsWith(publicRealDir+path.sep)){res.writeHead(404);res.end();return;}
+    const ext=path.extname(resolvedFile);
     if(!extTypes[ext]){res.writeHead(403);res.end();return;}
     res.setHeader('Content-Type',extTypes[ext]);
     res.setHeader('Cache-Control',ext==='.html'?'no-store':'public,max-age=120');
-    fs.createReadStream(absolute).on('error',()=>res.destroy()).pipe(res);
+    fs.createReadStream(resolvedFile).on('error',()=>res.destroy()).pipe(res);
   }catch(e){
     console.error('[http]',e.message);
     if(!res.headersSent){res.writeHead(400);res.end('Некорректный запрос');}else res.destroy();
@@ -56,7 +79,7 @@ server.keepAliveTimeout=5000;
 server.maxRequestsPerSocket=100;
 server.listen(config.port,config.host,()=>{
   const users=db.prepare('SELECT COUNT(*) AS n FROM users').get().n;
-  console.log(`\nEMS COMMAND v3.0 · ${config.origin}\nПользователей: ${users} | OCR: ${ocrAvailable?'доступен':'недоступен'}\n`);
+  console.log(`\nEMS COMMAND v3.6 · ${config.origin}\nПользователей: ${users} | OCR: ${ocrAvailable?'доступен':'недоступен'}\n`);
   if(!users)console.log('Сначала остановите сервер и запустите: npm run setup');
 });
 process.on('SIGINT',()=>server.close(()=>{db.close();process.exit(0);}));
