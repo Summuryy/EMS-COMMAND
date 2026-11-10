@@ -187,8 +187,15 @@ class LauncherManager{
    const child=spawn(binary,[],{cwd:dir,windowsHide:false,stdio:'ignore',detached:false,env:{...process.env,EMS_MANAGED_BY_LAUNCHER:'1'}});
    this.child=child;
    return new Promise((resolve,reject)=>{
-     child.once('error',reject);
-     child.once('spawn',()=>{child.once('exit',()=>{if(this.child===child)this.child=null;});report(this.progress,'running','EMS COMMAND запущен',100);resolve({running:true,version:state.current});});
+     child.once('error',err=>{if(this.child===child)this.child=null;reject(err);});
+     child.once('spawn',()=>{
+       child.once('exit',(code,signal)=>{
+         if(this.child===child)this.child=null;
+         report(this.progress,'stopped',code===0||code===null?'Рабочее приложение закрыто. Можно снова запустить EMS COMMAND.':'EMS COMMAND завершился с кодом '+code,0);
+       });
+       report(this.progress,'running','EMS COMMAND запущен',100);
+       resolve({running:true,version:state.current});
+     });
    });
  }
  async rollback(){
