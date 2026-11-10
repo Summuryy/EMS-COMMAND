@@ -2,6 +2,27 @@
 const {app,ipcMain,dialog}=require('electron');
 const {join}=require('node:path');
 const {readFileSync}=require('node:fs');
+const https=require('node:https');
+const crypto=require('node:crypto');
+const MANIFEST_URL='https://github.com/Summuryy/EMS-COMMAND-RELEASES/releases/latest/download/ems-manifest.json';
+function getSignedManifest(url=MANIFEST_URL,depth=0){
+ if(depth>5) return Promise.reject(Error('Слишком много перенаправлений'));
+ const u=new URL(url);
+ if(u.protocol!=='https:'||!['github.com','release-assets.githubusercontent.com','objects.githubusercontent.com'].includes(u.hostname)||u.username||u.password)return Promise.reject(Error('Недоверенный адрес релиза'));
+ return new Promise((resolve,reject)=>{
+  const req=https.get(url,{timeout:15000,headers:{'User-Agent':'EMS-COMMAND/3.7','Accept':'application/json'}},res=>{
+   if([301,302,303,307,308].includes(res.statusCode)){const next=new URL(res.headers.location||'',url).href;res.resume();getSignedManifest(next,depth+1).then(resolve,reject);return;}
+   if(res.statusCode!==200){res.resume();reject(Error('Сервер обновлений: HTTP '+res.statusCode));return;}
+   let size=0,parts=[];
+   res.on('data',chunk=>{size+=chunk.length;if(size>2*1024*1024){req.destroy(Error('Слишком большой манифест'));return;}parts.push(chunk);});
+   res.on('end',()=>{try{resolve(JSON.parse(Buffer.concat(parts).toString('utf8')));}catch(e){reject(e);}});
+   res.on('error',reject);
+  });
+  req.on('timeout',()=>req.destroy(Error('Тайм-аут проверки обновлений')));req.on('error',reject);
+ });
+}
+function newer(a,b){const x=a.split('.').map(Number),y=b.split('.').map(Number);for(let i=0;i<3;i++)if(x[i]!==y[i])return x[i]>y[i];return false;}
+
 
 let updater=null;
 let state={status:'unconfigured',percent:0,message:'Канал обновлений не настроен.'};
@@ -35,8 +56,23 @@ function initUpdates(getWindow,log,isTrustedSender=()=>false){
   };
   let feed='';
   try{const cfg=JSON.parse(readFileSync(join(__dirname,'release-config.json'),'utf8'));feed=cfg.feedUrl||'';}catch{}
-  if(process.env.EMS_MANAGED_BY_LAUNCHER==='1'){
-    set('managed','Обновления EMS COMMAND устанавливаются отдельным EMS Launcher. Откройте лаунчер для проверки и восстановления файлов.');
+  const managed=process.env.EMS_MANAGED_BY_LAUNCHER==='1';
+  const managedPublicKey=managed?Buffer.from(process.env.EMS_LAUNCHER_PUBLIC_KEY_PEM_B64||'','base64').toString('utf8'):'';
+  const checkManaged=async()=>{
+    if(!managedPublicKey.includes('BEGIN PUBLIC KEY'))throw Error('Ключ проверки лаунчера отсутствует. Запустите приложение через новый EMS Launcher.');
+    const envelope=await getSignedManifest();
+    const bytes=Buffer.from(JSON.stringify(envelope.manifest),'utf8');
+    const signature=Buffer.from(envelope.signature||'','base64');
+    const key=crypto.createPublicKey(managedPublicKey);
+    if(key.asymmetricKeyType!=='ed25519'||signature.length!==64||!crypto.verify(null,bytes,key,signature))throw Error('Цифровая подпись обновления не прошла проверку');
+    const version=envelope.manifest?.version;
+    if(!/^\d+\.\d+\.\d+$/.test(version)||envelope.manifest.platform!=='win32-x64'||envelope.manifest.url!==`https://github.com/Summuryy/EMS-COMMAND-RELEASES/releases/download/v${version}/EMS-COMMAND-App-${version}-win-x64.zip`)throw Error('Неверный манифест релиза');
+    latestVersion=version;
+    set(newer(version,app.getVersion())?'managed-available':'current',newer(version,app.getVersion())?'Доступна версия '+version+'. Закройте приложение и установите её через EMS Launcher.':'Установлена последняя версия. Проверка Ed25519 пройдена.',0);
+    return snapshot();
+  };
+  if(managed){
+    set('managed','Проверка релизов доступна внутри приложения. Установка и восстановление выполняются через EMS Launcher.');
   }else if(!app.isPackaged){
     set('dev','Проверка обновлений доступна только в установленной Windows-версии.');
   }else if(!isTrustedFeed(feed)){
@@ -62,6 +98,7 @@ function initUpdates(getWindow,log,isTrustedSender=()=>false){
   }
   ipcMain.handle('ems:updates:status',guard(async()=>snapshot()));
   ipcMain.handle('ems:updates:check',guard(async()=>{
+    if(managed){set('checking','Проверяем подпись официального релиза…',0);return checkManaged();}
     if(!updater)return snapshot();
     if(['checking','downloading','ready'].includes(state.status))return snapshot();
     set('checking','Проверяем HTTPS-канал обновлений…',0);
