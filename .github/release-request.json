@@ -1,7 +1,7 @@
 {
-  "version": "3.7.1",
+  "version": "3.7.2",
   "approvePublicClientCode": true,
   "distribution": "public-binary-only",
-  "note": "EMS COMMAND 3.7.1: signed in-app update checks and dark Windows titlebar",
-  "attempt": 2
+  "note": "EMS COMMAND 3.7.2 cinematic motion preview; launcher-managed test update",
+  "attempt": 3
 }
