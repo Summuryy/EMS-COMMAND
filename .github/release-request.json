@@ -1,7 +1,7 @@
 {
-  "version": "3.7.0",
+  "version": "3.7.1",
   "approvePublicClientCode": true,
   "distribution": "public-binary-only",
-  "note": "Approved unified permanent launcher 1.1.0 + signed EMS COMMAND app 3.7.0 production release",
-  "attempt": 1
+  "note": "EMS COMMAND 3.7.1: signed in-app update checks and dark Windows titlebar",
+  "attempt": 2
 }
