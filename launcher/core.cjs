@@ -108,12 +108,21 @@ class LauncherManager{
  async init(){await Promise.all(['versions','records','staging','quarantine'].map(x=>fsp.mkdir(path.join(this.base,x),{recursive:true})));}
  async status(){
    const state=await readState(this.base);
-   return {current:state.current,previous:state.previous,available:this.latest?.manifest?.version||null,updateAvailable:!!this.latest?.manifest?.version&&(!state.current||compareVersions(this.latest.manifest.version,state.current)>0),configured:!!this.trust.publicKeyPem,appRunning:!!this.child&&this.child.exitCode===null,busy:this.busy};
+   return {current:state.current,previous:state.previous,available:this.latest?.manifest?.version||null,canInstall:!!this.latest?.manifest?.version,updateAvailable:!!this.latest?.manifest?.version&&(!state.current||compareVersions(this.latest.manifest.version,state.current)>0),configured:!!this.trust.publicKeyPem,appRunning:!!this.child&&this.child.exitCode===null,busy:this.busy};
  }
  async check(){
    if(!this.trust.publicKeyPem)throw Error('Ключ доверия не настроен. Публикация релизов пока недоступна.');
    report(this.progress,'checking','Проверяем подписанный манифест…');
-   const bytes=await request(this.trust.manifestUrl,{limit:MAX_MANIFEST});
+   let bytes;
+   try{
+     bytes=await request(this.trust.manifestUrl,{limit:MAX_MANIFEST});
+   }catch(err){
+     if(/Release server HTTP 404/.test(String(err.message))){
+       report(this.progress,'unavailable','Первый официальный выпуск EMS COMMAND ещё не опубликован.',0);
+       throw Error('Официальный выпуск ещё не опубликован. Установка станет доступна после публикации подписанного релиза.');
+     }
+     throw err;
+   }
    const envelope=JSON.parse(bytes.toString('utf8'));
    const manifest=verifyEnvelope(envelope,this.trust.publicKeyPem);
    const state=await readState(this.base);
