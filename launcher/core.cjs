@@ -184,7 +184,7 @@ class LauncherManager{
    report(this.progress,'verifying','Проверяем установленную версию…',0);
    await verifyFiles(dir,manifest,this.progress);
    const binary=path.join(dir,manifest.entry);
-   const child=spawn(binary,[],{cwd:dir,windowsHide:false,stdio:'ignore',detached:false,env:{...process.env,EMS_MANAGED_BY_LAUNCHER:'1'}});
+   const child=spawn(binary,[],{cwd:dir,windowsHide:false,stdio:'ignore',detached:false,env:{...process.env,EMS_MANAGED_BY_LAUNCHER:'1',EMS_LAUNCHER_PUBLIC_KEY_PEM_B64:Buffer.from(this.trust.publicKeyPem||'','utf8').toString('base64'),EMS_LAUNCHER_MANIFEST_URL:this.trust.manifestUrl}});
    this.child=child;
    return new Promise((resolve,reject)=>{
      child.once('error',err=>{if(this.child===child)this.child=null;reject(err);});
