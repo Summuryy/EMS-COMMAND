@@ -54,12 +54,7 @@ async function start(){
  handle('launch',()=>run('launch',()=>manager.launch()));
  handle('rollback',()=>run('rollback',()=>manager.rollback()));
  await window.loadFile(join(__dirname,'index.html'));
- if((await prefs()).autoUpdate!==false&&manager.trust.publicKeyPem){
-   setTimeout(()=>{run('auto-update',async()=>{
-     const result=await manager.check();
-     if(result.newer)progress({stage:'available',detail:'Доступна версия '+result.version+'. Рекомендуем обновиться.',percent:0});
-   }).catch(()=>{});},2000);
- }
+
 }
 app.whenReady().then(start).catch(e=>{dialog.showErrorBox('Ошибка лаунчера',String(e.message||e));app.quit();});
 app.on('window-all-closed',()=>app.quit());
