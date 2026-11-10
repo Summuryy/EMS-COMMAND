@@ -1,0 +1,6 @@
+{
+  "version": "3.6.0",
+  "approvePublicClientCode": true,
+  "distribution": "public-binary-only",
+  "note": "First production EMS COMMAND portable launcher release; inspectable Electron application code approved for distribution, no private repository history or secret keys."
+}
