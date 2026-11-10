@@ -55,3 +55,37 @@ html[data-motion=off] .v3-home-hero{background-position:center 55%!important}
 .v3-home-hero::after{z-index:2}
 .v3-home-hero .v3-hero-content,.v3-home-hero .v3-hero-data{z-index:3}
 @media(max-width:650px){.v3-home-hero{background-position:68% center}}
+
+
+/* 3.7.2 — live command center: purposeful, GPU-friendly interactions. */
+@keyframes ems372-ripple{0%{opacity:.36;transform:scale(.12)}65%{opacity:.14}100%{opacity:0;transform:scale(1)}}
+@keyframes ems372-nav-enter{from{opacity:0;transform:translate3d(-10px,0,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes ems372-status-breathe{0%,100%{filter:drop-shadow(0 0 1px #65dca470)}50%{filter:drop-shadow(0 0 9px #65dca4a0)}}
+@keyframes ems372-border-sweep{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes ems372-login-orbit{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes ems372-toast-enter{from{opacity:0;transform:translate3d(22px,0,0) scale(.97)}to{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+@keyframes ems372-progress-sheen{from{background-position:180% 0}to{background-position:-180% 0}}
+.btn,.nav-link,.v3-number-card,.v3-card-lift{position:relative}
+.btn,.nav-link{overflow:hidden}
+.ems-tap-ripple{position:absolute;z-index:5;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#ffe7eea6 0%,#ff81906b 38%,transparent 72%);transform:scale(.12);animation:ems372-ripple .62s cubic-bezier(.12,.55,.35,1) both}
+.v3-number-card,.v3-id-card,.v3-card-lift{--ems-pointer-x:50%;--ems-pointer-y:50%}
+.v3-number-card::after,.v3-id-card::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;background:radial-gradient(260px circle at var(--ems-pointer-x) var(--ems-pointer-y),#ff9fb11d,transparent 78%);transition:opacity .28s ease;z-index:1}
+.v3-number-card:hover::after,.v3-id-card:hover::before{opacity:1}
+.v3-reveal{transition-delay:var(--ems-stagger,0ms)}
+.nav-link{transition:background-color .22s ease,border-color .22s ease,color .22s ease,transform .22s ease}
+.nav-link:hover:not(:disabled){transform:translate3d(4px,0,0)}
+.nav-link.active{animation:ems372-nav-enter .3s cubic-bezier(.18,.78,.2,1) both}
+.online-pill:not(.disconnected) .v3-online-ring{animation:ems372-status-breathe 2.8s ease-in-out infinite}
+.auth-visual .core-orbit:first-child{animation:ems372-login-orbit 24s linear infinite}
+.auth-visual .core-orbit:nth-child(2){animation:ems372-login-orbit 32s linear infinite reverse}
+.v3-toast{animation:ems372-toast-enter .4s cubic-bezier(.16,.85,.25,1) both}
+.ems-update-track>span,.v3-meter>span{background-size:220% 100%;background-image:linear-gradient(100deg,#d63e61,#ff9cad,#e74e72,#d63e61)}
+.ems-update-hub .ems-update-orbit.is-running{animation:v3-breathe 2.2s ease-in-out infinite}
+.ems-update-hub .ems-update-track>span{animation:ems372-progress-sheen 3.2s linear infinite}
+.v3-home-hero{transition:background-position .18s ease-out}
+.v3-home-hero .v3-hero-content{animation:ems36-page-enter .6s cubic-bezier(.18,.78,.2,1) both}
+.ems-motion-paused *, .ems-motion-paused *::before,.ems-motion-paused *::after{animation-play-state:paused!important}
+html[data-motion="off"] .ems-tap-ripple{display:none!important}
+html[data-motion="off"] .v3-number-card::after,html[data-motion="off"] .v3-id-card::before{display:none!important}
+html[data-motion="off"] .nav-link.active{animation:none!important}
+@media(prefers-reduced-motion:reduce){.ems-tap-ripple{display:none!important}.v3-number-card::after,.v3-id-card::before{display:none!important}.nav-link.active,.v3-toast,.auth-visual .core-orbit{animation:none!important}.nav-link:hover:not(:disabled){transform:none!important}}
