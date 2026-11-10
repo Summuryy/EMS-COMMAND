@@ -1,5 +1,9 @@
 name: Publish signed portable EMS COMMAND
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/release-request.json'
   workflow_dispatch:
     inputs:
       version:
@@ -31,6 +35,12 @@ jobs:
         run: |
           if (-not $env:GH_TOKEN -or -not $env:EMS_MANIFEST_SIGNING_KEY_PEM_B64 -or -not $env:EMS_LAUNCHER_PUBLIC_KEY_PEM_B64) {
             throw 'Production release requires EMS_RELEASES_TOKEN, EMS_MANIFEST_SIGNING_KEY_PEM_B64 and EMS_LAUNCHER_PUBLIC_KEY_PEM_B64'
+          }
+          if ($env:GITHUB_REF -ne 'refs/heads/main') { throw 'Production publishing is allowed only from main' }
+          if ($env:GITHUB_EVENT_NAME -eq 'push') {
+            $request = Get-Content '.github/release-request.json' -Raw | ConvertFrom-Json
+            if ($request.approvePublicClientCode -ne $true) { throw 'Publication request must explicitly approve client code distribution' }
+            $env:REQUESTED_VERSION = [string]$request.version
           }
           $pkg = Get-Content package.json -Raw | ConvertFrom-Json
           if ($env:REQUESTED_VERSION -ne $pkg.version) { throw 'Requested version must equal package.json version' }
@@ -67,7 +77,12 @@ jobs:
         env:
           EMS_PUBLIC_BINARY_APPROVED: ${{ inputs.acknowledge_public_client_code }}
         run: |
-          if ($env:EMS_PUBLIC_BINARY_APPROVED -ne 'true') {
+          $approved = ($env:EMS_PUBLIC_BINARY_APPROVED -eq 'true')
+          if ($env:GITHUB_EVENT_NAME -eq 'push') {
+            $request = Get-Content '.github/release-request.json' -Raw | ConvertFrom-Json
+            $approved = ($request.approvePublicClientCode -eq $true)
+          }
+          if (-not $approved) {
             throw 'Public release blocked: explicit approval of inspectable Electron client-code distribution is required.'
           }
           $payload = 'dist/win-unpacked'
