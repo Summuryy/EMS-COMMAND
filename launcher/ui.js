@@ -8,6 +8,7 @@ function showProgress(s){
  $('progress').style.width=percent+'%';
  document.querySelector('[role="progressbar"]').setAttribute('aria-valuenow',String(percent));
  if(s.stage==='error')$('error').textContent=s.detail;
+ if(s.stage==='available')$('update').classList.add('primary');
 }
 async function sync(){
  const r=await window.emsLauncher.status();
@@ -30,7 +31,7 @@ async function action(name){
    const r=await window.emsLauncher[name]();
    if(!r.ok)throw Error(r.error||'Неизвестная ошибка');
    if(name==='check'&&r.result?.newer)$('message').textContent='Доступна новая версия '+r.result.version;
-   if(name==='check'&&!r.result?.newer)$('message').textContent='Обновления не требуются';
+   if(name==='check'&&!r.result?.newer)$('message').textContent='Обновлений нет. Установлена последняя доступная версия.';
  }catch(e){$('error').textContent=e.message;}
  finally{busy=false;await sync().catch(e=>{$('error').textContent=e.message;});}
 }
@@ -40,6 +41,9 @@ function showFatal(detail){
  buttons.forEach(id=>$(id).disabled=true);
 }
 buttons.forEach(id=>$(id).disabled=true);
+for(const [id,action] of [['win-min','minimize'],['win-max','maximize'],['win-close','close']]){
+ $(id).addEventListener('click',()=>window.emsLauncher?.[action]?.());
+}
 if(!window.emsLauncher||typeof window.emsLauncher.status!=='function'){
  showFatal('Не загрузился защищённый мост Electron (preload.cjs). Закройте лаунчер, обновите ветку в GitHub Desktop и запустите снова. Если ошибка повторится, откройте DevTools (Ctrl+Shift+I) и пришлите текст из Console.');
 }else{
