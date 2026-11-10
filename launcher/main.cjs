@@ -55,6 +55,7 @@ async function start(){
  handle('update',()=>run('update',()=>manager.update()));
  handle('repair',()=>run('repair',()=>manager.update({repair:true})));
  handle('launch',()=>run('launch',async()=>{
+   process.env.EMS_LAUNCHER_EXE=process.execPath;
    const result=await manager.launch();
    if(window&&!window.isDestroyed())window.hide();
    return result;
