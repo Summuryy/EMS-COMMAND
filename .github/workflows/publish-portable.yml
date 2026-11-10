@@ -6,6 +6,10 @@ on:
         description: 'Version from package.json, e.g. 3.6.0'
         required: true
         type: string
+      acknowledge_public_client_code:
+        description: 'I approve distributing inspectable Electron client code (never private source repo, tokens, or signing keys)'
+        required: true
+        type: boolean
 permissions:
   contents: read
 jobs:
@@ -61,11 +65,10 @@ jobs:
       - name: Block accidental publication of unreviewed plaintext source
         shell: pwsh
         env:
-          EMS_PUBLIC_BINARY_REVIEWED: ${{ vars.EMS_PUBLIC_BINARY_REVIEWED }}
+          EMS_PUBLIC_BINARY_APPROVED: ${{ inputs.acknowledge_public_client_code }}
         run: |
-          $pkg = Get-Content package.json -Raw | ConvertFrom-Json
-          if ($env:EMS_PUBLIC_BINARY_REVIEWED -ne 'true') {
-            throw 'Public release blocked: a portable Electron package contains inspectable client code, with or without ASAR. After reviewing the exact public payload, explicitly approve distribution using protected production variable EMS_PUBLIC_BINARY_REVIEWED=true.'
+          if ($env:EMS_PUBLIC_BINARY_APPROVED -ne 'true') {
+            throw 'Public release blocked: explicit approval of inspectable Electron client-code distribution is required.'
           }
           $payload = 'dist/win-unpacked'
           if (-not (Test-Path $payload)) { throw 'Windows payload directory missing' }
