@@ -4,7 +4,9 @@
 
 The original Electron EMS COMMAND application (evidence, shift, rank, academy, profile, PRO, administration) is unchanged in its core business workflows. The new `launcher/` project is an **independent Windows executable** built via electron-builder's **portable** target. It is not an NSIS wizard installer.
 
-On startup, the launcher automatically checks for a signed release. If a newer signed version is available, it downloads the app ZIP, validates its SHA-256, checks all extracted files against a signed inventory, installs to an immutable version directory, then switches an atomic `state.json` pointer. The launcher UI exposes **Check**, **Update**, **Repair**, **Launch**, and **Rollback**, with live download and verification progress.
+On startup, the launcher checks for an available signed release and **offers an update without downloading it automatically**. When the user chooses installation, it downloads the app ZIP, validates its SHA-256, checks all extracted files against a signed inventory, installs to a version directory, then atomically switches the `state.json` pointer. The launcher UI exposes **Check**, **Update**, **Repair**, **Launch**, and **Rollback**, with live download and verification progress.
+
+When the work application starts, the launcher window is hidden; it reappears when the application closes. This is **one distributed launcher EXE and one visible window at a time**, not a single-process executable: a separate Electron application is downloaded and started under the hood. This release does not yet embed the whole EMS COMMAND application in the launcher binary. An empty release channel is reported clearly; it is never incorrectly classified as 'up to date'.
 
 ### Local storage
 
@@ -29,7 +31,7 @@ On startup, the launcher automatically checks for a signed release. If a newer s
 2. Create a separate **public, binary-only** repository `Summuryy/EMS-COMMAND-RELEASES`. Do not push source code, user data or credentials there.
 3. Generate one Ed25519 private/public key pair **locally**, store an offline backup, and never rotate it without a deliberate trusted launcher transition. Convert each PEM to base64 (including PEM headers and newlines).
 4. In the private source repo, configure GitHub Actions **secret** `EMS_MANIFEST_SIGNING_KEY_PEM_B64` (private PEM base64), **variable** `EMS_LAUNCHER_PUBLIC_KEY_PEM_B64` (public PEM base64), and **secret** `EMS_RELEASES_TOKEN` (minimum privilege to create releases in the public binary repository).
-5. Protect the `production` GitHub Actions environment with reviewer approval/branch restrictions. Use the workflow **Publish signed portable EMS COMMAND** with version equal to `package.json`. The workflow checks the public binary-only repo, builds the app ZIP, signs the inventory, pins the public key in the launcher, builds the launcher, and publishes all artifacts to GitHub Releases.
+5. Protect the `production` GitHub Actions environment with reviewer approval/branch restrictions. Use the workflow **Publish signed portable EMS COMMAND** with version equal to `package.json` and explicitly approve the `acknowledge_public_client_code` input after reviewing what goes into the distributed Windows package. The workflow checks the public binary-only repo, builds the app ZIP, signs the inventory, pins the public key in the launcher, builds the launcher, and publishes all artifacts to GitHub Releases.
 6. Download the released `EMS-COMMAND-Launcher-...exe` **once**; future versions of EMS COMMAND are downloaded from Releases by the launcher. No NSIS installation wizard is needed.
 
 **Important:** The regular Pull Request QA workflow intentionally creates a **fresh ephemeral key** solely for validation; its builds are marked `QA-NOT-FOR-RELEASE` and **must not be distributed as a production updater**. The launcher included in such an artifact will not trust later production releases unless built with the permanent public key.
@@ -46,7 +48,7 @@ On startup, the launcher automatically checks for a signed release. If a newer s
 ## Acceptance criteria
 
 - Windows CI checks Node source, unit tests, payload ZIP extraction, exact file hashes, portable launcher packaging, and PE executable header.
-- A person must still run the resulting portable launcher **on Windows**, check first installation, interrupted download/retry, update while the app is open, corrupted file repair, rollback, and compatibility with existing user data.
+- A person must still run the resulting portable launcher **on Windows**, check first installation, interrupted download/retry, updates while the app is open, corrupted file repair, rollback, and compatibility with existing user data. Successful CI alone does not prove first-run installation from a public release.
 - Until the public release repo, protected key and production pipeline have been configured and tested, do not describe live updates as operational.
 
 ## Limitations
@@ -73,3 +75,7 @@ The **public binary-only** repository `Summuryy/EMS-COMMAND-RELEASES` already ex
 **Key boundary:** a long-lived Ed25519 identity is a free application-level update integrity mechanism, **not** a paid Windows Authenticode certificate. Users can still see Windows SmartScreen warnings. The launcher binary itself does not yet self-update and needs manual replacement for launcher releases.
 
 **Security note:** a successful GitHub Actions run proves build and file-integrity tests. It does **not** prove GUI launch, crash recovery, end-user usability, or release delivery from the public channel. Test these on a disposable Windows machine before making a production release.
+
+## First release (production only)
+
+After PR #2 and its parent PR #1 have been reviewed, merged into `main`, and QA succeeds, trigger `.github/workflows/publish-portable.yml` from `main` with version `3.6.0` and `acknowledge_public_client_code=true` **only after inspecting the public Windows payload**. This approval is per release and is separate from GitHub Environment secrets. The workflow blocks .env and private-key artifacts and publishes exactly a portable launcher, app ZIP and Ed25519 signed manifest. Use the released launcher EXE, **never** the QA-NOT-FOR-RELEASE artifact. The launcher itself must be replaced manually when its own executable is updated.
