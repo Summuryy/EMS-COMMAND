@@ -28,8 +28,8 @@ async function start(){
  session.defaultSession.setPermissionRequestHandler((_w,_p,callback)=>callback(false));
  session.defaultSession.setPermissionCheckHandler(()=>false);
  window=new BrowserWindow({
-   width:960,height:650,minWidth:730,minHeight:500,backgroundColor:'#0b121f',
-   title:'EMS COMMAND Launcher',autoHideMenuBar:true,show:false,
+   width:1060,height:720,minWidth:800,minHeight:560,backgroundColor:'#0b121f',
+   title:'EMS COMMAND',frame:false,autoHideMenuBar:true,show:false,
    webPreferences:{contextIsolation:true,sandbox:true,nodeIntegration:false,webSecurity:true,webviewTag:false,
      preload:join(__dirname,'preload.cjs')}
  });
@@ -44,6 +44,9 @@ async function start(){
  function handle(action,fn){
    ipcMain.handle('launcher:'+action,async e=>allowed(e)?fn():{ok:false,error:'Недоверенный IPC вызов'});
  }
+ handle('window-minimize',async()=>{window.minimize();return {ok:true};});
+ handle('window-maximize',async()=>{window.isMaximized()?window.unmaximize():window.maximize();return {ok:true};});
+ handle('window-close',async()=>{window.close();return {ok:true};});
  handle('status',async()=>({ok:true,result:{...await manager.status(),autoUpdate:(await prefs()).autoUpdate!==false}}));
  handle('check',()=>run('check',()=>manager.check()));
  handle('update',()=>run('update',()=>manager.update()));
@@ -54,7 +57,7 @@ async function start(){
  if((await prefs()).autoUpdate!==false&&manager.trust.publicKeyPem){
    setTimeout(()=>{run('auto-update',async()=>{
      const result=await manager.check();
-     if(result.newer)await manager.update();
+     if(result.newer)progress({stage:'available',detail:'Доступна версия '+result.version+'. Рекомендуем обновиться.',percent:0});
    }).catch(()=>{});},2000);
  }
 }
