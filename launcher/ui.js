@@ -2,6 +2,7 @@
 const $=id=>document.getElementById(id);
 const buttons=['launch','check','update','repair','rollback'];
 let busy=false;
+let lastStatus=null;
 function showProgress(s){
  $('message').textContent=s.detail||'';
  const percent=Math.max(0,Math.min(100,Number(s.percent)||0));
@@ -14,6 +15,7 @@ async function sync(){
  const r=await window.emsLauncher.status();
  if(!r.ok)throw Error(r.error);
  const s=r.result;
+ lastStatus=s;
  $('installed').textContent='Установлено: '+(s.current||'не установлено');
  $('available').textContent='Доступно: '+(s.available||'—');
  $('trust').textContent=s.configured?'Подпись: Ed25519':'Канал не настроен';
@@ -21,20 +23,30 @@ async function sync(){
  $('update').disabled=busy||!s.configured||!s.canInstall||!s.updateAvailable||s.appRunning;
  $('update').textContent=s.current?(s.updateAvailable?'↓ Обновить до '+s.available:'✓ Последняя версия'):'↓ Установить приложение';
  $('update').classList.toggle('primary',!!s.updateAvailable);
+ if(!s.current&&s.canInstall&&!busy){$('message').textContent='EMS COMMAND ещё не установлен. Нажмите «Установить приложение», чтобы загрузить необходимые файлы.';}
+ else if(s.updateAvailable&&!busy){$('message').textContent='Доступна новая версия '+s.available+'. Установите её прямо здесь, без скачивания нового лаунчера.';}
  $('check').disabled=busy||!s.configured;
  $('repair').disabled=busy||!s.current||s.appRunning;
  $('rollback').disabled=busy||!s.previous||s.appRunning;
 }
 async function action(name){
  if(busy)return;
+ if(name==='update'){
+   const s=lastStatus;
+   if(!s?.canInstall)return;
+   const prompt=s.current?'Доступна версия '+s.available+'. Скачать и установить обновление EMS COMMAND?':'EMS COMMAND не установлен. Скачать необходимые файлы и установить версию '+s.available+'?';
+   if(!window.confirm(prompt))return;
+ }
+ if(name==='repair'&&!window.confirm('Проверить все файлы EMS COMMAND и при необходимости загрузить повреждённые или отсутствующие файлы?'))return;
  busy=true;$('error').textContent='';
  buttons.forEach(id=>$(id).disabled=true);
  try{
    const r=await window.emsLauncher[name]();
    if(!r.ok)throw Error(r.error||'Неизвестная ошибка');
+   if(name==='launch')$('message').textContent='EMS COMMAND запущен.';
    if(name==='check'&&r.result?.newer)$('message').textContent='Доступна версия '+r.result.version+'. Рекомендуем обновиться.';
    if(name==='check'&&!r.result?.newer)$('message').textContent='Обновлений нет. Установлена последняя доступная версия.';
- }catch(e){$('message').textContent=name==='check'?'Не удалось проверить обновления':'Не удалось выполнить операцию';$('error').textContent=e.message;}
+ }catch(e){$('message').textContent=name==='check'?'Не удалось проверить обновления':name==='launch'?'Не удалось запустить EMS COMMAND. Попробуйте «Проверить и восстановить».':'Не удалось выполнить операцию';$('error').textContent=e.message;}
  finally{busy=false;await sync().catch(e=>{$('error').textContent=e.message;});}
 }
 function showFatal(detail){

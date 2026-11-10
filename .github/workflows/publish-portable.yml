@@ -30,7 +30,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.EMS_RELEASES_TOKEN }}
           EMS_MANIFEST_SIGNING_KEY_PEM_B64: ${{ secrets.EMS_MANIFEST_SIGNING_KEY_PEM_B64 }}
-          EMS_LAUNCHER_PUBLIC_KEY_PEM_B64: ${{ vars.EMS_LAUNCHER_PUBLIC_KEY_PEM_B64 }}
+          EMS_LAUNCHER_PUBLIC_KEY_PEM_B64: ${{ secrets.EMS_LAUNCHER_PUBLIC_KEY_PEM_B64 }}
           REQUESTED_VERSION: ${{ inputs.version }}
         run: |
           if (-not $env:GH_TOKEN -or -not $env:EMS_MANIFEST_SIGNING_KEY_PEM_B64 -or -not $env:EMS_LAUNCHER_PUBLIC_KEY_PEM_B64) {
@@ -68,7 +68,7 @@ jobs:
         shell: pwsh
         env:
           EMS_MANIFEST_SIGNING_KEY_PEM_B64: ${{ secrets.EMS_MANIFEST_SIGNING_KEY_PEM_B64 }}
-          EMS_LAUNCHER_PUBLIC_KEY_PEM_B64: ${{ vars.EMS_LAUNCHER_PUBLIC_KEY_PEM_B64 }}
+          EMS_LAUNCHER_PUBLIC_KEY_PEM_B64: ${{ secrets.EMS_LAUNCHER_PUBLIC_KEY_PEM_B64 }}
         run: |
           $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
           node launcher/create-release.cjs dist/win-unpacked "dist/EMS-COMMAND-App-$version-win-x64.zip"
