@@ -16,7 +16,7 @@ function error(title,details){log(title+': '+details);dialog.showErrorBox(title,
 function freePort(){return new Promise((resolve,reject)=>{const s=net.createServer();s.once('error',reject);s.listen(0,'127.0.0.1',()=>{const port=s.address().port;s.close(()=>resolve(port));});});}
 function health(port,token){return new Promise(resolve=>{const req=http.get({host:'127.0.0.1',port,path:'/__ems/ready',timeout:1200,headers:{'X-EMS-Health-Token':token}},res=>{let txt='';res.on('data',c=>txt+=c);res.on('end',()=>{try{resolve(res.statusCode===200&&JSON.parse(txt).ok===true);}catch{resolve(false);}});});req.on('error',()=>resolve(false));req.on('timeout',()=>{req.destroy();resolve(false);});});}
 function splash(){
- mainWindow=new BrowserWindow({width:1320,height:860,minWidth:960,minHeight:640,backgroundColor:'#10151c',title:'EMS COMMAND v3.6 — Госбольница RP',autoHideMenuBar:true,show:false,webPreferences:{sandbox:true,contextIsolation:true,nodeIntegration:false,webSecurity:true,webviewTag:false,preload:join(__dirname,'setup-preload.cjs')}});
+ mainWindow=new BrowserWindow({width:1320,height:860,minWidth:960,minHeight:640,backgroundColor:'#10151c',title:'EMS COMMAND — Госбольница RP',titleBarStyle:'hidden',titleBarOverlay:{color:'#10151c',symbolColor:'#e6edf5',height:36},autoHideMenuBar:true,show:false,webPreferences:{sandbox:true,contextIsolation:true,nodeIntegration:false,webSecurity:true,webviewTag:false,preload:join(__dirname,'setup-preload.cjs')}});
  mainWindow.removeMenu();
  mainWindow.once('ready-to-show',()=>mainWindow.show());
  mainWindow.loadFile(join(__dirname,'splash.html'));
