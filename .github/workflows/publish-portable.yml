@@ -46,8 +46,10 @@ jobs:
           if ($env:REQUESTED_VERSION -ne $pkg.version) { throw 'Requested version must equal package.json version' }
           $private = gh api repos/Summuryy/EMS-COMMAND-RELEASES --jq '.private'
           if ($LASTEXITCODE -ne 0 -or "$private".Trim() -ne 'false') { throw 'Separate EMS-COMMAND-RELEASES repository must exist and be public' }
-          gh release view "v$($pkg.version)" --repo Summuryy/EMS-COMMAND-RELEASES 2>$null
-          if ($LASTEXITCODE -eq 0) { throw 'Release tag already exists; releases must be immutable' }
+          $releasesJson = gh release list --repo Summuryy/EMS-COMMAND-RELEASES --limit 1000 --json tagName
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to enumerate existing production releases' }
+          $existingTags = @($releasesJson | ConvertFrom-Json | ForEach-Object { $_.tagName })
+          if ($existingTags -contains "v$($pkg.version)") { throw 'Release tag already exists; releases must be immutable' }
       - name: Install and test dependencies
         shell: pwsh
         run: |
