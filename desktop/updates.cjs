@@ -57,7 +57,11 @@ function initUpdates(getWindow,log,isTrustedSender=()=>false){
   let feed='';
   try{const cfg=JSON.parse(readFileSync(join(__dirname,'release-config.json'),'utf8'));feed=cfg.feedUrl||'';}catch{}
   const managed=process.env.EMS_MANAGED_BY_LAUNCHER==='1';
-  const managedPublicKey=managed?Buffer.from(process.env.EMS_LAUNCHER_PUBLIC_KEY_PEM_B64||'','base64').toString('utf8'):'';
+  let managedPublicKey='';
+  if(managed){
+    try{managedPublicKey=JSON.parse(readFileSync(join(__dirname,'release-trust.json'),'utf8')).publicKeyPem||'';}catch{}
+    if(!managedPublicKey)managedPublicKey=Buffer.from(process.env.EMS_LAUNCHER_PUBLIC_KEY_PEM_B64||'','base64').toString('utf8');
+  }
   const checkManaged=async()=>{
     if(!managedPublicKey.includes('BEGIN PUBLIC KEY'))throw Error('Ключ проверки лаунчера отсутствует. Запустите приложение через новый EMS Launcher.');
     const envelope=await getSignedManifest();
