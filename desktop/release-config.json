@@ -1,5 +1,4 @@
 {
-  "feedUrl": "",
-  "channel": "stable",
-  "note": "Gated public signed feed configured by publish-updates.yml build from EMS_UPDATE_FEED_URL Actions variable."
+  "feedUrl": "https://github.com/Summuryy/EMS-COMMAND-RELEASES/releases/latest/download/",
+  "channel": "stable"
 }
