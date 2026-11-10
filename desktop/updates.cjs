@@ -35,9 +35,7 @@ function initUpdates(getWindow,log,isTrustedSender=()=>false){
   };
   let feed='';
   try{const cfg=JSON.parse(readFileSync(join(__dirname,'release-config.json'),'utf8'));feed=cfg.feedUrl||'';}catch{}
-  if(process.env.EMS_MANAGED_BY_LAUNCHER==='1'){
-    set('managed','Обновления EMS COMMAND устанавливаются отдельным EMS Launcher. Откройте лаунчер для проверки и восстановления файлов.');
-  }else if(!app.isPackaged){
+  if(!app.isPackaged){
     set('dev','Проверка обновлений доступна только в установленной Windows-версии.');
   }else if(!isTrustedFeed(feed)){
     set('unconfigured','Укажите доверенный публичный HTTPS-канал в release-config.json при сборке. Приватный GitHub Releases без токена в клиенте недоступен.');
