@@ -57,6 +57,15 @@ jobs:
           npm --prefix launcher install --no-audit --no-fund
           npm run check
           npm test
+      - name: Pin public verification key in desktop payload
+        shell: pwsh
+        env:
+          EMS_LAUNCHER_PUBLIC_KEY_PEM_B64: ${{ secrets.EMS_LAUNCHER_PUBLIC_KEY_PEM_B64 }}
+        run: |
+          if (-not $env:EMS_LAUNCHER_PUBLIC_KEY_PEM_B64) { throw 'Missing public key' }
+          $pem = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($env:EMS_LAUNCHER_PUBLIC_KEY_PEM_B64))
+          if (-not $pem.Contains('BEGIN PUBLIC KEY')) { throw 'Invalid public key' }
+          @{ publicKeyPem = $pem } | ConvertTo-Json -Compress | Set-Content -Encoding utf8 'desktop/release-trust.json'
       - name: Build application directory
         run: npm run dist:dir
       - name: Archive application files
