@@ -21,3 +21,12 @@ dist/
 out/
 .env.*
 !.env.example
+
+# Portable launcher builds and local signing materials
+dist-launcher/
+launcher/node_modules/
+release-keys/
+*.pfx
+*.p12
+*.pem
+*.key

@@ -1,0 +1,116 @@
+name: Publish signed portable EMS COMMAND
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/release-request.json'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version from package.json, e.g. 3.6.0'
+        required: true
+        type: string
+      acknowledge_public_client_code:
+        description: 'I approve distributing inspectable Electron client code (never private source repo, tokens, or signing keys)'
+        required: true
+        type: boolean
+permissions:
+  contents: read
+jobs:
+  release:
+    runs-on: windows-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate publisher configuration
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.EMS_RELEASES_TOKEN }}
+          EMS_MANIFEST_SIGNING_KEY_PEM_B64: ${{ secrets.EMS_MANIFEST_SIGNING_KEY_PEM_B64 }}
+          EMS_LAUNCHER_PUBLIC_KEY_PEM_B64: ${{ vars.EMS_LAUNCHER_PUBLIC_KEY_PEM_B64 }}
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          if (-not $env:GH_TOKEN -or -not $env:EMS_MANIFEST_SIGNING_KEY_PEM_B64 -or -not $env:EMS_LAUNCHER_PUBLIC_KEY_PEM_B64) {
+            throw 'Production release requires EMS_RELEASES_TOKEN, EMS_MANIFEST_SIGNING_KEY_PEM_B64 and EMS_LAUNCHER_PUBLIC_KEY_PEM_B64'
+          }
+          if ($env:GITHUB_REF -ne 'refs/heads/main') { throw 'Production publishing is allowed only from main' }
+          if ($env:GITHUB_EVENT_NAME -eq 'push') {
+            $request = Get-Content '.github/release-request.json' -Raw | ConvertFrom-Json
+            if ($request.approvePublicClientCode -ne $true) { throw 'Publication request must explicitly approve client code distribution' }
+            $env:REQUESTED_VERSION = [string]$request.version
+          }
+          $pkg = Get-Content package.json -Raw | ConvertFrom-Json
+          if ($env:REQUESTED_VERSION -ne $pkg.version) { throw 'Requested version must equal package.json version' }
+          $private = gh api repos/Summuryy/EMS-COMMAND-RELEASES --jq '.private'
+          if ($LASTEXITCODE -ne 0 -or "$private".Trim() -ne 'false') { throw 'Separate EMS-COMMAND-RELEASES repository must exist and be public' }
+          gh release view "v$($pkg.version)" --repo Summuryy/EMS-COMMAND-RELEASES 2>$null
+          if ($LASTEXITCODE -eq 0) { throw 'Release tag already exists; releases must be immutable' }
+      - name: Install and test dependencies
+        shell: pwsh
+        run: |
+          npm install --no-audit --no-fund
+          npm --prefix launcher install --no-audit --no-fund
+          npm run check
+          npm test
+      - name: Build application directory
+        run: npm run dist:dir
+      - name: Archive application files
+        shell: pwsh
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          Compress-Archive -Path 'dist/win-unpacked/*' -DestinationPath "dist/EMS-COMMAND-App-$version-win-x64.zip" -CompressionLevel Optimal
+      - name: Generate Ed25519 signed update manifest
+        shell: pwsh
+        env:
+          EMS_MANIFEST_SIGNING_KEY_PEM_B64: ${{ secrets.EMS_MANIFEST_SIGNING_KEY_PEM_B64 }}
+          EMS_LAUNCHER_PUBLIC_KEY_PEM_B64: ${{ vars.EMS_LAUNCHER_PUBLIC_KEY_PEM_B64 }}
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          node launcher/create-release.cjs dist/win-unpacked "dist/EMS-COMMAND-App-$version-win-x64.zip"
+      - name: Build launcher pinned to the persistent release public key
+        run: npm run dist:launcher -- --publish never
+      - name: Block accidental publication of unreviewed plaintext source
+        shell: pwsh
+        env:
+          EMS_PUBLIC_BINARY_APPROVED: ${{ inputs.acknowledge_public_client_code }}
+        run: |
+          $approved = ($env:EMS_PUBLIC_BINARY_APPROVED -eq 'true')
+          if ($env:GITHUB_EVENT_NAME -eq 'push') {
+            $request = Get-Content '.github/release-request.json' -Raw | ConvertFrom-Json
+            $approved = ($request.approvePublicClientCode -eq $true)
+          }
+          if (-not $approved) {
+            throw 'Public release blocked: explicit approval of inspectable Electron client-code distribution is required.'
+          }
+          $payload = 'dist/win-unpacked'
+          if (-not (Test-Path $payload)) { throw 'Windows payload directory missing' }
+          $blockedNames = @('.env', '.env.local', '.env.production', '.npmrc', '.git', '.github', 'id_rsa', 'id_ed25519', 'ed25519-release-private.pem', 'setup-portable-signing.cjs')
+          $blockedExtensions = @('.pem', '.key', '.p12', '.pfx')
+          $all = @(Get-ChildItem -LiteralPath $payload -Recurse -Force)
+          foreach ($item in $all) {
+            if ($blockedNames -contains $item.Name -or ($item.Extension -and $blockedExtensions -contains $item.Extension.ToLowerInvariant())) {
+              throw "Blocked sensitive/internal artifact in public payload: $($item.FullName)"
+            }
+          }
+          $appRoot = Join-Path $payload 'resources/app'
+          if (Test-Path $appRoot) {
+            foreach ($name in @('tests', '.github', 'docs', 'tools/setup-portable-signing.cjs')) {
+              if (Test-Path (Join-Path $appRoot $name)) { throw "Unexpected development artifact in public app: $name" }
+            }
+          }
+          Write-Host "Checked $($all.Count) payload entries for forbidden private/development files."
+          Write-Host 'WARNING: Client JavaScript remains inspectable; explicit public binary review is not source-code protection.'
+      - name: Publish files to the public binary-only GitHub repository
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.EMS_RELEASES_TOKEN }}
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $zip = "dist/EMS-COMMAND-App-$version-win-x64.zip"
+          $launcher = @(Get-ChildItem dist-launcher -Filter "EMS-COMMAND-Launcher-*-win-x64.exe")
+          if ($launcher.Count -ne 1 -or -not (Test-Path $zip) -or -not (Test-Path dist/ems-manifest.json)) { throw 'Missing signed release outputs' }
+          gh release create "v$version" $zip dist/ems-manifest.json $launcher[0].FullName --repo Summuryy/EMS-COMMAND-RELEASES --title "EMS COMMAND $version" --notes "Portable launcher and Ed25519-verified application ZIP. Not an NSIS installer." --latest
+          if ($LASTEXITCODE -ne 0) { throw 'GitHub release publish failed' }

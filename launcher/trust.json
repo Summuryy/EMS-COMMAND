@@ -1,0 +1,6 @@
+{
+  "schema": 1,
+  "manifestUrl": "https://github.com/Summuryy/EMS-COMMAND-RELEASES/releases/latest/download/ems-manifest.json",
+  "publicKeyPem": "",
+  "note": "Provision a persistent Ed25519 public key from EMS_LAUNCHER_PUBLIC_KEY_PEM_B64 for release builds. An empty key disables network installs."
+}
