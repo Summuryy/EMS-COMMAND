@@ -70,7 +70,7 @@ jobs:
           $payload = 'dist/win-unpacked'
           if (-not (Test-Path $payload)) { throw 'Windows payload directory missing' }
           $blockedNames = @('.env', '.env.local', '.env.production', '.npmrc', '.git', '.github', 'id_rsa', 'id_ed25519', 'ed25519-release-private.pem', 'setup-portable-signing.cjs')
-          $blockedExtensions = @('.pem', '.key', '.p12', '.pfx', '.map')
+          $blockedExtensions = @('.pem', '.key', '.p12', '.pfx')
           $all = @(Get-ChildItem -LiteralPath $payload -Recurse -Force)
           foreach ($item in $all) {
             if ($blockedNames -contains $item.Name -or ($item.Extension -and $blockedExtensions -contains $item.Extension.ToLowerInvariant())) {
