@@ -111,9 +111,9 @@ if(window.emsUpdates?.onStatus){window.emsUpdates.onStatus(async status=>{
  catch{paintUpdateStatus(status);}
 });}
 window.addEventListener('click',async e=>{
- const b=e.target.closest('#update-check,#update-download,#update-install');if(!b)return;
+ const b=e.target.closest('#update-check,#update-download,#update-install,#update-open-launcher');if(!b)return;
  const action=b.id;b.disabled=true;
- try{const u=window.emsUpdates;const s=await (action==='update-check'?u.check():action==='update-download'?u.download():u.install());paintUpdateStatus({...await u.status(),...s});}catch(err){toast('Ошибка обновления',err.message,true);}finally{b.disabled=false;}
+ try{const u=window.emsUpdates;const s=await (action==='update-check'?u.check():action==='update-download'?u.download():action==='update-open-launcher'?u.openLauncher():u.install());paintUpdateStatus({...await u.status(),...s});}catch(err){toast('Ошибка обновления',err.message,true);}finally{b.disabled=false;}
 });
 async function onSubmit(form){const data=Object.fromEntries(new FormData(form));const id=form.id;const btn=form.querySelector('button[type=submit]');if(btn)btn.disabled=true;try{
  if(id==='auth-form'){const route=state.authMode==='login'?'login':'register';const r=await request('/api/auth/'+route,{method:'POST',body:data});state.user=r.user;setCsrf(r.csrf);state.page='home';state.authMode='login';toast('Добро пожаловать',r.user.displayName);await refreshPage();return;}
