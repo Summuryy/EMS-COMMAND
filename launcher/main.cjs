@@ -10,6 +10,9 @@ const safeError=err=>({ok:false,error:String(err?.message||err).slice(0,500)});
 const progress=p=>{
  if(window&&!window.isDestroyed()&&!window.webContents.isDestroyed())
    window.webContents.send('launcher:progress',p);
+ if(p?.stage==='stopped'&&window&&!window.isDestroyed()){
+   window.show();window.focus();
+ }
 };
 async function prefs(){
  try{return JSON.parse(await fs.readFile(join(app.getPath('userData'),'launcher-prefs.json'),'utf8'));}
@@ -51,7 +54,11 @@ async function start(){
  handle('check',()=>run('check',()=>manager.check()));
  handle('update',()=>run('update',()=>manager.update()));
  handle('repair',()=>run('repair',()=>manager.update({repair:true})));
- handle('launch',()=>run('launch',()=>manager.launch()));
+ handle('launch',()=>run('launch',async()=>{
+   const result=await manager.launch();
+   if(window&&!window.isDestroyed())window.hide();
+   return result;
+ }));
  handle('rollback',()=>run('rollback',()=>manager.rollback()));
  await window.loadFile(join(__dirname,'index.html'));
 
