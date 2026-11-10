@@ -1,7 +1,7 @@
 'use strict';
 const $=id=>document.getElementById(id);
 const buttons=['launch','check','update','repair','rollback'];
-let busy=false;
+let busy=false;let lastChecked=null;let lastState=null;
 function showProgress(s){
  $('message').textContent=s.detail||'';
  const percent=Math.max(0,Math.min(100,Number(s.percent)||0));
@@ -13,14 +13,16 @@ function showProgress(s){
 async function sync(){
  const r=await window.emsLauncher.status();
  if(!r.ok)throw Error(r.error);
- const s=r.result;
+ const s=r.result;lastState=s;
  $('installed').textContent='Установлено: '+(s.current||'не установлено');
  $('available').textContent='Доступно: '+(s.available||'—');
- $('trust').textContent=s.configured?'Подпись: Ed25519':'Канал не настроен';
+ $('trust').textContent=s.configured?'Канал: защищённый · Ed25519':'Канал не настроен';
+ $('last-check').textContent=lastChecked?'Проверено: '+lastChecked.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}):'Проверка: ещё не выполнялась';
  $('launch').disabled=busy||!s.current||s.appRunning;
  $('update').disabled=busy||!s.configured||!s.canInstall||!s.updateAvailable||s.appRunning;
  $('update').textContent=s.current?(s.updateAvailable?'↓ Обновить до '+s.available:'✓ Последняя версия'):'↓ Установить приложение';
- $('update').classList.toggle('primary',!!s.updateAvailable);
+ $('update').classList.toggle('primary',!!s.updateAvailable||!s.current&&s.configured);
+ if(!busy&&s.configured&&s.current&&!s.updateAvailable&&lastChecked){$('message').textContent='✓ Установлена актуальная версия '+s.current+'. Обновлений нет.';}
  $('check').disabled=busy||!s.configured;
  $('repair').disabled=busy||!s.current||s.appRunning;
  $('rollback').disabled=busy||!s.previous||s.appRunning;
@@ -32,8 +34,9 @@ async function action(name){
  try{
    const r=await window.emsLauncher[name]();
    if(!r.ok)throw Error(r.error||'Неизвестная ошибка');
+   if(name==='check'){lastChecked=new Date();}
    if(name==='check'&&r.result?.newer)$('message').textContent='Доступна версия '+r.result.version+'. Рекомендуем обновиться.';
-   if(name==='check'&&!r.result?.newer)$('message').textContent='Обновлений нет. Установлена последняя доступная версия.';
+   if(name==='check'&&!r.result?.newer)$('message').textContent='✓ Обновлений нет. Установлена последняя доступная версия.';
  }catch(e){$('message').textContent=name==='check'?'Не удалось проверить обновления':'Не удалось выполнить операцию';$('error').textContent=e.message;}
  finally{busy=false;await sync().catch(e=>{$('error').textContent=e.message;});}
 }
