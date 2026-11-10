@@ -1,7 +1,9 @@
 'use strict';
 const {app,ipcMain,dialog}=require('electron');
 const {join}=require('node:path');
-const {readFileSync}=require('node:fs');
+const {readFileSync,existsSync}=require('node:fs');
+const {spawn}=require('node:child_process');
+const {isAbsolute,basename}=require('node:path');
 
 let updater=null;
 let state={status:'unconfigured',percent:0,message:'Канал обновлений не настроен.'};
@@ -23,7 +25,9 @@ function initUpdates(getWindow,log,isTrustedSender=()=>false){
     if(win&&!win.isDestroyed()&&!win.webContents.isDestroyed())
       win.webContents.send('ems:update-status',snapshot());
   };
-  const snapshot=()=>({...state,version:app.getVersion(),latestVersion});
+  const launcherExe=process.env.EMS_MANAGED_BY_LAUNCHER==='1'?process.env.EMS_LAUNCHER_EXE||'':'';
+  const canOpenLauncher=()=>isAbsolute(launcherExe)&&/EMS.*Launcher.*\.exe$/i.test(basename(launcherExe))&&existsSync(launcherExe);
+  const snapshot=()=>({...state,version:app.getVersion(),latestVersion,canOpenLauncher:canOpenLauncher()});
   const set=(status,message,percent=state.percent)=>{
     state={status,message,percent};log('update '+status+' '+message);emit();
   };
@@ -60,6 +64,12 @@ function initUpdates(getWindow,log,isTrustedSender=()=>false){
       setTimeout(()=>{if(state.status==='idle')updater.checkForUpdates().catch(err=>set('error',err.message,0));},2600);
     }catch(err){set('error','Модуль обновлений недоступен: '+err.message);}
   }
+  ipcMain.handle('ems:updates:open-launcher',guard(async()=>{
+    if(!canOpenLauncher())return {...snapshot(),message:'Лаунчер не найден. Запустите EMS COMMAND через установленный EMS Launcher.'};
+    const child=spawn(launcherExe,[],{detached:true,stdio:'ignore',windowsHide:false});
+    child.unref();
+    return {...snapshot(),message:'EMS Launcher открыт. Проверка и установка обновлений выполняются в нём.'};
+  }));
   ipcMain.handle('ems:updates:status',guard(async()=>snapshot()));
   ipcMain.handle('ems:updates:check',guard(async()=>{
     if(!updater)return snapshot();
