@@ -108,6 +108,7 @@ jobs:
           $digest = (Get-FileHash $launcher[0].FullName -Algorithm SHA256).Hash.ToLower()
           "$digest  $($launcher[0].Name)" | Set-Content "dist-launcher/$($launcher[0].Name).sha256" -Encoding ascii
       - name: Upload QA artifacts (ephemeral signing key; not production)
+        if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
           name: EMS-COMMAND-PORTABLE-QA-NOT-FOR-RELEASE
