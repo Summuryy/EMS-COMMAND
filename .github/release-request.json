@@ -1,7 +1,7 @@
 {
-  "version": "3.6.0",
+  "version": "3.7.0",
   "approvePublicClientCode": true,
   "distribution": "public-binary-only",
-  "note": "First signed production release after empty-release-check correction; client code distribution approved",
-  "attempt": 2
+  "note": "Approved unified permanent launcher 1.1.0 + signed EMS COMMAND app 3.7.0 production release",
+  "attempt": 1
 }
