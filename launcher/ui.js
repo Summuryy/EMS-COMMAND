@@ -52,7 +52,7 @@ for(const [id,action] of [['win-min','minimize'],['win-max','maximize'],['win-cl
 if(!window.emsLauncher||typeof window.emsLauncher.status!=='function'){
  showFatal('Не загрузился защищённый мост Electron (preload.cjs). Закройте лаунчер, обновите ветку в GitHub Desktop и запустите снова. Если ошибка повторится, откройте DevTools (Ctrl+Shift+I) и пришлите текст из Console.');
 }else{
- window.emsLauncher.onProgress(s=>{showProgress(s);if(s.stage==='checked'){sync().then(()=>window.emsLauncher.status()).then(r=>{if(r.ok&&r.result.available){lastCheck={newer:r.result.current!==r.result.available,version:r.result.available};sync();}}).catch(()=>{});}if(['ready','running'].includes(s.stage))sync().catch(e=>showFatal(e.message));});
+ window.emsLauncher.onProgress(s=>{showProgress(s);if(s.stage==='checked'){sync().then(()=>window.emsLauncher.status()).then(r=>{if(r.ok&&r.result.available){lastCheck={newer:r.result.updateAvailable,version:r.result.available};sync();}}).catch(()=>{});}if(['ready','running'].includes(s.stage))sync().catch(e=>showFatal(e.message));});
  for(const name of buttons)$(name).addEventListener('click',()=>action(name));
  sync().then(()=>{$('message').textContent='Лаунчер готов. '+($('trust').textContent==='Канал не настроен'?'Канал обновлений ещё не настроен.':'Проверяем наличие обновлений…');if($('trust').textContent!=='Канал не настроен')action('check');}).catch(e=>showFatal(e.message));
 }
