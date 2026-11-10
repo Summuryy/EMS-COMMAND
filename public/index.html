@@ -19,7 +19,8 @@
     ::-webkit-scrollbar-track { background: #10151c; }
     ::-webkit-scrollbar-thumb { background: #47566c; border: 2px solid #10151c; border-radius: 8px; }
     ::-webkit-scrollbar-thumb:hover { background: #6a7d97; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; right: 138px; height: 36px; -webkit-app-region: drag; z-index: 10000; pointer-events: auto; }
+    .topbar { -webkit-app-region: drag; padding-right: 138px; }
+    .topbar button, .topbar a, .topbar input, .topbar select { -webkit-app-region: no-drag; }
   </style>
 </head>
 <body>
