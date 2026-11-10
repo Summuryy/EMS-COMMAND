@@ -3,6 +3,9 @@ const {contextBridge,ipcRenderer}=require('electron');
 const invoke=action=>ipcRenderer.invoke('launcher:'+action);
 contextBridge.exposeInMainWorld('emsLauncher',Object.freeze({
   status:()=>invoke('status'),
+  minimize:()=>invoke('window-minimize'),
+  maximize:()=>invoke('window-maximize'),
+  close:()=>invoke('window-close'),
   check:()=>invoke('check'),
   update:()=>invoke('update'),
   repair:()=>invoke('repair'),
