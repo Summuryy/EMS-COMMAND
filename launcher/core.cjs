@@ -108,7 +108,7 @@ class LauncherManager{
  async init(){await Promise.all(['versions','records','staging','quarantine'].map(x=>fsp.mkdir(path.join(this.base,x),{recursive:true})));}
  async status(){
    const state=await readState(this.base);
-   return {current:state.current,previous:state.previous,available:this.latest?.manifest?.version||null,configured:!!this.trust.publicKeyPem,appRunning:!!this.child&&this.child.exitCode===null,busy:this.busy};
+   return {current:state.current,previous:state.previous,available:this.latest?.manifest?.version||null,updateAvailable:!!this.latest?.manifest?.version&&(!state.current||compareVersions(this.latest.manifest.version,state.current)>0),configured:!!this.trust.publicKeyPem,appRunning:!!this.child&&this.child.exitCode===null,busy:this.busy};
  }
  async check(){
    if(!this.trust.publicKeyPem)throw Error('Ключ доверия не настроен. Публикация релизов пока недоступна.');
