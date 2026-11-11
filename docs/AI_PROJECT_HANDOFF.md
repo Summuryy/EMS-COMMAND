@@ -1,5 +1,5 @@
 # EMS COMMAND — AI PROJECT HANDOFF (living source of truth)
-Updated: 2026-11-11. Read this before making changes. This document describes the owner's intent, not a guarantee of current release status.
+Updated: 2026-11-12. Read this before making changes. This document describes the owner's intent, not a guarantee of current release status.
 
 ## Mission and owner preferences
 Build a polished, responsive, cinematic Windows desktop companion for GTA 5 RP EMS / state hospital staff. The owner is currently the only tester. This is a private *product development / acceptance* phase; do not announce a public product launch without explicit approval. However, to test each iteration, the owner REQUIRES the latest changes to be delivered as an installable signed app update visible from their EXISTING launcher. A commit or PR alone is NOT delivery. Speak Russian, be direct, and show proof. Do not repeatedly ask the owner to test basic issues that Windows CI can test.
@@ -161,3 +161,15 @@ These files do **not** change EMS COMMAND 3.9.2 application runtime or Electron 
 - Add startup phase durations to local desktop log without usernames, credentials or image data.
 - Server-independent feature design is exploratory, not an implemented adapter. See `docs/PLATFORM_MODEL.md`. Russia Online first, no unverified automatic server integration.
 - Before release: run Node checks/tests, Windows installer smoke and Portable Launcher QA. Merge and publish separately by updating `.github/release-request.json` only after gates pass.
+
+## Verified 3.9.3 — Actions recovery and signed preview (2026-11-12)
+
+- **Owner issue:** installed app remained 3.9.2 while 3.9.3 source PR #19 had already merged. `main` had `package.json` version 3.9.3 but `.github/release-request.json` still targeted 3.9.2. Multiple Actions runs were stuck in `queued` with **zero jobs**; the owner observed nine `Failed to cancel workflow` messages. This is consistent with GitHub's documented stuck-run state. Do not claim the old runs were cancelled.
+- **Source:** PR #19 merged as `d4c11400c568371c403959374f177a9688e08826`. The final OCR worker isolation was not covered by the earlier green PR commit, but the subsequent new checks on the release branch and `main` completed successfully.
+- **Release recovery:** PR #20 `fix/release-393-actions-recovery`, atomic head `ac7a278bbf513726e8423e525d86ae6d40731bc4`, squash-merged to `main` as `2bb4e390728fcce534c6b94bb8bda04ca2064075`. Set release request to 3.9.3, added per-PR concurrency (without grouping `main` runs), job timeouts, and production verification of the Ed25519 envelope plus exact signed ZIP extraction before publishing. **Old stuck runs may remain visible**; new jobs successfully started.
+- **QA on new commit:** `EMS COMMAND checks` run `43103305235` SUCCESS (PR), `43103360952` SUCCESS (main); Windows installer smoke QA `43103305424` SUCCESS; Portable Launcher Windows QA `43103305411` SUCCESS.
+- **Signed production:** run `43103360879` SUCCESS. It installed dependencies, ran checks and tests, built Windows application, generated Ed25519 signed manifest, verified manifest and extracted ZIP, built pinned-key launcher, checked public payload, and published three assets. No private signing key was disclosed or committed.
+- **Verified latest release:** `https://github.com/Summuryy/EMS-COMMAND-RELEASES/releases/tag/v3.9.3`; `releases/latest` returns `v3.9.3`, published `2026-11-11T21:36:11Z`.
+- **Release assets:** `EMS-COMMAND-App-3.9.3-win-x64.zip` (141392616 B, SHA-256 `d4628eba8786d6ccf9d6ea8f57d5f8b365dd08e06d11c7318ce2a6214f79e811`); `EMS-COMMAND-Launcher-1.1.0-win-x64.exe` (414609699 B, SHA-256 `a1fa2df50051a14e0eff00606d0a02986deee10c6b4d25515cbe66989c9310f9`); `ems-manifest.json` (75529 B, SHA-256 `e64ac264919c70e18aa9ad93e69565700169f3ed3d4706ae9837a35357e23175`). Hashes are GitHub release asset digests; independent client download/reverification was not performed in this environment.
+- **Owner installation:** still needs confirmation that existing Launcher 1.1.0 offers and installs 3.9.3 on Windows. Do not assert 3.9.3 is locally installed or that the 5–10 minute lag is fixed without real-world acceptance/performance profiling.
+- **Release policy:** this is an owner-test preview with publicly accessible binary assets, **not** permission for an official product launch.
