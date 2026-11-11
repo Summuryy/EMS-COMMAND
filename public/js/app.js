@@ -21,6 +21,26 @@ const pages=[['home','Центр управления','home'],['evidence','До
 const viewFns={home:renderHome,evidence:renderEvidence,shift:renderShift,career:renderCareer,academy:renderAcademy,profile:renderProfile,admin:renderAdmin,pro:renderPro};
 const toastCenter=createToastCenter({getRoot:()=>$('#toast-stack'),icon});
 function toast(title,detail='',error=false){toastCenter.notify(title,detail,{tone:error?'error':'success'});}
+async function saveMotionMode(mode){
+ if(!window.emsMotion?.set)return;
+ try{const result=await window.emsMotion.set(mode);if(!result?.ok)throw Error(result?.error||'Запись не выполнена');}
+ catch{toast('Настройка не сохранена','Проверь права записи EMS COMMAND. Изменение действует до перезапуска.',true);}
+}
+async function restoreMotionMode(){
+ if(!window.emsMotion?.get)return;
+ try{
+  const result=await window.emsMotion.get();
+  if(!result?.ok)return;
+  if(result.mode==='on'){state.motionEnabled=true;state.motionOverride=true;return;}
+  if(result.mode==='off'){state.motionEnabled=false;state.motionOverride=false;return;}
+  // One-time migration from origin-scoped storage, when it is still available.
+  const previous=localStorage.getItem('ems-motion-enabled');
+  if(previous==='true'||previous==='false'){
+   state.motionEnabled=previous==='true';state.motionOverride=previous==='true';
+   await saveMotionMode(previous==='true'?'on':'off');
+  }else{state.motionEnabled=true;state.motionOverride=false;}
+ }catch{/* The app still works with origin-scoped fallback in development. */}
+}
 function authView(){return `<div class="auth-page"><div class="auth-art"><div class="auth-inner"><div class="logo-line"><div class="brandmark">${icon('medical',25)}</div><div><div class="brandtitle">EMS COMMAND</div><div class="branddesc">ГОСБОЛЬНИЦА / RP</div></div></div><h1>Смена.<br>Помощь.<br><span class="ems382-auth-accent">Карьера.</span></h1><p>Личный кабинет сотрудника госбольницы. Смены, доказательства, карьерный прогресс.</p><div class="auth-visual" aria-hidden="true"><div class="core-orbit"></div><div class="core-orbit"></div><div class="core-mark">${icon('medical',48)}</div></div><div class="caps">ГОСУДАРСТВЕННАЯ МЕДИЦИНСКАЯ СЛУЖБА</div></div></div><div class="auth-form-wrap"><div class="auth-form"><div class="eyebrow">EMS / ВХОД ДЛЯ СОТРУДНИКОВ</div><h2>${state.authMode==='login'?'Войти в систему':'Регистрация'}</h2><p>${state.authMode==='login'?'Доступ к персональному командному центру.':'Понадобится одноразовое приглашение от администратора.'}</p><form id="auth-form">${state.authMode==='register'?`<div class="input-group"><label for="displayName">Имя в игре</label><input id="displayName" name="displayName" class="field" required minlength="2" maxlength="60" placeholder="Имя Фамилия"></div>`:''}<div class="input-group"><label for="username">Логин</label><input id="username" name="username" class="field" autocomplete="username" required minlength="3" maxlength="32" pattern="[a-zA-Z0-9_.-]+" placeholder="username"></div><div class="input-group"><label for="password">Пароль</label><input id="password" name="password" class="field" type="password" required minlength="12" autocomplete="${state.authMode==='login'?'current-password':'new-password'}" placeholder="Не менее 12 символов"></div>${state.authMode==='register'?`<div class="input-group"><label for="invite">Код приглашения</label><input id="invite" name="invite" class="field" required maxlength="150" placeholder="Код от администрации"></div>`:''}<button type="submit" class="btn btn-primary btn-block">${icon(state.authMode==='login'?'lock':'shield',16)} ${state.authMode==='login'?'Войти':'Создать аккаунт'}</button></form><div class="auth-switch">${state.authMode==='login'?'Нет аккаунта?':'Уже зарегистрирован?'} <button class="text-btn" data-action="switch-auth">${state.authMode==='login'?'Регистрация по приглашению':'Войти'}</button></div><div class="dotted"></div><div class="tiny muted">Защищённая сессия · учётные записи хранятся на сервере EMS COMMAND.</div></div></div></div>`;}
 function shell(){const pageLabel=(pages.find(x=>x[0]===state.page)||['','Администрирование'])[1];const unreads=state.notices.filter(n=>!n.read_at).length;return `<div class="layout ems38-layout ${state.mobile?'menu-open':''}"><aside class="rail"><div class="brand"><div class="brandmark v3-brandmark">${icon('medical',25)}</div><div><div class="brandtitle">EMS COMMAND</div><div class="branddesc">ГОСБОЛЬНИЦА / RP</div></div></div><div class="v3-sidebar-scroll"><div class="nav-label">РАБОЧЕЕ ПРОСТРАНСТВО</div><nav class="nav-group" aria-label="Основная навигация">${pages.map(([id,title,ic],i)=>`<button class="nav-link ${state.page===id?'active':''}" data-nav="${id}" ${state.page===id?'aria-current="page"':''}>${icon(ic,18)}<span>${title}</span>${id==='evidence'&&state.queue.some(j=>!j.finished)?'<i class="v3-nav-pulse"></i>':''}</button>`).join('')}</nav>${['admin','reviewer'].includes(state.user.role)?`<div class="nav-label v3-nav-admin">УПРАВЛЕНИЕ</div><button class="nav-link ${state.page==='admin'?'active':''}" data-nav="admin">${icon('shield',18)}<span>Администрирование</span></button>`:''}</div><div class="rail-bottom"><div class="ems38-rail-hub" aria-label="Быстрый доступ"><div class="ems38-hub-kicker"><span>БЫСТРЫЙ ДОСТУП</span><span>EMS / CONTROL</span></div><button class="ems38-hub-link" data-nav="shift">${icon('clock',16)}<span>Моя смена</span>${icon('arrow',14)}</button><button class="ems38-hub-link" data-nav="evidence">${icon('file',16)}<span>Архив кадров</span>${icon('arrow',14)}</button></div><button class="rail-person" data-nav="profile" aria-label="Открыть профиль"><div class="avatar">${userInitial(state.user)}</div><div class="v3-person-copy"><strong>${esc(state.user.displayName)}</strong><span>#${esc(state.user.staticId||'—')} · Ранг ${esc(state.user.rank)}</span></div>${icon('chevron',15)}</button></div></aside><main class="main"><header class="topbar ems38-topbar"><div class="v3-crumb-line"><button class="btn btn-ghost btn-icon mobile-menu" data-action="toggle-menu" aria-label="Меню">${icon('menu',20)}</button><span class="station-dot"></span><div class="crumb"><span class="ems38-crumb-label">EMS COMMAND</span> <span class="v3-crumb-divider">/</span> <span>${esc(state.user.serverName||'Кутузовский')}</span> <span class="v3-crumb-divider">/</span> <strong>${esc(pageLabel)}</strong></div></div><div class="top-actions" aria-label="Действия приложения"><span class="online-pill ${state.health?.ok?'':'disconnected'}"><i class="v3-online-ring"></i>${state.health?.ok?'На связи':'Нет связи'}</span><button class="btn btn-ghost btn-icon" data-action="desktop-updates" title="Проверить обновления" aria-label="Проверить обновления">${icon('clock',18)}</button><button class="btn btn-ghost btn-icon v3-bell" data-action="notices" title="Уведомления" aria-label="Уведомления${unreads?' · '+unreads+' непрочитанных':''}">${icon('bell',18)}${unreads?`<span class="icon-count"></span>`:''}</button><button class="btn btn-ghost btn-icon" data-action="logout" title="Выйти" aria-label="Выйти">${icon('out',18)}</button><button class="btn btn-primary v3-upload-top" data-action="upload" aria-label="Добавить скриншоты" title="Горячая клавиша: Ctrl+Shift+U">${icon('plus',17)}<span> Добавить скриншоты</span></button></div></header><div class="page ems391-page-enter" id="page">${(viewFns[state.page]||renderHome)(state)}</div></main></div>`;}
 function render(){state.systemReducedMotion=Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);const focusId=document.activeElement?.id;let sel=null;try{if(focusId){const el=document.activeElement;sel={start:el.selectionStart,end:el.selectionEnd};}}catch{}$('#app').innerHTML=state.user?shell():authView();setMotionPreference(state.motionEnabled,state.motionOverride);applyMotion($('#app'));if(focusId&&sel){try{let el=document.getElementById(focusId);if(el){el.focus();el.setSelectionRange(sel.start,sel.end);}}catch{}}}
@@ -69,6 +89,7 @@ async function handleAction(action,el){
    state.motionEnabled=true;state.motionOverride=true;
    localStorage.setItem('ems-motion-enabled','true');
    localStorage.setItem('ems-motion-force','true');
+   await saveMotionMode('on');
    render();toast('Полный Motion/VFX включён','EMS COMMAND теперь показывает эффекты даже при ограничении Windows.');
    return;
   }
@@ -76,6 +97,7 @@ async function handleAction(action,el){
    state.motionEnabled=true;state.motionOverride=false;
    localStorage.removeItem('ems-motion-enabled');
    localStorage.removeItem('ems-motion-force');
+   await saveMotionMode('system');
    render();toast('Системный режим','EMS COMMAND снова учитывает ограничение движения Windows.');
    return;
   }
@@ -173,6 +195,7 @@ window.addEventListener('change',async e=>{if(e.target.id==='motion-switch'){
   state.motionOverride=e.target.checked;
   localStorage.setItem('ems-motion-enabled',String(state.motionEnabled));
   localStorage.setItem('ems-motion-force',String(state.motionOverride));
+  await saveMotionMode(state.motionEnabled?'on':'off');
   render();
   toast(state.motionEnabled?'Полный Motion/VFX включён':'Анимации отключены',
    state.motionEnabled?'Кардиограмма, кнопки, переходы и уведомления теперь активны.':'Приложение остановило декоративное движение.');
@@ -199,4 +222,4 @@ let lastNotices=null;
 setInterval(async()=>{if(!state.user)return;try{const r=await request('/api/notices');const items=r.items||[];const newer=lastNotices===null?[]:items.filter(n=>!n.read_at&&!lastNotices.has(n.id));lastNotices=new Set(items.map(n=>n.id));state.notices=items;for(const n of newer.slice(0,2))toast(n.title,n.message);const bell=document.querySelector('[data-action=notices]');if(bell&&items.some(n=>!n.read_at)&&!bell.querySelector('.icon-count'))bell.insertAdjacentHTML('beforeend','<span class="icon-count"></span>');}catch{}},20000);
 setInterval(()=>{const el=$('#shift-clock');const shift=state.shifts?.shifts?.find(x=>!x.end_at);if(el&&shift)el.textContent=duration(shift.start_at);const home=$('#home-shift-clock');if(home&&state.dashboard?.shift&&!state.dashboard.shift.end_at)home.textContent=duration(state.dashboard.shift.start_at);syncDutyTimeline(document,shift?.start_at);},1000);
 installCinematicPointer();installMotionEffects();
-(async function start(){try{state.health=await request('/api/health');const r=await request('/api/auth/me');state.user=r.user;setCsrf(r.csrf);if(state.user){await refreshPage();if(state.user.mustChangePassword)toast('Обнови пароль','Пароль необходимо сменить в профиле.');}else render();}catch(e){render();toast('Не удалось связаться с сервером',e.message,true);}})();
+(async function start(){try{await restoreMotionMode();state.health=await request('/api/health');const r=await request('/api/auth/me');state.user=r.user;setCsrf(r.csrf);if(state.user){await refreshPage();if(state.user.mustChangePassword)toast('Обнови пароль','Пароль необходимо сменить в профиле.');}else render();}catch(e){render();toast('Не удалось связаться с сервером',e.message,true);}})();
