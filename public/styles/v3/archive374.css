@@ -1,0 +1,59 @@
+/* EMS COMMAND 3.7.4 — functional Evidence Registry workspace.
+   Styling is scoped: the archive keeps existing upload, OCR and detail actions. */
+.ems-archive {
+  --archive-mint: #82d8c6;
+  --archive-edge: rgba(130,216,198,.25);
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(145deg,#182533 0%,#101b28 100%);
+  border: 1px solid rgba(155,191,208,.18);
+}
+.ems-archive:before {
+  content: ""; position: absolute; height: 2px; top: 0; left: 26px; right: 26px;
+  background: linear-gradient(90deg,transparent,var(--archive-mint),transparent);
+  opacity: .65; pointer-events: none;
+}
+.ems-archive .v3-archive-toolbar {padding-bottom: 17px; border-bottom: 1px solid #d7e5ed16; margin-bottom: 18px}
+.ems-archive .v3-mini-medallion {border-color: var(--archive-edge);background: #82d8c616;color: var(--archive-mint)}
+.ems-archive .v3-archive-summary strong {font-variant-numeric: tabular-nums}
+.ems-archive-control {display: flex; align-items: flex-end; gap: 12px; margin-bottom: 15px}
+.ems-archive-search {display: grid; gap: 8px; min-width: 0; flex: 1}
+.ems-archive-search-label {display: flex;align-items:center;gap:9px;font-size: 10px;letter-spacing:.13em;font-weight:800;color:#9cb9c4}
+.ems-archive-search-label .icon {color:var(--archive-mint)}
+.ems-archive-search .field {width: 100%;min-width:0;background:#0b1622;border:1px solid #a7c5d333;border-radius:12px;padding:12px 14px;color:#edf4f7;font-size:13px;transition:border-color .18s,box-shadow .18s}
+.ems-archive-search .field:focus {border-color:var(--archive-mint);box-shadow:0 0 0 3px #82d8c61c}
+.ems-archive-search .field::placeholder {color:#8299aa}
+.ems-archive-clear {min-height: 43px; white-space: nowrap}
+.ems-archive-clear:disabled {opacity:.42;cursor:default}
+.ems-archive-quickstats {display:flex;flex-wrap:wrap;gap:8px;margin-bottom:17px}
+.ems-archive-quickstats span {display:inline-flex;align-items:center;gap:8px;border:1px solid #bacbd821;border-radius:9px;background:#ffffff05;padding:8px 10px;font-size:11px;color:#aabec9}
+.ems-archive-quickstats strong {font-size:14px;font-weight:850;color:#e9f4f4}
+.ems-archive-quickstats span:first-child strong {color:var(--archive-mint)}
+.ems-archive .v3-tabs {margin-bottom: 13px}
+.ems-archive .v3-tabs .tab {transition:color .18s,border-color .18s}
+.ems-archive .v3-tabs .tab.active {color:#effbf8;border-color:var(--archive-mint)}
+.ems-archive .v3-tabs .tab:hover {color:#ffffff}
+.ems-archive-results-caption {font-size:11px;color:#9dafbf;padding:0 0 14px;line-height:1.55}
+.ems-archive #evidence-results {min-height:85px}
+.ems-archive .evidence-row {transition:background .18s,transform .18s}
+.ems-archive .evidence-row:hover {background:#82d8c60b!important;transform:translateX(3px)}
+.ems-archive .evidence-row:focus-visible {outline:2px solid var(--archive-mint);outline-offset:-3px;border-radius:9px}
+.ems-archive .evidence-row .ev-arrow {color:var(--archive-mint)!important}
+.ems-archive .empty {padding:38px 14px;border:1px dashed #a2c9c32d;border-radius:12px;background:linear-gradient(140deg,#152733aa,#0e1927aa)}
+.ems-archive .empty .icon {color:var(--archive-mint)}
+.ems-archive .empty .btn {margin-top:14px}
+@media(max-width:750px) {
+ .ems-archive-control {align-items:stretch;flex-direction:column}
+ .ems-archive-clear {align-self:flex-start}
+ .ems-archive .v3-archive-toolbar {align-items:flex-start}
+}
+@media(max-width:450px) {
+ .ems-archive .v3-toolbar-actions {width:100%;flex-wrap:wrap}
+ .ems-archive .v3-toolbar-actions .btn {flex:1}
+ .ems-archive-quickstats {display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .ems-archive-quickstats span {min-width:0}
+}
+@media(prefers-reduced-motion:reduce) {
+ .ems-archive .evidence-row:hover {transform:none}
+}
+html[data-motion="off"] .ems-archive .evidence-row:hover {transform:none}
