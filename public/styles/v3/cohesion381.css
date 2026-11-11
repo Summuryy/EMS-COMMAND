@@ -1,0 +1,164 @@
+/* EMS COMMAND 3.8.1 — screenshot-based Clinical Command unification.
+   Brand ECG remains rose; actions and operational surfaces use the medical mint system.
+   CSS only: no evidence logic, promotion, capture, auth, or updater behavior changes. */
+.ems38-layout .v3-evidence-hero {
+  min-height:248px;grid-template-columns:minmax(0,1.18fr) minmax(255px,.82fr);
+  padding:0;background:linear-gradient(125deg,#142936,#101c29 82%);
+  border-color:#8bdccc42;
+}
+.ems38-layout .v3-evidence-drop {
+  min-height:226px;margin:11px;gap:11px;border:1px dashed #87cbbf7c;
+  background:linear-gradient(155deg,#122e35b8,#0d202d);
+  transition:border-color .18s ease,background-color .18s ease;
+}
+.ems38-layout .v3-evidence-drop:hover,.ems38-layout .v3-evidence-drop.dragover,
+.ems38-layout .v3-evidence-drop:focus-visible {
+  border-color:#a8f0db;background:#1d3c43;
+}
+.ems38-layout .v3-drop-icon {
+  width:54px;height:54px;border-radius:14px;
+  background:#8bdccc16;border:1px solid #8bdccc4e;color:#b3ede0;
+  box-shadow:0 0 26px #8bdccc13;
+}
+.ems38-layout .v3-drop-hint {
+  background:#81d7c70e;border-color:#8bdccc45;color:#abdfd3;
+}
+.ems38-layout .v3-evidence-aside {
+  background:radial-gradient(circle at 95% 38%,#8bdccc13,transparent 69%),#111f2b;
+  border-left-color:#8bdccc24;padding:20px 24px;
+}
+.ems38-layout .v3-evidence-aside>strong{font-size:clamp(23px,2vw,30px)}
+.ems38-layout .v3-evidence-aside>strong span{color:#9ce8d7}
+.ems38-layout .v3-evidence-aside .ecg {height:31px;margin:13px 0 8px;opacity:.66;filter:none}
+.ems38-layout .v3-evidence-aside .v3-chip-row span {background:#8bdccc0d;border-color:#8bdccc29}
+.ems38-layout .v3-processing-panel {background:linear-gradient(130deg,#1c343a,#152331);border-color:#8bdccc3e}
+.ems38-layout .v3-process-percentage>span,.ems38-layout .v3-job-pct {color:#a6e7d9}
+
+/* Ustav — remove the double scroll; let the page itself scroll and details expand. */
+.ems38-layout .v3-academy-banner {
+  min-height:180px;padding:22px 27px;
+  background:linear-gradient(115deg,#1c3640,#122431 78%);
+  border:1px solid #8bdccc38;border-radius:14px;box-shadow:inset 0 1px #ffffff0a;
+}
+.ems38-layout .v3-academy-banner h2{font-size:clamp(27px,2.65vw,37px);margin:8px 0;line-height:1.12}
+.ems38-layout .v3-academy-banner h2 em {color:#9ce8d7}
+.ems38-layout .v3-academy-banner p {font-size:12px;line-height:1.55;color:#b1c9d2}
+.ems38-layout .v3-academy-mark{color:#88cfc050;min-width:180px}
+.ems38-layout .v3-academy-mark .ecg{width:170px;height:30px;opacity:.65;filter:none}
+.ems38-layout .v3-academy-panel{padding:17px 20px}
+.ems38-layout .v3-academy-searchbar{background:#101e2a;border-color:#8bdccc40;gap:11px}
+.ems38-layout .v3-search-icon{color:#9be3d4}
+.ems38-layout .v3-search-count{color:#afc2cb}
+.ems38-layout .v3-academy-panel .v3-rule-list {
+  max-height:none;overflow:visible;scrollbar-width:auto;
+}
+.ems38-layout .v3-academy-panel .v3-rule{
+  border-color:#91b9c42f;background:#162632;min-height:48px;
+}
+.ems38-layout .v3-academy-panel .v3-rule:hover{border-color:#8bdccc58}
+.ems38-layout .v3-academy-panel .v3-rule[open]{background:#1b303b;border-color:#8bdccc5c}
+.ems38-layout .v3-rule-index{background:#8bdccc13;border-color:#8bdccc39;color:#a8e8d9}
+.ems38-layout .v3-academy-panel .v3-rule summary:focus-visible{
+  outline:2px solid #9ce9d8;outline-offset:2px;border-radius:8px;
+}
+.ems38-layout .v3-academy-panel .v3-rule-body{color:#c5d7dd;line-height:1.8}
+
+/* Profile — keep identity clearly data-driven; avoid purple legacy card. */
+.ems38-layout .v3-id-card{
+  min-height:300px;border:1px solid #8bdccc46;border-radius:14px;
+  background:radial-gradient(circle at 100% 0,#8bdccc19,transparent 46%),
+             linear-gradient(142deg,#1d3640,#13222f 82%);
+  padding:21px 23px;box-shadow:0 15px 39px #0003;
+}
+.ems38-layout .v3-id-card:before{color:#8bdccc09;font-size:160px}
+.ems38-layout .v3-id-top{color:#b2e8db}
+.ems38-layout .v3-id-top>span:nth-child(2){color:#afcbd3}
+.ems38-layout .v3-id-person{margin:19px 0}
+.ems38-layout .v3-id-avatar{
+  width:60px;height:60px;border-radius:14px;
+  background:linear-gradient(135deg,#376763,#1c3b44);
+  border:1px solid #8bdccc5b;color:#e4fcf8;box-shadow:0 9px 22px #09241e36;font-size:32px;
+}
+.ems38-layout .v3-id-grid>div{border-top-color:#8bdccc26}
+.ems38-layout .v3-id-card .ecg{opacity:.6;filter:none}
+.ems38-layout .v3-profile-edit .form-grid{row-gap:12px}
+.ems38-layout .v3-profile-edit h2{font-size:20px;margin:8px 0 17px}
+.ems38-layout .v3-profile-edit .field{min-height:42px}
+.ems381-field-hint{display:block;margin:6px 0 0;font-size:10.5px;line-height:1.5;color:#a6c2c9}
+.ems38-layout .v3-settings-panel .v3-switch-track{border-color:#8bdccc55}
+
+/* PRO is planned — amber offline retains accurate meaning. */
+.ems38-layout .v3-pro-hero{
+  min-height:251px;
+  background:radial-gradient(circle at 88% 45%,#8bdccc12,transparent 53%),
+             linear-gradient(113deg,#1e3640,#122330 85%);
+  border-color:#8bdccc3e;border-radius:14px;
+}
+.ems38-layout .v3-pro-copy{padding:24px 29px;max-width:620px}
+.ems38-layout .v3-pro-pill{
+  background:#e3bb7c14;border-color:#e3bb7c54;color:#e6c68e;letter-spacing:.08em;
+}
+.ems38-layout .v3-pro-pill .v3-beacon{
+  background:#e3bb7c;box-shadow:0 0 0 4px #e3bb7c15;animation:none;
+}
+.ems38-layout .v3-pro-hero h2{font-size:clamp(32px,3.4vw,47px);margin:11px 0 10px}
+.ems38-layout .v3-pro-hero h2 em{color:#a6e7d7}
+.ems38-layout .v3-pro-hero p{color:#bfd0d4;font-size:12.5px}
+.ems38-layout .v3-pro-cross{color:#8bdccc54;filter:none}
+.ems38-layout .v3-pro-readout{background:#101e29;border-color:#e3bb7c4b;box-shadow:0 10px 30px #0309112d}
+.ems38-layout .v3-pro-readout strong{color:#e6c58b}
+.ems38-layout .v3-pro-flow .panel{min-height:177px;gap:7px;padding:17px}
+.ems38-layout .v3-pro-flow .v3-step-n{color:#90d7c9}
+.ems38-layout .v3-pro-flow .v3-flow-icon{
+  background:#8bdccc12;border-color:#8bdccc35;color:#b5e7dc;
+}
+.ems38-layout .v3-pro-flow p{color:#afc5cd}
+
+/* Administration — one clear mint hierarchy for real role-limited controls. */
+.ems38-layout .v3-admin-banner{
+  min-height:145px;padding:22px 27px;
+  background:linear-gradient(115deg,#1e3640,#132431 85%);
+  border-color:#8bdccc3d;border-radius:14px;
+}
+.ems38-layout .v3-admin-banner h2{font-size:26px;margin:9px 0}
+.ems38-layout .v3-admin-banner p{color:#b7cbd3}
+.ems38-layout .v3-admin-art{color:#8bdccc66}
+.ems38-layout .v3-admin-art .ecg{height:26px;opacity:.65;filter:none}
+.ems38-layout .v3-admin-tabs{padding:10px 0;margin-bottom:7px}
+.ems38-layout .v3-admin-tabs button{
+  min-height:38px;padding:9px 13px;border-radius:9px;
+  background:#172a36;border-color:#a0c7ca26;color:#c0d3da;
+  transition:background .17s,border-color .17s,color .17s;
+}
+.ems38-layout .v3-admin-tabs button:hover{border-color:#8bdccc62;color:#edfefa}
+.ems38-layout .v3-admin-tabs button.active{
+  background:#8bdccc1c;border-color:#8bdccc69;color:#bbf2e5;
+}
+.ems38-layout .v3-admin-tabs button:focus-visible{outline:2px solid #9ce9d8;outline-offset:2px}
+.ems38-layout .v3-admin-section{min-height:180px}
+.ems38-layout .v3-admin-section .panel-head{margin-bottom:14px}
+.ems38-layout .v3-admin-section h2{font-size:19px}
+
+/* Small windows, preference-controlled and OS reduced-motion settings. */
+@media(max-width:900px){
+ .ems38-layout .v3-evidence-hero{grid-template-columns:1fr}
+ .ems38-layout .v3-evidence-aside{border-left:0;border-top:1px solid #8bdccc25;min-height:145px;padding:17px 22px}
+ .ems38-layout .v3-evidence-drop{min-height:205px}
+ .ems38-layout .v3-academy-banner{min-height:165px}
+ .ems38-layout .v3-admin-banner{min-height:130px}
+ .ems38-layout .v3-pro-copy{padding:23px}
+}
+@media(max-width:650px){
+ .ems38-layout .v3-academy-banner,.ems38-layout .v3-admin-banner{padding:20px;min-height:auto}
+ .ems38-layout .v3-academy-panel{padding:14px}
+ .ems38-layout .v3-search-count{font-size:9px}
+ .ems38-layout .v3-id-card{min-height:0;padding:19px}
+ .ems38-layout .v3-pro-hero{min-height:0}
+ .ems38-layout .v3-pro-copy{padding:21px}
+ .ems38-layout .v3-admin-tabs button{padding:8px 11px}
+}
+html[data-motion="off"] .ems38-layout .v3-evidence-drop,
+html[data-motion="off"] .ems38-layout .v3-admin-tabs button{transition:none!important}
+@media(prefers-reduced-motion:reduce){
+ .ems38-layout .v3-evidence-drop,.ems38-layout .v3-admin-tabs button{transition:none!important}
+}
