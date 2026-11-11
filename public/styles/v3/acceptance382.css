@@ -187,7 +187,7 @@ html[data-motion="off"] .ems382-update-hub .ems-update-orbit,
 html[data-motion="off"] .ems382-update-hub .ems-update-track>span,
 html[data-motion="off"] .auth-visual .core-orbit{animation:none!important;transition:none!important}
 @media(prefers-reduced-motion:reduce){
- .ems382-update-hub .ems-update-orbit,
- .ems382-update-hub .ems-update-track>span,
- .auth-visual .core-orbit{animation:none!important;transition:none!important}
+ html:not([data-motion="force"]) .ems382-update-hub .ems-update-orbit,
+ html:not([data-motion="force"]) .ems382-update-hub .ems-update-track>span,
+ html:not([data-motion="force"]) .auth-visual .core-orbit{animation:none!important;transition:none!important}
 }
