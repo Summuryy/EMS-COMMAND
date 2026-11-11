@@ -149,3 +149,15 @@ Never commit secrets, personal screenshots, real user credentials, local DBs, to
 The owner requested Emil Kowalski design/motion skills and Taste Skills for future EMS COMMAND UI/UX and Motion/VFX work. The portable, MIT-licensed Markdown skills are vendored in `.agents/skills/` with upstream commit pins, full relative reference files, and license notices. Emil source: `emilkowalski/skills@715c1807e08c497cfd1dc4feb450a2a3300ef2a9`; Taste source: `tasteskill/tasteskill@37c8c376b92ebc02456f7c70776b514fddda88e1`. `.agents/skills/README.md` documents which skills to apply, security priorities and maintenance.
 
 These files do **not** change EMS COMMAND 3.9.2 application runtime or Electron packaging. They are discoverable by compatible coding agents reading project skills, not globally installed into ChatGPT and not automatically active in every chat. Use them to guide future code changes, and still verify animations with tests and real Windows acceptance. This skills-only change must not trigger a signed app release.
+
+
+## Proposed 3.9.3 — motion performance and task-first UX (not yet released)
+- Owner reports that app can lag for 5–10 minutes and is dissatisfied with 3.9.2 effects. This is **unverified on-device**; do not claim the patch fixes it without Windows profiling.
+- Source branch `feat/motion-performance-nav-393`: use vendored Emil Kowalski animation-performance / animate and Taste redesign principles, but retain Electron/vanilla JS and security.
+- Remove every repetitive request to override Windows motion preferences. No OS security bypass, no prompts; keep explicit settings and accessibility policy.
+- Reduce always-on whole-scene filters, ambient sweeps, JavaScript pointer reads, per-panel intersection observers and RAF counters. Retain composited ECG/feedback and truthful counters.
+- Defer resuming pending heavy OCR processing until after initial HTTP server startup; preserve task queue and data.
+- Group navigation around daily tasks (Overview, My Shift, Evidence, Promotion) with secondary Handbook and PRO, role-specific Admin, and persistent Profile.
+- Add startup phase durations to local desktop log without usernames, credentials or image data.
+- Server-independent feature design is exploratory, not an implemented adapter. See `docs/PLATFORM_MODEL.md`. Russia Online first, no unverified automatic server integration.
+- Before release: run Node checks/tests, Windows installer smoke and Portable Launcher QA. Merge and publish separately by updating `.github/release-request.json` only after gates pass.
