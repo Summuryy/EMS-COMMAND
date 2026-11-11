@@ -54,6 +54,6 @@
  .ems-archive-quickstats span {min-width:0}
 }
 @media(prefers-reduced-motion:reduce) {
- .ems-archive .evidence-row:hover {transform:none}
+ html:not([data-motion="force"]) .ems-archive .evidence-row:hover {transform:none}
 }
 html[data-motion="off"] .ems-archive .evidence-row:hover {transform:none}
