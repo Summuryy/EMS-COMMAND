@@ -43,10 +43,10 @@
 .btn:focus-visible,.nav-link:focus-visible,.v3-text-action:focus-visible{outline:2px solid #ffa5b8;outline-offset:3px}
 @media(max-width:650px){.v3-home-hero{min-height:380px}.v3-home-hero::after{opacity:.25}}
 html[data-motion=off] .page{animation:none!important}
-@media(prefers-reduced-motion:reduce){.page{animation:none!important}.v3-home-hero:before,.v3-home-hero:after,.v3-admin-banner:after,.v3-pro-hero:after,.v3-shift-hero:after{animation:none!important}}
+@media(prefers-reduced-motion:reduce){html:not([data-motion="force"]) .page{animation:none!important}html:not([data-motion="force"]) .v3-home-hero:before,html:not([data-motion="force"]) .v3-home-hero:after,html:not([data-motion="force"]) .v3-admin-banner:after,html:not([data-motion="force"]) .v3-pro-hero:after,html:not([data-motion="force"]) .v3-shift-hero:after{animation:none!important}}
 
 html[data-motion=off] .v3-home-hero{background-position:center 55%!important}
-@media(prefers-reduced-motion:reduce){.v3-home-hero{background-position:center 55%!important}}
+@media(prefers-reduced-motion:reduce){html:not([data-motion="force"]) .v3-home-hero{background-position:center 55%!important}}
 
 /* Consistent commissioned scene in login and desktop workspaces; no external network assets. */
 .auth-art{background-image:radial-gradient(circle at 25% 65%,#08101b88,transparent 66%),linear-gradient(90deg,#0a121bd4,#111829b8),url('/assets/ems-cinematic-hospital.svg')}
@@ -88,4 +88,4 @@ html[data-motion=off] .v3-home-hero{background-position:center 55%!important}
 html[data-motion="off"] .ems-tap-ripple{display:none!important}
 html[data-motion="off"] .v3-number-card::after,html[data-motion="off"] .v3-id-card::before{display:none!important}
 html[data-motion="off"] .nav-link.active{animation:none!important}
-@media(prefers-reduced-motion:reduce){.ems-tap-ripple{display:none!important}.v3-number-card::after,.v3-id-card::before{display:none!important}.nav-link.active,.v3-toast,.auth-visual .core-orbit{animation:none!important}.nav-link:hover:not(:disabled){transform:none!important}}
+@media(prefers-reduced-motion:reduce){html:not([data-motion="force"]) .ems-tap-ripple{display:none!important}html:not([data-motion="force"]) .v3-number-card::after,html:not([data-motion="force"]) .v3-id-card::before{display:none!important}html:not([data-motion="force"]) .nav-link.active,html:not([data-motion="force"]) .v3-toast,html:not([data-motion="force"]) .auth-visual .core-orbit{animation:none!important}html:not([data-motion="force"]) .nav-link:hover:not(:disabled){transform:none!important}}
