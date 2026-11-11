@@ -34,7 +34,7 @@ html[data-motion="off"] *,html[data-motion="off"] *:before,html[data-motion="off
 html[data-motion="off"] .v3-reveal{opacity:1!important;transform:none!important}
 html[data-motion="off"] .ecg-trace{stroke-dasharray:none;stroke-dashoffset:0;filter:none}
 html[data-motion="off"] .v3-toast-timer{display:none}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.v3-reveal{opacity:1!important;transform:none!important}.ecg-trace{stroke-dasharray:none;filter:none}}
+@media(prefers-reduced-motion:reduce){html:not([data-motion="force"]) *,html:not([data-motion="force"]) *:before,html:not([data-motion="force"]) *:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}html:not([data-motion="force"]) .v3-reveal{opacity:1!important;transform:none!important}html:not([data-motion="force"]) .ecg-trace{stroke-dasharray:none;filter:none}}
 
 /* 3.3: visible moving cardiogram, layered glow and active surfaces. */
 .ems-ecg-live {display:block; height:43px; overflow:hidden; filter:drop-shadow(0 0 5px #f74f7480)}
@@ -70,11 +70,11 @@ html[data-motion="off"] .v3-toast-timer{display:none}
 .ems-update-hub .ems-update-track>span {transition:width .35s ease}
 .ems-connection-aura{position:absolute;inset:-6px;border:1px solid #5ae2a03b;border-radius:40px;animation:v3-online 2.1s ease-out infinite;pointer-events:none}
 html[data-motion="off"] .ems-ecg-moving,html[data-motion="off"] .ems-ecg-sensor{animation:none!important}
-@media (prefers-reduced-motion:reduce){.ems-ecg-moving,.ems-ecg-sensor{animation:none!important}}
+@media (prefers-reduced-motion:reduce){html:not([data-motion="force"]) .ems-ecg-moving,html:not([data-motion="force"]) .ems-ecg-sensor{animation:none!important}}
 
 /* v3.4: visible ECG in all screens. */
 .ems-ecg-live{overflow:hidden;isolation:isolate;filter:drop-shadow(0 0 6px #ff526e98)}
 .ems-ecg-line{stroke-width:3.2;filter:drop-shadow(0 0 3px #ff5679aa)}
 .ecg-compact .ems-ecg-line{stroke-width:4.1}
-@media(prefers-reduced-motion:reduce){.ems-ecg-moving{animation:none!important}}
+@media(prefers-reduced-motion:reduce){html:not([data-motion="force"]) .ems-ecg-moving{animation:none!important}}
 html[data-motion="off"] .ems-ecg-moving{animation:none!important}
