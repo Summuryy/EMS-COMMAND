@@ -144,3 +144,46 @@ test('3.8 shared UI system loads last and protects Windows caption and motion',(
  assert.match(js,/data-action="desktop-updates"/);
  assert.match(js,/data-action="logout"/);
 });
+
+test('3.8.1 screenshot review: academy search and native page scroll',()=>{
+ const html=renderAcademy(base);
+ assert.match(html,/class="v3-academy-banner"/);
+ assert.match(html,/id="charter-search"/);
+ assert.match(html,/class="rule v3-rule"/);
+ assert.match(html,/Общее положение/);
+ const css=fs.readFileSync(new URL('../public/styles/v3/cohesion381.css',import.meta.url),'utf8');
+ assert.match(css,/\.ems38-layout \.v3-academy-panel \.v3-rule-list\s*\{\s*max-height:none;overflow:visible/);
+ assert.match(css,/\.v3-academy-panel \.v3-rule summary:focus-visible/);
+});
+test('3.8.1 Static ID is an explicit placeholder, not an apparent saved value',()=>{
+ const html=renderProfile({...base,user:{...user,staticId:null}});
+ assert.match(html,/id="prof-static"/);
+ assert.match(html,/placeholder="Введите Static ID"/);
+ assert.match(html,/aria-describedby="static-id-hint"/);
+ assert.match(html,/id="static-id-hint"/);
+ assert.doesNotMatch(html,/placeholder="113104"/);
+ assert.match(html,/id="profile-form"/);
+ assert.match(html,/id="password-form"/);
+ assert.match(html,/id="motion-switch"/);
+});
+test('3.8.1 evidence archive, PRO offline and admin permission actions preserved',()=>{
+ const evidence=renderEvidence(base),pro=renderPro(base),admin=renderAdmin(base);
+ assert.match(evidence,/id="dropzone"/);
+ assert.match(evidence,/data-action="export-report"/);
+ assert.match(pro,/PRO \/ В РАЗРАБОТКЕ/);
+ assert.match(pro,/OFFLINE/);
+ assert.doesNotMatch(pro,/data-action="start-capture"/);
+ assert.match(admin,/data-admin-tab="reviews"/);
+ assert.match(admin,/data-admin-tab="users"/);
+ assert.match(admin,/data-action="create-invite"|data-admin-tab="invites"/);
+});
+test('3.8.1 final stylesheet order, media sizing and motion access',()=>{
+ const index=fs.readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
+ const css=fs.readFileSync(new URL('../public/styles/v3/cohesion381.css',import.meta.url),'utf8');
+ assert.ok(index.indexOf('cohesion381.css')>index.indexOf('clinical38.css'));
+ assert.match(css,/\.v3-evidence-drop:focus-visible/);
+ assert.match(css,/\.v3-admin-tabs button:focus-visible/);
+ assert.match(css,/@media\(max-width:650px\)/);
+ assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
+ assert.match(css,/html\[data-motion="off"\]/);
+});
