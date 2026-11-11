@@ -31,16 +31,16 @@ test('3.9.2 ECG has 9 P-QRS-T cycles, grid, sweep and 72-bpm illustrative cadenc
  assert.ok(html.indexOf('motion392.css')>html.indexOf('motion391.css'));
 });
 
-test('3.9.3 respects the OS and never prompts for decorative effects',()=>{
- assert.match(motion,/const reduced=/);
- assert.match(motion,/dataset.motion=!on?'off':force?'force':'on'/);
- assert.match(motionCss,/html:not\\(\\[data-motion="force"\\]\\) \\*/);
- assert.match(css,/html\\[data-motion="force"\\] \\.ems-ecg-moving/);
- assert.match(app,/setMotionPreference\\(state\\.motionEnabled,state\\.motionOverride\\)/);
- assert.doesNotMatch(app,/if\\(action==='force-motion'\\)/);
- assert.doesNotMatch(app,/insertAdjacentHTML\\('afterbegin','<div class="ems392-motion-alert"/);
+test('3.9.3 respects OS reduced-motion without asking permission',()=>{
+ assert.ok(motion.includes('const reduced='));
+ assert.ok(motion.includes("dataset.motion=!on?'off':force?'force':'on'"));
+ assert.ok(motionCss.includes('html:not([data-motion="force"]) *'));
+ assert.ok(css.includes('html[data-motion="force"] .ems-ecg-moving'));
+ assert.ok(app.includes('setMotionPreference(state.motionEnabled,state.motionOverride)'));
+ assert.ok(!app.includes("if(action==='force-motion')"));
+ assert.ok(!app.includes('ems392-motion-alert'));
  const os=renderProfile({user,motionEnabled:true,motionOverride:false,systemReducedMotion:true});
- assert.doesNotMatch(os,/Включить полный Motion\\/VFX/);
+ assert.doesNotMatch(os,/Включить полный Motion/);
  assert.match(os,/Windows использует уменьшенное движение/);
  assert.match(os,/aria-disabled="true"/);
  const forced=renderProfile({user,motionEnabled:true,motionOverride:true,systemReducedMotion:true});
@@ -48,6 +48,7 @@ test('3.9.3 respects the OS and never prompts for decorative effects',()=>{
  const off=renderProfile({user,motionEnabled:false,motionOverride:false,systemReducedMotion:false});
  assert.match(off,/Эффекты выключены/);
 });
+
 test('3.9.2 notification progress is deterministic and bounded',()=>{
  assert.equal(remainingFraction(0,5500),1);
  assert.equal(remainingFraction(2750,5500),.5);
