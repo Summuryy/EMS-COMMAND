@@ -9,13 +9,13 @@ export function remainingFraction(elapsedMs, durationMs) {
 export function toastDuration(tone) {
   return tone === 'error' ? 7200 : tone === 'warning' ? 6500 : 5500;
 }
-export function createToastCenter({getRoot, icon}) {
+export function createToastCenter({getRoot, icon, now = () => performance.now(), every = setInterval, cancelEvery = clearInterval, after = setTimeout}) {
   const visible = [];
   const waiting = [];
   let timer = null;
   const maxVisible = 3;
   const maxWaiting = 16;
-  const timestamp = () => performance.now();
+  const timestamp = now;
   const escText = value => String(value ?? '');
   function tick() {
     const now = timestamp();
@@ -32,18 +32,18 @@ export function createToastCenter({getRoot, icon}) {
       if (left <= 0) dismiss(entry);
     }
     if (!visible.some(entry => !entry.leaving) && waiting.length === 0 && timer !== null) {
-      clearInterval(timer);
+      cancelEvery(timer);
       timer = null;
     }
   }
   function startTimer() {
-    if (timer === null) timer = setInterval(tick, 40);
+    if (timer === null) timer = every(tick, 40);
   }
   function dismiss(entry) {
     if (!entry || entry.leaving) return;
     entry.leaving = true;
     entry.el.classList.add('ems392-toast-leaving');
-    setTimeout(() => {
+    after(() => {
       entry.el.remove();
       const index = visible.indexOf(entry);
       if (index !== -1) visible.splice(index, 1);
