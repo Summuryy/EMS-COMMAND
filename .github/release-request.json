@@ -1,7 +1,7 @@
 {
-  "version": "3.7.4",
+  "version": "3.7.5",
   "approvePublicClientCode": true,
   "distribution": "public-binary-only",
-  "note": "EMS COMMAND 3.7.4 Evidence Registry workspace preview; launcher-managed test update",
+  "note": "EMS COMMAND 3.7.5 Duty Operations and Career Progress premium UI preview; launcher-managed test update",
   "attempt": 1
 }
