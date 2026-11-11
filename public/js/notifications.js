@@ -71,7 +71,7 @@ export function createToastCenter({getRoot, icon}) {
       detail.textContent = escText(item.detail);
       if (!item.detail) detail.hidden = true;
       el.querySelector('.ems392-toast-icon').innerHTML = icon(tone === 'error' ? 'warning' : tone === 'warning' ? 'clock' : tone === 'info' ? 'activity' : 'check', 19);
-      const meter = el.querySelector('.ems392-toast-life');
+      const meter = el.querySelector('.ems392-toast-life i');
       const entry = {el, life: meter, duration: item.duration, elapsed: 0, last: timestamp(), paused: false, leaving: false};
       el.querySelector('.ems392-toast-close').addEventListener('click', () => dismiss(entry));
       el.addEventListener('mouseenter', () => {entry.paused = true;});
