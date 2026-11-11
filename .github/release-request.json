@@ -1,7 +1,7 @@
 {
-  "version": "3.9.0",
+  "version": "3.9.1",
   "approvePublicClientCode": true,
   "distribution": "public-binary-only",
-  "note": "EMS COMMAND 3.9.0 Premium Experience preview: live operational command feed, Duty 2.0 timeline, Career 2.0 roadmap and accessible motion",
+  "note": "EMS COMMAND 3.9.1 visible Motion/VFX acceptance preview: restore cinematic hospital lighting, waiting ECG motion and diagnostics",
   "attempt": 1
 }
