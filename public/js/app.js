@@ -14,14 +14,36 @@ import {renderAdmin} from './views/admin.js';
 import {renderPro} from './views/pro.js';
 import {applyMotion,setMotionPreference,installCinematicPointer,installMotionEffects} from './motion.js';
 import {ecg} from './views/visual.js';
+import {createToastCenter} from './notifications.js';
 const $=sel=>document.querySelector(sel);
-const state={user:null,page:'home',filter:'all',evidenceSearch:'',dashboard:null,evidence:null,shifts:null,career:null,charter:[],charterSearch:'',queue:[],admin:{},adminTab:'reviews',inviteCode:null,mobile:false,notices:[],authMode:'login',busy:false,health:null,motionEnabled:localStorage.getItem('ems-motion-enabled')!=='false'};
+const state={user:null,page:'home',filter:'all',evidenceSearch:'',dashboard:null,evidence:null,shifts:null,career:null,charter:[],charterSearch:'',queue:[],admin:{},adminTab:'reviews',inviteCode:null,mobile:false,notices:[],authMode:'login',busy:false,health:null,motionEnabled:localStorage.getItem('ems-motion-enabled')!=='false',motionOverride:localStorage.getItem('ems-motion-enabled')==='true'||localStorage.getItem('ems-motion-force')==='true'};
 const pages=[['home','Центр управления','home'],['evidence','Доказательства','scan'],['shift','Смена','clock'],['career','Карьера','trophy'],['academy','Устав','book'],['profile','Профиль','user'],['pro','Автозахват · PRO','scan']];
 const viewFns={home:renderHome,evidence:renderEvidence,shift:renderShift,career:renderCareer,academy:renderAcademy,profile:renderProfile,admin:renderAdmin,pro:renderPro};
-function toast(title,detail='',error=false){const el=document.createElement('div');el.className='toast v3-toast'+(error?' error':'');el.innerHTML=`<span class="v3-toast-symbol">${icon(error?'warning':'check',19)}</span><div><strong>${esc(title)}</strong>${detail?`<span>${esc(detail)}</span>`:''}</div><span class="v3-toast-timer" aria-hidden="true"></span>`;$('#toast-stack').append(el);setTimeout(()=>el.remove(),5500);}
+const toastCenter=createToastCenter({getRoot:()=>$('#toast-stack'),icon});
+function toast(title,detail='',error=false){toastCenter.notify(title,detail,{tone:error?'error':'success'});}
+async function saveMotionMode(mode){
+ if(!window.emsMotion?.set)return;
+ try{const result=await window.emsMotion.set(mode);if(!result?.ok)throw Error(result?.error||'Запись не выполнена');}
+ catch{toast('Настройка не сохранена','Проверь права записи EMS COMMAND. Изменение действует до перезапуска.',true);}
+}
+async function restoreMotionMode(){
+ if(!window.emsMotion?.get)return;
+ try{
+  const result=await window.emsMotion.get();
+  if(!result?.ok)return;
+  if(result.mode==='on'){state.motionEnabled=true;state.motionOverride=true;return;}
+  if(result.mode==='off'){state.motionEnabled=false;state.motionOverride=false;return;}
+  // One-time migration from origin-scoped storage, when it is still available.
+  const previous=localStorage.getItem('ems-motion-enabled');
+  if(previous==='true'||previous==='false'){
+   state.motionEnabled=previous==='true';state.motionOverride=previous==='true';
+   await saveMotionMode(previous==='true'?'on':'off');
+  }else{state.motionEnabled=true;state.motionOverride=false;}
+ }catch{/* The app still works with origin-scoped fallback in development. */}
+}
 function authView(){return `<div class="auth-page"><div class="auth-art"><div class="auth-inner"><div class="logo-line"><div class="brandmark">${icon('medical',25)}</div><div><div class="brandtitle">EMS COMMAND</div><div class="branddesc">ГОСБОЛЬНИЦА / RP</div></div></div><h1>Смена.<br>Помощь.<br><span class="ems382-auth-accent">Карьера.</span></h1><p>Личный кабинет сотрудника госбольницы. Смены, доказательства, карьерный прогресс.</p><div class="auth-visual" aria-hidden="true"><div class="core-orbit"></div><div class="core-orbit"></div><div class="core-mark">${icon('medical',48)}</div></div><div class="caps">ГОСУДАРСТВЕННАЯ МЕДИЦИНСКАЯ СЛУЖБА</div></div></div><div class="auth-form-wrap"><div class="auth-form"><div class="eyebrow">EMS / ВХОД ДЛЯ СОТРУДНИКОВ</div><h2>${state.authMode==='login'?'Войти в систему':'Регистрация'}</h2><p>${state.authMode==='login'?'Доступ к персональному командному центру.':'Понадобится одноразовое приглашение от администратора.'}</p><form id="auth-form">${state.authMode==='register'?`<div class="input-group"><label for="displayName">Имя в игре</label><input id="displayName" name="displayName" class="field" required minlength="2" maxlength="60" placeholder="Имя Фамилия"></div>`:''}<div class="input-group"><label for="username">Логин</label><input id="username" name="username" class="field" autocomplete="username" required minlength="3" maxlength="32" pattern="[a-zA-Z0-9_.-]+" placeholder="username"></div><div class="input-group"><label for="password">Пароль</label><input id="password" name="password" class="field" type="password" required minlength="12" autocomplete="${state.authMode==='login'?'current-password':'new-password'}" placeholder="Не менее 12 символов"></div>${state.authMode==='register'?`<div class="input-group"><label for="invite">Код приглашения</label><input id="invite" name="invite" class="field" required maxlength="150" placeholder="Код от администрации"></div>`:''}<button type="submit" class="btn btn-primary btn-block">${icon(state.authMode==='login'?'lock':'shield',16)} ${state.authMode==='login'?'Войти':'Создать аккаунт'}</button></form><div class="auth-switch">${state.authMode==='login'?'Нет аккаунта?':'Уже зарегистрирован?'} <button class="text-btn" data-action="switch-auth">${state.authMode==='login'?'Регистрация по приглашению':'Войти'}</button></div><div class="dotted"></div><div class="tiny muted">Защищённая сессия · учётные записи хранятся на сервере EMS COMMAND.</div></div></div></div>`;}
 function shell(){const pageLabel=(pages.find(x=>x[0]===state.page)||['','Администрирование'])[1];const unreads=state.notices.filter(n=>!n.read_at).length;return `<div class="layout ems38-layout ${state.mobile?'menu-open':''}"><aside class="rail"><div class="brand"><div class="brandmark v3-brandmark">${icon('medical',25)}</div><div><div class="brandtitle">EMS COMMAND</div><div class="branddesc">ГОСБОЛЬНИЦА / RP</div></div></div><div class="v3-sidebar-scroll"><div class="nav-label">РАБОЧЕЕ ПРОСТРАНСТВО</div><nav class="nav-group" aria-label="Основная навигация">${pages.map(([id,title,ic],i)=>`<button class="nav-link ${state.page===id?'active':''}" data-nav="${id}" ${state.page===id?'aria-current="page"':''}>${icon(ic,18)}<span>${title}</span>${id==='evidence'&&state.queue.some(j=>!j.finished)?'<i class="v3-nav-pulse"></i>':''}</button>`).join('')}</nav>${['admin','reviewer'].includes(state.user.role)?`<div class="nav-label v3-nav-admin">УПРАВЛЕНИЕ</div><button class="nav-link ${state.page==='admin'?'active':''}" data-nav="admin">${icon('shield',18)}<span>Администрирование</span></button>`:''}</div><div class="rail-bottom"><div class="ems38-rail-hub" aria-label="Быстрый доступ"><div class="ems38-hub-kicker"><span>БЫСТРЫЙ ДОСТУП</span><span>EMS / CONTROL</span></div><button class="ems38-hub-link" data-nav="shift">${icon('clock',16)}<span>Моя смена</span>${icon('arrow',14)}</button><button class="ems38-hub-link" data-nav="evidence">${icon('file',16)}<span>Архив кадров</span>${icon('arrow',14)}</button></div><button class="rail-person" data-nav="profile" aria-label="Открыть профиль"><div class="avatar">${userInitial(state.user)}</div><div class="v3-person-copy"><strong>${esc(state.user.displayName)}</strong><span>#${esc(state.user.staticId||'—')} · Ранг ${esc(state.user.rank)}</span></div>${icon('chevron',15)}</button></div></aside><main class="main"><header class="topbar ems38-topbar"><div class="v3-crumb-line"><button class="btn btn-ghost btn-icon mobile-menu" data-action="toggle-menu" aria-label="Меню">${icon('menu',20)}</button><span class="station-dot"></span><div class="crumb"><span class="ems38-crumb-label">EMS COMMAND</span> <span class="v3-crumb-divider">/</span> <span>${esc(state.user.serverName||'Кутузовский')}</span> <span class="v3-crumb-divider">/</span> <strong>${esc(pageLabel)}</strong></div></div><div class="top-actions" aria-label="Действия приложения"><span class="online-pill ${state.health?.ok?'':'disconnected'}"><i class="v3-online-ring"></i>${state.health?.ok?'На связи':'Нет связи'}</span><button class="btn btn-ghost btn-icon" data-action="desktop-updates" title="Проверить обновления" aria-label="Проверить обновления">${icon('clock',18)}</button><button class="btn btn-ghost btn-icon v3-bell" data-action="notices" title="Уведомления" aria-label="Уведомления${unreads?' · '+unreads+' непрочитанных':''}">${icon('bell',18)}${unreads?`<span class="icon-count"></span>`:''}</button><button class="btn btn-ghost btn-icon" data-action="logout" title="Выйти" aria-label="Выйти">${icon('out',18)}</button><button class="btn btn-primary v3-upload-top" data-action="upload" aria-label="Добавить скриншоты" title="Горячая клавиша: Ctrl+Shift+U">${icon('plus',17)}<span> Добавить скриншоты</span></button></div></header><div class="page ems391-page-enter" id="page">${(viewFns[state.page]||renderHome)(state)}</div></main></div>`;}
-function render(){state.systemReducedMotion=Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);const focusId=document.activeElement?.id;let sel=null;try{if(focusId){const el=document.activeElement;sel={start:el.selectionStart,end:el.selectionEnd};}}catch{}$('#app').innerHTML=state.user?shell():authView();setMotionPreference(state.motionEnabled);applyMotion($('#app'));if(focusId&&sel){try{let el=document.getElementById(focusId);if(el){el.focus();el.setSelectionRange(sel.start,sel.end);}}catch{}}}
+function render(){state.systemReducedMotion=Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);const focusId=document.activeElement?.id;let sel=null;try{if(focusId){const el=document.activeElement;sel={start:el.selectionStart,end:el.selectionEnd};}}catch{}$('#app').innerHTML=state.user?shell():authView();if(state.user&&state.systemReducedMotion&&!state.motionOverride&&state.motionEnabled){$('#page')?.insertAdjacentHTML('afterbegin','<div class="ems392-motion-alert" role="status"><span>Windows ограничивает анимации EMS COMMAND. Можно разрешить эффекты только для этого приложения.</span><button type="button" class="btn btn-primary" data-action="force-motion">Включить Motion/VFX</button></div>');}setMotionPreference(state.motionEnabled,state.motionOverride);applyMotion($('#app'));if(focusId&&sel){try{let el=document.getElementById(focusId);if(el){el.focus();el.setSelectionRange(sel.start,sel.end);}}catch{}}}
 async function refreshPage(){if(!state.user)return;try{
   const p=state.page;
   if(p==='home')state.dashboard=await request('/api/dashboard');
@@ -63,27 +85,46 @@ async function detail(id){try{let item=state.evidence?.items?.find(x=>x.id===id)
  }catch(e){toast('Ошибка',e.message,true)}}
 async function openNotifications(){try{const items=(await request('/api/notices')).items||[];showModal('Уведомления',noticeRows(items));if(items.some(n=>!n.read_at)){await request('/api/notices/read',{method:'POST',body:{}});state.notices=items.map(n=>({...n,read_at:n.read_at||new Date().toISOString()}));document.querySelector('.v3-bell .icon-count')?.remove();}}catch(e){toast('Ошибка',e.message,true)}}
 async function handleAction(action,el){
- if(action==='test-motion'){
-  const box=$('#ems391-motion-test'),label=$('#ems391-motion-status');
-  if(!box||!label)return;
-  const reduce=Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
-  const ready=state.motionEnabled&&!reduce&&!document.hidden;
-  box.setAttribute('aria-disabled',String(!ready));
-  box.classList.remove('is-testing');
-  if(!ready){
-   label.textContent=!state.motionEnabled?'Анимации выключены переключателем выше.':reduce?'Уменьшение движения включено в Windows. Выключи его, если хочешь увидеть эффект.':'Окно неактивно. Открой приложение для проверки.';
+ if(action==='force-motion'){
+   state.motionEnabled=true;state.motionOverride=true;
+   localStorage.setItem('ems-motion-enabled','true');
+   localStorage.setItem('ems-motion-force','true');
+   await saveMotionMode('on');
+   render();toast('Полный Motion/VFX включён','EMS COMMAND теперь показывает эффекты даже при ограничении Windows.');
    return;
   }
-  const track=box.querySelector('.ems391-motion-track');
-  const probe=box.querySelector('.ems391-motion-probe');
-  if(!track||!probe)return;
-  probe.style.setProperty('--ems391-travel',Math.max(0,track.clientWidth-29)+'px');
-  void box.offsetWidth;
-  box.classList.add('is-testing');
-  const active=window.getComputedStyle(probe).animationName.includes('ems391-motion-check');
-  label.textContent=active?'Движение запущено — световая метка пройдёт по линии за 2,7 секунды.':'Анимация не запустилась. Проверь системную настройку движения.';
-  return;
- }
+  if(action==='respect-system-motion'){
+   state.motionEnabled=true;state.motionOverride=false;
+   localStorage.removeItem('ems-motion-enabled');
+   localStorage.removeItem('ems-motion-force');
+   await saveMotionMode('system');
+   render();toast('Системный режим','EMS COMMAND снова учитывает ограничение движения Windows.');
+   return;
+  }
+  if(action==='test-motion'){
+   const box=$('#ems391-motion-test'),label=$('#ems391-motion-status');
+   if(!box||!label)return;
+   const reduce=Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+   const ready=state.motionEnabled&&(!reduce||state.motionOverride)&&!document.hidden;
+   box.setAttribute('aria-disabled',String(!ready));
+   box.classList.remove('is-testing');
+   if(!ready){
+    label.textContent=!state.motionEnabled?'Анимации выключены переключателем выше.':reduce?'Windows ограничивает движение. Нажми «Включить полный Motion/VFX», чтобы разрешить эффекты в EMS COMMAND.':'Окно неактивно. Открой приложение для проверки.';
+    toast('Проверка движения',label.textContent,true);
+    return;
+   }
+   const track=box.querySelector('.ems391-motion-track');
+   const probe=box.querySelector('.ems391-motion-probe');
+   if(!track||!probe)return;
+   probe.style.setProperty('--ems391-travel',Math.max(0,track.clientWidth-29)+'px');
+   void box.offsetWidth;
+   box.classList.add('is-testing');
+   const active=window.getComputedStyle(probe).animationName.includes('ems391-motion-check');
+   label.textContent=active?'Движение запущено: метка пройдёт линию за 2,7 секунды. Уведомление исчезнет за 5,5 секунды.':'CSS-анимация заблокирована. Проверь разрешение Motion/VFX.';
+   if(active)toast('Motion/VFX работает','Проверь движущуюся метку и полосу времени этого уведомления.');
+   else toast('Анимация не запустилась','CSS всё ещё запрещает движение. Проверь режим Motion/VFX.',true);
+   return;
+  }
  if(action==='upload'){ $('#global-files').click();return;}
  if(action==='clear-evidence-search'){state.evidenceSearch='';render();$('#evidence-search')?.focus({preventScroll:true});return;}
  if(action==='close-modal'){closeModal();return;}
@@ -149,16 +190,17 @@ async function onSubmit(form){const data=Object.fromEntries(new FormData(form));
 window.addEventListener('click',e=>{if(e.target.closest('#dropzone')&&!e.target.closest('[data-action]')){document.querySelector('#global-files')?.click();return;}const nav=e.target.closest('[data-nav]');if(nav){goto(nav.dataset.nav);return;}const filter=e.target.closest('[data-filter]');if(filter){state.filter=filter.dataset.filter;render();return;}const adminTab=e.target.closest('[data-admin-tab]');if(adminTab){state.adminTab=adminTab.dataset.adminTab;refreshPage();return;}const action=e.target.closest('[data-action]');if(action){handleAction(action.dataset.action,action);return;}if(e.target.id==='modal-root')closeModal();});
 window.addEventListener('submit',e=>{if(e.target.matches('form')){e.preventDefault();onSubmit(e.target);}});
 window.addEventListener('change',async e=>{if(e.target.id==='motion-switch'){
- state.motionEnabled=e.target.checked;
- localStorage.setItem('ems-motion-enabled',String(state.motionEnabled));
- setMotionPreference(state.motionEnabled);applyMotion($('#app'));
- const reduce=Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
- const box=$('#ems391-motion-test'),label=$('#ems391-motion-status');
- if(box){box.classList.remove('is-testing');box.setAttribute('aria-disabled',String(!state.motionEnabled||reduce));}
- if(label)label.textContent=!state.motionEnabled?'Анимации выключены переключателем выше.':reduce?'Уменьшение движения включено в Windows — эффекты остановлены.':'Эффекты разрешены. Нажми кнопку, чтобы увидеть движение.';
- toast(state.motionEnabled?(reduce?'Анимации ограничены Windows':'Анимации включены'):'Анимации отключены');
- return;
-}if(e.target.id==='global-files'){const files=e.target.files;e.target.value='';if(files?.length)await upload(files);return;}if(e.target.hasAttribute('data-check')){const shift=state.shifts?.shifts?.find(x=>!x.end_at);if(!shift)return;try{await request(`/api/shifts/${shift.id}/checklist`,{method:'POST',body:{key:e.target.dataset.check,value:e.target.checked}});await refreshPage();}catch(err){toast('Ошибка чек-листа',err.message,true);e.target.checked=!e.target.checked;}}});
+  state.motionEnabled=e.target.checked;
+  // Switching ON is an explicit app-level opt-in, even if Windows requests less motion.
+  state.motionOverride=e.target.checked;
+  localStorage.setItem('ems-motion-enabled',String(state.motionEnabled));
+  localStorage.setItem('ems-motion-force',String(state.motionOverride));
+  await saveMotionMode(state.motionEnabled?'on':'off');
+  render();
+  toast(state.motionEnabled?'Полный Motion/VFX включён':'Анимации отключены',
+   state.motionEnabled?'Кардиограмма, кнопки, переходы и уведомления теперь активны.':'Приложение остановило декоративное движение.');
+  return;
+ }if(e.target.id==='global-files'){const files=e.target.files;e.target.value='';if(files?.length)await upload(files);return;}if(e.target.hasAttribute('data-check')){const shift=state.shifts?.shifts?.find(x=>!x.end_at);if(!shift)return;try{await request(`/api/shifts/${shift.id}/checklist`,{method:'POST',body:{key:e.target.dataset.check,value:e.target.checked}});await refreshPage();}catch(err){toast('Ошибка чек-листа',err.message,true);e.target.checked=!e.target.checked;}}});
 window.addEventListener('input',e=>{
  if(e.target.id==='evidence-search'){
   state.evidenceSearch=e.target.value;
@@ -180,4 +222,4 @@ let lastNotices=null;
 setInterval(async()=>{if(!state.user)return;try{const r=await request('/api/notices');const items=r.items||[];const newer=lastNotices===null?[]:items.filter(n=>!n.read_at&&!lastNotices.has(n.id));lastNotices=new Set(items.map(n=>n.id));state.notices=items;for(const n of newer.slice(0,2))toast(n.title,n.message);const bell=document.querySelector('[data-action=notices]');if(bell&&items.some(n=>!n.read_at)&&!bell.querySelector('.icon-count'))bell.insertAdjacentHTML('beforeend','<span class="icon-count"></span>');}catch{}},20000);
 setInterval(()=>{const el=$('#shift-clock');const shift=state.shifts?.shifts?.find(x=>!x.end_at);if(el&&shift)el.textContent=duration(shift.start_at);const home=$('#home-shift-clock');if(home&&state.dashboard?.shift&&!state.dashboard.shift.end_at)home.textContent=duration(state.dashboard.shift.start_at);syncDutyTimeline(document,shift?.start_at);},1000);
 installCinematicPointer();installMotionEffects();
-(async function start(){try{state.health=await request('/api/health');const r=await request('/api/auth/me');state.user=r.user;setCsrf(r.csrf);if(state.user){await refreshPage();if(state.user.mustChangePassword)toast('Обнови пароль','Пароль необходимо сменить в профиле.');}else render();}catch(e){render();toast('Не удалось связаться с сервером',e.message,true);}})();
+(async function start(){try{await restoreMotionMode();state.health=await request('/api/health');const r=await request('/api/auth/me');state.user=r.user;setCsrf(r.csrf);if(state.user){await refreshPage();if(state.user.mustChangePassword)toast('Обнови пароль','Пароль необходимо сменить в профиле.');}else render();}catch(e){render();toast('Не удалось связаться с сервером',e.message,true);}})();

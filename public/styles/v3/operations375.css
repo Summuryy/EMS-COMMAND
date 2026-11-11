@@ -89,8 +89,8 @@
  .ems-career-brief-action {width:100%;justify-content:center}
 }
 @media(prefers-reduced-motion:reduce){
- .ems-duty-track>span,.ems-career-goal-meter>span {animation:none!important}
- .ems-career-goal:hover {transform:none}
+ html:not([data-motion="force"]) .ems-duty-track>span,html:not([data-motion="force"]) .ems-career-goal-meter>span {animation:none!important}
+ html:not([data-motion="force"]) .ems-career-goal:hover {transform:none}
 }
 html[data-motion="off"] .ems-duty-track>span,html[data-motion="off"] .ems-career-goal-meter>span {animation:none!important}
 html[data-motion="off"] .ems-career-goal:hover {transform:none}

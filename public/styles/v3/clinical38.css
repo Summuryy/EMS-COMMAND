@@ -375,6 +375,6 @@ html[data-motion="off"] .ems38-layout .v3-card-lift:hover,
 html[data-motion="off"] .ems38-layout .v3-number-card:hover,
 html[data-motion="off"] .ems38-layout .ems-career-goal:hover{transform:none!important}
 @media(prefers-reduced-motion:reduce){
- .ems38-layout .page,.ems38-home-brief{animation:none!important;transform:none!important;opacity:1!important}
- .ems38-layout .v3-card-lift:hover,.ems38-layout .v3-number-card:hover,.ems38-layout .ems-career-goal:hover{transform:none!important}
+ html:not([data-motion="force"]) .ems38-layout .page,html:not([data-motion="force"]) .ems38-home-brief{animation:none!important;transform:none!important;opacity:1!important}
+ html:not([data-motion="force"]) .ems38-layout .v3-card-lift:hover,html:not([data-motion="force"]) .ems38-layout .v3-number-card:hover,html:not([data-motion="force"]) .ems38-layout .ems-career-goal:hover{transform:none!important}
 }
