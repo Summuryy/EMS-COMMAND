@@ -1,0 +1,380 @@
+/* EMS COMMAND 3.8.0 — Clinical Command UI foundation.
+   A coherent cross-screen visual language: no new telemetry, backend or update logic.
+   Existing user and OS reduced-motion preferences remain authoritative. */
+:root {
+  --bg:#0b121c;--rail:#0d1823;--panel:#14222e;--raised:#1c2d39;
+  --line:#324552;--text:#edf7f7;--muted:#a9bbc5;
+  --green:#8bdccc;--aqua:#8bdccc;--amber:#e3bb7c;--danger:#ed8a8e;
+  --red:#e96f7e;--red2:#b74960;--red-soft:#e96f7e17;
+  --ems-surface:#14222e;--ems-stroke:#a1c7cb27;--ems-ink:#eef7f7;
+  --ems-dim:#afc1c9;--ems-accent:#8bdccc;
+  --ems38-edge:#a0c9cd24;--ems38-spot:#8bdccc;
+  --ems38-panel:linear-gradient(145deg,#1a2b38,#101b27 85%);
+  --heading-font:'Bahnschrift','Segoe UI Variable Display','Segoe UI',sans-serif;
+}
+html {scrollbar-color:#4a6470 #0e1822}
+body {
+  background:radial-gradient(ellipse 75% 42% at 85% -18%,#43796c16,transparent 72%),
+             radial-gradient(ellipse 50% 38% at -8% 99%,#19384b40,transparent 76%),#0b121c;
+  color:var(--text);
+}
+body:before{opacity:.10;background-size:56px 56px}
+::selection {background:#8bdccc64;color:#f8fffe}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,[tabindex]:focus-visible,
+.btn:focus-visible,.nav-link:focus-visible,.v3-text-action:focus-visible {
+  outline:2px solid #9de8d9;outline-offset:3px;
+}
+.ems38-layout {grid-template-columns:236px minmax(0,1fr)}
+.ems38-layout .rail {
+  background:linear-gradient(170deg,#101e2a,#0b1520 65%,#0c1620);
+  border-right:1px solid #76929f2a;
+  padding:17px 11px 15px;gap:18px;
+  box-shadow:8px 0 36px #02080d37;
+}
+.ems38-layout .brand {padding:5px 8px 16px;border-bottom:1px solid #8eafb21e;gap:11px}
+.ems38-layout .brandtitle{font-size:14px;letter-spacing:.105em;color:#f1f8f8}
+.ems38-layout .branddesc{color:#9bb1bf;font-size:9px}
+.ems38-layout .brandmark.v3-brandmark{
+  background:linear-gradient(140deg,#d85b6c,#8b344b);border-color:#f5a1ac3c;
+  width:39px;height:39px;border-radius:12px;box-shadow:0 9px 25px #9e385036;
+}
+.ems38-layout .v3-sidebar-scroll{padding:0 3px}
+.ems38-layout .nav-label{font-size:9px;color:#98b1bd;margin:6px 10px 12px;letter-spacing:.14em}
+.ems38-layout .nav-group{gap:3px}
+.ems38-layout .nav-link{
+  height:42px;min-height:42px;gap:11px;padding:0 11px;border-radius:9px;
+  color:#afc0cb;font-size:12px;letter-spacing:0;border:1px solid transparent;
+  transition:color .17s ease,background-color .17s ease,border-color .17s ease;
+}
+.ems38-layout .nav-link .icon{width:17px;height:17px;opacity:.85}
+.ems38-layout .nav-link:hover:not(:disabled){
+  transform:none;color:#f0fbf9;background:#85c8bb0b;border-color:#8bdccc19;
+}
+.ems38-layout .nav-link.active {
+  background:linear-gradient(90deg,#7ed3c11d,#7ed3c10a);
+  border-color:#82d9ca53;box-shadow:inset 0 0 0 1px #9af2db07;
+  color:#edfefa;animation:none;
+}
+.ems38-layout .nav-link.active:before {
+  left:0;top:8px;height:25px;width:3px;background:#8bdccc;box-shadow:0 0 14px #8bdccc56;
+}
+.ems38-layout .nav-link.active .icon{color:#a8e9db}
+.ems38-layout .nav-link.active:after{background:#8bdccc;box-shadow:0 0 9px #8bdccc44;animation:none}
+.ems38-layout .v3-nav-admin{margin-top:17px}
+.ems38-layout .rail-bottom{gap:8px}
+.ems38-rail-hub {
+  border:1px solid #779eaa31;background:linear-gradient(145deg,#172b37,#101d29);
+  border-radius:12px;padding:11px 10px;display:grid;gap:5px;
+  box-shadow:inset 0 1px #ffffff09;
+}
+.ems38-hub-kicker {display:flex;justify-content:space-between;gap:8px;
+  font-size:9px;letter-spacing:.075em;font-weight:800;color:#a2c8ca;margin:0 3px 5px}
+.ems38-hub-kicker>span:last-child{color:#718e9b;font-size:8px;white-space:nowrap}
+.ems38-hub-link{
+  min-height:36px;padding:0 9px;border-radius:8px;display:flex;align-items:center;gap:10px;
+  background:#ffffff04;border:1px solid transparent;color:#d0e4e7;font-size:11px;
+  text-align:left;transition:background .17s,border-color .17s;
+}
+.ems38-hub-link:hover{background:#8bdccc12;border-color:#8bdccc35}
+.ems38-hub-link>.icon:first-child{color:#8bdccc}
+.ems38-hub-link>span{flex:1}
+.ems38-layout .rail-person{padding:10px 5px 0;min-height:47px}
+.ems38-layout .rail-person .avatar{background:#274b4d;border-color:#8bdccc40;color:#e7fcf4}
+.ems38-layout .v3-person-copy strong{font-size:12px;color:#eef8f8}
+.ems38-layout .v3-person-copy span{font-size:10px;color:#9aafba}
+.ems38-layout .main{min-width:0;overflow-x:clip}
+.ems38-topbar {
+  height:68px;min-height:68px;background:#101b27f5;
+  border-bottom:1px solid #93b9c02a;
+  padding:0 148px 0 clamp(16px,2.2vw,30px)!important;
+  display:flex;justify-content:space-between;gap:14px;align-items:center;
+  box-shadow:0 8px 25px #01070d27;backdrop-filter:blur(16px);
+}
+.ems38-topbar .v3-crumb-line {min-width:0;flex:1;gap:10px;overflow:hidden}
+.ems38-topbar .station-dot {width:7px;height:7px;box-shadow:0 0 0 4px #8bdccc1c; background:#8bdccc;animation:none}
+.ems38-topbar .crumb{min-width:0;overflow:hidden;text-overflow:ellipsis;
+  color:#afc2c9;font-weight:750;font-size:10px;letter-spacing:.035em}
+.ems38-topbar .crumb strong{color:#effaf9}
+.ems38-crumb-label{color:#bad3d5}
+.ems38-topbar .v3-crumb-divider{color:#78a79d;margin:0 5px}
+.ems38-topbar .top-actions{display:flex;align-items:center;gap:7px;flex-shrink:0;min-width:0}
+.ems38-topbar .online-pill{
+  background:#17362f;border-color:#8bdccc46;color:#a8e8d2;
+  border-radius:9px;padding:8px 11px;white-space:nowrap;font-size:11px;box-shadow:none;
+}
+.ems38-topbar .v3-online-ring {background:#8bdccc;box-shadow:0 0 8px #8bdccc5a}
+.ems38-topbar .online-pill.disconnected{background:#39252b;color:#efb5b5;border-color:#ed8a8e70}
+.ems38-topbar .btn-icon{min-width:36px;width:36px;height:36px;min-height:36px;padding:0}
+.ems38-topbar .v3-upload-top {height:36px;min-height:36px;padding:0 12px;margin-left:3px;max-width:228px}
+.ems38-topbar .v3-upload-top .icon{width:16px;height:16px}
+.ems38-layout .page {
+  max-width:1510px;
+  padding:25px clamp(19px,2.75vw,41px) 54px;
+}
+.ems38-layout .v3-eyebrow {font-size:10px;color:#a5d9d2;letter-spacing:.13em}
+.ems38-layout .eyebrow-index{background:#8bdccc12;border-color:#8bdccc42;color:#a4e6d7;border-radius:6px}
+.ems38-layout .eyebrow-line{background:linear-gradient(90deg,#8bdccc72,transparent)}
+.ems38-layout .v3-intro{margin-bottom:19px}
+.ems38-layout .v3-intro h1 {font-size:clamp(31px,2.8vw,44px);letter-spacing:-.045em;margin:6px 0 7px}
+.ems38-layout .v3-intro p{font-size:12.5px;color:#afc4ce;line-height:1.6}
+.ems38-layout .v3-section-title{margin:25px 0 14px;gap:12px}
+.ems38-layout .v3-section-title h2{font-size:19px;color:#edf8f8;letter-spacing:-.026em}
+.ems38-layout .v3-section-title p{font-size:11.5px;color:#a3bbc5;line-height:1.5;margin-left:36px}
+.ems38-layout .section-index{background:#8bdccc0f;color:#9de4d5;border-color:#8bdccc38}
+.ems38-layout .v3-panel-kicker{color:#a6dcd2}
+.ems38-layout .v3-beacon {background:#79cdb8;box-shadow:0 0 0 4px #79cdb810,0 0 8px #79cdb84a}
+.ems38-layout .v3-beacon.active{background:#8be3b4}
+.ems38-layout .panel {
+  background:var(--ems38-panel);border:1px solid var(--ems38-edge);
+  border-radius:14px;padding:20px;box-shadow:0 13px 40px #03080e2c,inset 0 1px #ffffff08;
+}
+.ems38-layout .panel:focus-within{border-color:#8bdccc54}
+.ems38-layout .btn {
+  border-radius:9px;min-height:37px;
+  background:#20323e;border-color:#97b7bd35;color:#e3f2f2;
+  font-size:12px;box-shadow:inset 0 1px #ffffff0c;
+}
+.ems38-layout .btn:hover:not(:disabled){background:#2a424c;border-color:#8bdccc72;color:#fff}
+.ems38-layout .btn-primary {
+  background:linear-gradient(125deg,#a2e7d8,#77cbb8);color:#0d2b31;
+  border-color:#b7fff056;box-shadow:0 9px 26px #1c81732b,inset 0 1px #ffffff9b;
+}
+.ems38-layout .btn-primary:hover:not(:disabled){
+  background:linear-gradient(125deg,#bbf3e4,#89dac6);color:#09232a;
+  box-shadow:0 12px 30px #247d703c;
+}
+.ems38-layout .btn-red{background:#472a37;border-color:#e58f9570;color:#f9c8cc}
+.ems38-layout .btn-red:hover:not(:disabled){background:#633243;color:#fff}
+.ems38-layout .btn-ghost {background:#ffffff04;border-color:#93b6c238}
+.ems38-layout .v3-text-action{color:#9be1d3;font-size:12px}
+.ems38-layout .v3-text-action:hover{color:#f1fffa}
+.ems38-layout .v3-chip-row span,.ems38-layout .v3-info-chip{border-color:#a0c8cc25;color:#c7dce0}
+.ems38-layout .v3-progress-ring {
+  background:conic-gradient(from 0deg,#8bdccc calc(var(--ring)*1%),#ffffff16 0);
+  box-shadow:0 0 18px #8bdccc14;filter:none;
+}
+.ems38-layout .bar>span{background:linear-gradient(90deg,#568f92,#8bdccc)}
+.ems38-layout .v3-card-lift:hover,.ems38-layout .v3-number-card:hover{
+  border-color:#8bdccc50;box-shadow:0 18px 39px #03080e49;transform:translateY(-2px);
+}
+.ems38-layout .v3-no-goals{grid-column:1/-1}
+.ems38-layout .badge.accepted,.ems38-layout .badge.verified{color:#9fe6d0}
+.ems38-layout .badge.review{color:#f0cb88}
+.ems38-layout .v3-disclaimer{color:#849aa5}
+
+/* Command center: an editorial hero plus a genuine, state-driven readout. */
+.ems38-home-hero {
+  min-height:318px;border-radius:17px;border-color:#8bdccc38;
+  background-color:#0f2230;display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(225px,.37fr);align-items:center;
+  position:relative;
+  box-shadow:0 22px 58px #03060d6b;
+}
+.ems38-home-hero:before {background:linear-gradient(90deg,#08141fea 3%,#0b1b2de6 51%,#0c2435c5 80%,#10263391 100%);animation:none}
+.ems38-home-hero:after{opacity:.22;animation:none}
+.ems38-home-hero .v3-hero-content {padding:28px clamp(27px,3vw,44px);max-width:680px;z-index:4}
+.ems38-home-hero .v3-hud-label{font-size:9.5px;color:#b5e6d8;letter-spacing:.11em;text-shadow:none}
+.ems38-home-hero .v3-hud-label:before {background:#8bdccc;animation:none}
+.ems38-home-hero h1 {
+  font-size:clamp(36px,3.7vw,54px);letter-spacing:-.055em;
+  line-height:1.035;margin:15px 0 12px;max-width:510px;
+}
+.ems38-home-hero h1 em {color:#9be6d5}
+.ems38-home-hero p {font-size:13px;line-height:1.65;max-width:490px;color:#bbd1d7}
+.ems38-home-hero .v3-hero-actions{margin-top:20px;gap:10px}
+.ems38-home-hero .v3-hero-actions .btn{height:40px}
+.ems38-home-hero .v3-hero-data{display:none}
+.ems38-home-brief {
+  position:relative;z-index:5;margin:15px 17px 15px 0;padding:18px 18px 14px;
+  border:1px solid #91d6c456;background:#0c1a25df;border-radius:13px;
+  box-shadow:0 20px 45px #0207124d;display:grid;gap:13px;min-width:0;
+  backdrop-filter:blur(10px);
+}
+.ems38-brief-label {display:flex;align-items:center;gap:7px;font-size:9px;
+  letter-spacing:.095em;font-weight:900;color:#9fe2d4;padding-bottom:6px}
+.ems38-brief-row {display:flex;justify-content:space-between;align-items:center;gap:10px;
+  border-bottom:1px solid #ffffff11;padding-bottom:10px;font-size:11px;color:#acbfca}
+.ems38-brief-row strong{font-size:13px;color:#f1fbf8;white-space:nowrap}
+.ems38-brief-row .ems38-positive{color:#9be7cb}
+.ems38-brief-signal {display:flex;align-items:center;gap:12px;color:#8ca9af;
+  font-size:8px;font-weight:800;letter-spacing:.06em}
+.ems38-brief-signal .ecg {width:82px;flex:0 0 82px;height:20px;opacity:.65;filter:none}
+.ems38-brief-signal .ems-ecg-line {filter:none}
+.ems38-command-stats {margin-top:12px;gap:9px;grid-template-columns:repeat(4,minmax(0,1fr))}
+.ems38-command-stats .v3-number-card {
+  min-height:126px;padding:16px 17px;border-radius:12px;
+  background:linear-gradient(145deg,#1d2e39,#13202c);
+  border:1px solid #9dbbc427;box-shadow:inset 0 1px #ffffff0b;
+}
+.ems38-command-stats .v3-number-card>strong{font-size:32px;margin-top:3px;letter-spacing:-.035em}
+.ems38-command-stats .v3-number-card>span:nth-child(2){font-size:11px;color:#bdcfd4}
+.ems38-command-stats .v3-number-card>small {font-size:10.5px;color:#9fb2be}
+.ems38-command-stats .v3-stat-icon {color:#9bdaca;background:#8bdccc14;border-color:#8bdccc30}
+.ems38-command-stats .v3-number-card:before {
+  content:'01';position:absolute;top:15px;right:16px;
+  color:#7e9ba5;letter-spacing:.1em;font:750 9px var(--data-font);
+}
+.ems38-command-stats .v3-number-card:nth-child(2):before{content:'02'}
+.ems38-command-stats .v3-number-card:nth-child(3):before{content:'03'}
+.ems38-command-stats .v3-number-card:nth-child(4):before{content:'04'}
+.ems38-layout .v3-service{min-height:191px}
+.ems38-layout .v3-service .v3-orbit-icon{
+  color:#99decf;border-color:#8bdccc56;
+  background:radial-gradient(circle,#3a8f8040,transparent 71%);
+  box-shadow:0 0 0 7px #8bdccc07;
+}
+.ems38-layout .v3-rank-seal {background:#234047;border-color:#8bdccc40;color:#b6f0df}
+.ems38-layout .v3-pulse-panel .ecg{opacity:.5;max-height:29px}
+
+/* Duty: bring key actions, progress and readiness into a usable viewport. */
+.ems38-shift-command {min-height:194px;grid-template-columns:minmax(0,1fr) minmax(0,.62fr);background:linear-gradient(112deg,#1c2c39,#12212e 80%)}
+.ems38-shift-command .v3-shift-hero-main {padding:20px 27px}
+.ems38-shift-command .v3-time {font-size:clamp(46px,5vw,68px);margin-top:8px;line-height:1.07}
+.ems38-shift-command .v3-shift-time-caption{font-size:11.5px;margin-top:7px}
+.ems38-shift-command .v3-shift-actions{margin-top:14px}
+.ems38-shift-command .v3-shift-wave{padding:12px 24px;background:radial-gradient(circle,#407f7317,transparent 65%)}
+.ems38-shift-command .v3-shift-wave .ecg{height:55px;filter:drop-shadow(0 0 4px #8bdccc24)}
+.ems38-shift-command .v3-wave-caption{color:#b7d7d5}
+.ems38-duty-overview {margin:11px 0;gap:10px;grid-template-columns:minmax(0,1.08fr) minmax(0,1.2fr) minmax(170px,.65fr)}
+.ems38-duty-overview>div {padding:16px 18px;background:linear-gradient(140deg,#192d38,#11212c);
+  border-radius:12px;box-shadow:inset 0 1px #ffffff08;min-height:118px}
+.ems38-duty-overview .ems-duty-status-card strong {font-size:16px;margin:8px 0 3px}
+.ems38-duty-overview .ems-duty-status-card p,.ems38-duty-overview .ems-duty-readiness p{font-size:11px;margin-top:6px;line-height:1.5}
+.ems38-duty-overview .ems-duty-history-card strong {font-size:32px;margin:3px 0}
+.ems38-layout .v3-preflight-top h2{font-size:19px}
+.ems38-layout .v3-preflight .v3-progress-ring{width:65px;height:65px}
+.ems38-layout .v3-check-list .check-row{min-height:45px;font-size:12px}
+.ems38-layout .v3-duty-note .v3-duties p{line-height:1.55}
+.ems38-layout .v3-timeline-dot{border-color:#8bdccc48}
+
+/* Career: personnel record and requirements visible sooner, without false approvals. */
+.ems38-personnel-file {
+  min-height:165px;grid-template-columns:145px minmax(0,1fr) 100px;
+  background:linear-gradient(115deg,#21353e,#132330 85%);
+  border-color:#8bdccc4c;border-radius:14px;
+}
+.ems38-personnel-file .v3-career-rank {padding:12px;border-color:#8bdccc25}
+.ems38-personnel-file .v3-career-rank>strong {
+  font-size:70px;margin:0 0 3px;line-height:1.03;color:#f2fbf9;text-shadow:none;
+}
+.ems38-personnel-file .v3-career-rank .v3-panel-kicker {font-size:9px;color:#a9dccc}
+.ems38-personnel-file .v3-career-body {padding:19px 24px;min-width:0}
+.ems38-personnel-file .v3-career-body h2{font-size:27px}
+.ems38-personnel-file .v3-career-body p{margin-top:6px;font-size:12px}
+.ems38-personnel-file .v3-career-chipset{margin:12px 0}
+.ems38-personnel-file .v3-career-crest{opacity:.28;color:#9edccc}
+.ems38-career-brief{
+  padding:15px 19px;grid-template-columns:minmax(0,1fr) minmax(130px,180px) auto;
+  gap:18px;background:linear-gradient(133deg,#18343b,#0e1e29);
+  border-radius:12px;margin:11px 0;
+}
+.ems38-career-brief .ems-career-brief-primary>strong{font-size:16px;margin:7px 0 4px}
+.ems38-career-brief .ems-career-brief-primary p {font-size:11px;max-width:630px}
+.ems38-career-brief .ems-career-brief-count strong{font-size:29px}
+.ems38-career-brief .ems-career-brief-count>span{font-size:11px}
+.ems38-career-brief .ems-career-brief-action{min-height:35px}
+.ems38-layout .v3-goals{gap:11px}
+.ems38-layout .v3-goal-card {min-height:235px;gap:10px;padding:17px}
+.ems38-layout .v3-goal-body{gap:12px}
+.ems38-layout .v3-goal-body .v3-progress-ring{width:62px;height:62px}
+.ems38-layout .v3-goal-card .v3-progress-ring .ring-content strong{font-size:17px}
+.ems38-layout .v3-goal-card>p{font-size:11px;color:#aabdc7;line-height:1.6}
+.ems38-layout .v3-goal-warning{font-size:10px;line-height:1.45}
+.ems38-layout .ems-career-goal{transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.ems38-layout .ems-career-goal:hover{transform:translateY(-2px);border-color:#8bdccc45}
+.ems38-layout .ems-career-goal-state{font-size:10px}
+
+/* Input, empty and feedback states across functional screens. */
+.ems38-layout .field,.ems38-layout input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.ems38-layout select,.ems38-layout textarea{
+  border-color:#a2c7c840;background:#0e1c27;color:#ebf7f7;
+}
+.ems38-layout .field:focus,.ems38-layout input:focus-visible,.ems38-layout textarea:focus-visible{
+  border-color:#8bdccc91;box-shadow:0 0 0 3px #8bdccc1c;
+}
+.ems38-layout .v3-evidence-drop{border-color:#8bdccc64;background:radial-gradient(circle at 50% -30%,#31776a26,transparent 75%),#101f2a}
+.ems38-layout .v3-evidence-drop:hover,.ems38-layout .v3-evidence-drop.dragover{border-color:#8bdcccbb}
+.ems38-layout .v3-index{color:#9ce5d5;background:#8bdccc12;border-color:#8bdccc3a}
+
+/* Genuine UI motion: subtle transforms and opacity; never invents values. */
+@keyframes ems38-enter{from{opacity:.65;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.ems38-layout .page{animation:ems38-enter .24s cubic-bezier(.2,.7,.3,1) both}
+.ems38-home-brief{animation:ems38-enter .34s cubic-bezier(.2,.7,.3,1) both}
+.ems38-layout .v3-home-hero:before,.ems38-layout .v3-home-hero:after{animation:none}
+@media(max-width:1440px){
+ .ems38-layout{grid-template-columns:218px minmax(0,1fr)}
+ .ems38-topbar{gap:8px}
+ .ems38-topbar .v3-upload-top{max-width:175px}
+ .ems38-layout .page{padding-inline:23px}
+ .ems38-career-brief{grid-template-columns:minmax(0,1fr) auto}
+ .ems38-career-brief .ems-career-brief-action{grid-column:1/-1;justify-self:start}
+}
+@media(max-width:1170px){
+ .ems38-topbar .crumb>span:not(.ems38-crumb-label){display:none}
+ .ems38-topbar .v3-crumb-divider{display:none}
+ .ems38-topbar .v3-upload-top span{display:none}
+ .ems38-topbar .v3-upload-top{min-width:36px;width:36px;padding:0;justify-content:center}
+ .ems38-topbar .online-pill{padding:7px 9px}
+ .ems38-home-hero{grid-template-columns:minmax(0,1fr) 235px}
+ .ems38-home-brief{padding:15px}
+ .ems38-home-hero h1{font-size:clamp(33px,3.8vw,47px)}
+ .ems38-duty-overview{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .ems38-duty-overview .ems-duty-history-card{grid-column:1/-1;min-height:auto}
+ .ems38-personnel-file{grid-template-columns:130px minmax(0,1fr) 70px}
+}
+@media(max-width:960px){
+ .ems38-home-hero{display:block;min-height:320px}
+ .ems38-home-brief{display:none}
+ .ems38-home-hero .v3-hero-content{max-width:740px}
+ .ems38-home-hero .v3-hero-data{display:none}
+ .ems38-command-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .ems38-topbar .online-pill{font-size:0;gap:0;padding:9px}
+ .ems38-topbar .online-pill .v3-online-ring{width:8px;height:8px}
+ .ems38-personnel-file{grid-template-columns:120px minmax(0,1fr)}
+ .ems38-personnel-file .v3-career-crest{display:none}
+}
+@media(max-width:800px){
+ .ems38-layout{grid-template-columns:minmax(0,1fr)}
+ .ems38-layout .rail{width:254px;z-index:31;box-shadow:16px 0 44px #0008}
+ .ems38-topbar{padding:0 20px 0 16px!important}
+ .ems38-topbar .mobile-menu{display:inline-flex}
+ .ems38-topbar .crumb{max-width:180px}
+ .ems38-layout .page{padding:20px 17px 45px}
+ .ems38-shift-command{grid-template-columns:1fr}
+ .ems38-shift-command .v3-shift-wave{padding:10px 20px}
+}
+@media(max-width:630px){
+ .ems38-topbar .crumb>span.ems38-crumb-label{display:none}
+ .ems38-topbar .crumb{font-size:10px;max-width:110px}
+ .ems38-topbar .top-actions{gap:4px}
+ .ems38-topbar .btn-icon{width:31px;min-width:31px}
+ .ems38-topbar .online-pill{display:none}
+ .ems38-home-hero{min-height:350px}
+ .ems38-home-hero .v3-hero-content{padding:24px 20px}
+ .ems38-home-hero h1{font-size:36px}
+ .ems38-layout .v3-intro h1{font-size:32px}
+ .ems38-command-stats{gap:8px}
+ .ems38-command-stats .v3-number-card{padding:13px;min-height:117px}
+ .ems38-command-stats .v3-number-card>strong{font-size:29px}
+ .ems38-duty-overview{grid-template-columns:1fr}
+ .ems38-duty-overview .ems-duty-history-card{grid-column:auto}
+ .ems38-personnel-file{grid-template-columns:97px minmax(0,1fr);min-height:165px}
+ .ems38-personnel-file .v3-career-rank>strong{font-size:58px}
+ .ems38-personnel-file .v3-career-body{padding:16px}
+ .ems38-personnel-file .v3-career-body h2{font-size:22px}
+ .ems38-career-brief{grid-template-columns:1fr;gap:12px}
+ .ems38-career-brief .ems-career-brief-count{text-align:left}
+ .ems38-career-brief .ems-career-brief-action{grid-column:auto}
+ .ems38-layout .v3-goals{grid-template-columns:1fr}
+ .ems38-layout .panel{padding:17px}
+}
+/* All animations are optional and must not affect function or accessibility. */
+html[data-motion="off"] .ems38-layout .page,
+html[data-motion="off"] .ems38-home-brief{animation:none!important;transform:none!important;opacity:1!important}
+html[data-motion="off"] .ems38-layout .v3-card-lift:hover,
+html[data-motion="off"] .ems38-layout .v3-number-card:hover,
+html[data-motion="off"] .ems38-layout .ems-career-goal:hover{transform:none!important}
+@media(prefers-reduced-motion:reduce){
+ .ems38-layout .page,.ems38-home-brief{animation:none!important;transform:none!important;opacity:1!important}
+ .ems38-layout .v3-card-lift:hover,.ems38-layout .v3-number-card:hover,.ems38-layout .ems-career-goal:hover{transform:none!important}
+}

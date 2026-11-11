@@ -100,3 +100,47 @@ test('duty and career motion respects reduced-motion and in-app toggle',()=>{
  assert.match(css,/html\[data-motion="off"\]/);
  assert.match(css,/@keyframes ems375-bar/);
 });
+
+test('3.8 command center keeps state-driven readout, functional navigation and no fake evidence',()=>{
+ const html=renderHome({...base,dashboard:{...base.dashboard,stats:{total:11,accepted:6,review:3,rejected:2}}});
+ assert.match(html,/ems38-home-hero/);
+ assert.match(html,/ems38-home-brief/);
+ assert.match(html,/Кадры на проверке/);
+ assert.match(html,/Принято доказательств/);
+ assert.match(html,/ems38-command-stats/);
+ assert.match(html,/data-nav="shift"/);
+ assert.match(html,/data-action="upload"/);
+ assert.match(html,/>3<\/strong>/);
+ assert.match(html,/>6<\/strong>/);
+ assert.match(html,/Не начато/);
+ assert.doesNotMatch(html,/СМЕНА АКТИВНА/);
+});
+test('3.8 all page redesign preserves actual shift and career event contracts',()=>{
+ const shift=renderShift(base),career=renderCareer(base);
+ assert.match(shift,/ems38-shift-command/);
+ assert.match(shift,/ems38-duty-overview/);
+ assert.match(shift,/data-action="start-shift"/);
+ assert.match(shift,/Время наступления точки не означает/);
+ assert.match(career,/ems38-personnel-file/);
+ assert.match(career,/ems38-career-brief/);
+ assert.match(career,/Нужна проверка места|Нормативы не найдены/);
+ assert.match(career,/Ранг изменяется администратором/);
+});
+test('3.8 shared UI system loads last and protects Windows caption and motion',()=>{
+ const index=fs.readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
+ const style=fs.readFileSync(new URL('../public/styles/v3/clinical38.css',import.meta.url),'utf8');
+ const js=fs.readFileSync(new URL('../public/js/app.js',import.meta.url),'utf8');
+ assert.ok(index.lastIndexOf('clinical38.css')>index.lastIndexOf('operations375.css'));
+ assert.match(index,/padding-right: 148px/);
+ assert.match(style,/\.ems38-topbar\s*\{/);
+ assert.match(style,/padding:0 148px 0/);
+ assert.match(style,/@media\(max-width:1170px\)/);
+ assert.match(style,/@media\(max-width:800px\)/);
+ assert.match(style,/@media\(prefers-reduced-motion:reduce\)/);
+ assert.match(style,/html\[data-motion="off"\]/);
+ assert.match(js,/aria-label="Добавить скриншоты"/);
+ assert.match(js,/data-nav="shift"/);
+ assert.match(js,/data-nav="evidence"/);
+ assert.match(js,/data-action="desktop-updates"/);
+ assert.match(js,/data-action="logout"/);
+});
