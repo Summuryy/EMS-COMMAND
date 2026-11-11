@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {NAV_SECTIONS,navigationForRole,navTitle} from '../public/js/navigation.js';
 import {renderProfile} from '../public/js/views/profile.js';
+import {renderHome} from '../public/js/views/home.js';
 
 const read=path=>fs.readFileSync(new URL(path,import.meta.url),'utf8');
 const app=read('../public/js/app.js');
@@ -59,4 +60,15 @@ test('3.9.3 OCR resumes pending work after local server can start',()=>{
  assert.match(server,/12000/);
  assert.match(read('../desktop/main.cjs'),/setPermissionRequestHandler/);
  assert.equal(JSON.parse(read('../package.json')).version,'3.9.3');
+});
+
+test('new players see an actionable, truthful first-shift guide',()=>{
+ const user={displayName:'Новый игрок',rank:1,role:'user',serverName:'Россия Онлайн',department:'EMS'};
+ const initial=renderHome({user,dashboard:{stats:{total:0,accepted:0,review:0,rejected:0},shift:null,recent:[],notices:[]}});
+ assert.match(initial,/Три шага для первой смены/);
+ assert.match(initial,/data-nav="profile"/);
+ assert.match(initial,/data-nav="shift"/);
+ assert.match(initial,/data-action="upload"/);
+ const already=renderHome({user,dashboard:{stats:{total:10,accepted:2,review:8,rejected:0},shift:null,recent:[],notices:[]}});
+ assert.doesNotMatch(already,/Три шага для первой смены/);
 });
