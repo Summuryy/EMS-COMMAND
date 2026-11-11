@@ -187,3 +187,27 @@ test('3.8.1 final stylesheet order, media sizing and motion access',()=>{
  assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
  assert.match(css,/html\[data-motion="off"\]/);
 });
+
+test('3.8.2 idle command panel does not manufacture evidence acceptance percentage',()=>{
+ const html=renderHome({...base,dashboard:{...base.dashboard,stats:{total:0,accepted:0,review:0,rejected:0}}});
+ assert.match(html,/Нет данных о доле принятых кадров/);
+ assert.match(html,/class="ems382-no-metric"/);
+ assert.doesNotMatch(html,/aria-label="Принято: 0%"/);
+ assert.match(html,/data-nav="shift"/);
+});
+test('3.8.2 login, update modal and layout style are loaded without changing auth handlers',()=>{
+ const index=fs.readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
+ const style=fs.readFileSync(new URL('../public/styles/v3/acceptance382.css',import.meta.url),'utf8');
+ const source=fs.readFileSync(new URL('../public/js/app.js',import.meta.url),'utf8');
+ assert.ok(index.indexOf('acceptance382.css')>index.indexOf('cohesion381.css'));
+ assert.match(source,/ems382-auth-accent/);
+ assert.match(source,/id="auth-form"/);
+ assert.match(source,/id="profile-form"|id==='profile-form'/);
+ assert.match(source,/data-action="switch-auth"/);
+ assert.match(source,/data-action="desktop-updates"/);
+ assert.match(style,/@media\(max-width:980px\)/);
+ assert.match(style,/@media\(max-width:620px\)/);
+ assert.match(style,/@media\(prefers-reduced-motion:reduce\)/);
+ assert.match(style,/html\[data-motion="off"\]/);
+ assert.match(style,/\.ems38-layout \.empty/);
+});
