@@ -49,7 +49,7 @@ test('3.9.1 Profile has a functional accessible test action and honest user/OS m
  assert.match(off,/Эффекты выключены/);
  const osOff=renderProfile({...base,systemReducedMotion:true});
  assert.match(osOff,/aria-disabled="true"/);
- assert.match(osOff,/Windows — эффекты остановлены/);
+ assert.match(osOff,/Windows ограничивает движение/);
  assert.match(app,/if\(action==='test-motion'\)/);
  assert.match(app,/!state\.motionEnabled\?'Анимации выключены/);
  assert.match(app,/matchMedia\?\.\('\(prefers-reduced-motion: reduce\)'\)/);
@@ -68,13 +68,13 @@ test('3.9.1 reduced motion, inactive-window pause and privacy are still respecte
  assert.match(css,/@media\(max-width:560px\)/);
  assert.match(css,/\.ems391-motion-test button:focus-visible/);
  assert.match(app,/localStorage\.setItem\('ems-motion-enabled'/);
- assert.match(app,/setMotionPreference\(state\.motionEnabled\);applyMotion\(\$\('#app'\)\)/);
+ assert.match(app,/setMotionPreference\(state\.motionEnabled,state\.motionOverride\);applyMotion\(\$\('#app'\)\)/);
  assert.doesNotMatch(css,/animation:.*(?:capture-fake|evidence-approve|rank-up)/);
 });
 
 test('3.9.1 app version is isolated from release request pending CI',()=>{
  const pkg=JSON.parse(fs.readFileSync(new URL('../package.json',import.meta.url),'utf8'));
- assert.equal(pkg.version,'3.9.1');
+ assert.equal(pkg.version,'3.9.2');
  assert.match(app,/data-action="upload"/);
  assert.match(app,/data-action="logout"/);
  assert.match(renderShift(base),/data-action="start-shift"/);
