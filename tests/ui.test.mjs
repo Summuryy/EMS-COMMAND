@@ -139,8 +139,8 @@ test('3.8 shared UI system loads last and protects Windows caption and motion',(
  assert.match(style,/@media\(prefers-reduced-motion:reduce\)/);
  assert.match(style,/html\[data-motion="off"\]/);
  assert.match(js,/aria-label="Добавить скриншоты"/);
- assert.match(js,/data-nav="shift"/);
- assert.match(js,/data-nav="evidence"/);
+ assert.match(js,/renderSidebarNavigation\(\)/);
+ assert.match(js,/navigationForRole\(state.user.role\)/);
  assert.match(js,/data-action="desktop-updates"/);
  assert.match(js,/data-action="logout"/);
 });
