@@ -10,6 +10,7 @@ const {initUpdates} = require('./updates.cjs');
 const {validMode,readMotionPreference,writeMotionPreference,isTrustedMotionSender} = require('./motion-preferences.cjs');
 let mainWindow, backend, shuttingDown=false;
 let activePort=0;let dataDir,root,engineEnv;let settingUp=false;
+const bootStarted=Date.now();
 function log(line){
   try{const dir=join(app.getPath('userData'),'logs');mkdirSync(dir,{recursive:true});appendFileSync(join(dir,'desktop.log'),new Date().toISOString()+' '+String(line)+'\n');}catch{}
 }
@@ -27,6 +28,7 @@ function splash(){
  mainWindow.on('closed',()=>{mainWindow=null;});
 }
 async function launchServer(){
+ const serverStart=Date.now();
  try{
   activePort=await freePort();
   const healthToken=crypto.randomBytes(32).toString('hex');
@@ -43,8 +45,10 @@ async function launchServer(){
     await new Promise(r=>setTimeout(r,180));
   }
   if(!ready)throw Error('Локальный сервер не ответил. Проверьте desktop.log.');
+  log('PERF backend-ready-ms='+String(Date.now()-serverStart));
   const url=`http://127.0.0.1:${activePort}/`;
   await mainWindow.loadURL(url);
+  log('PERF window-load-ms='+String(Date.now()-bootStarted));
   log('Application ready '+url);
  }catch(e){error('EMS COMMAND — ошибка запуска',e.stack||e.message);app.quit();}
 }
@@ -67,6 +71,7 @@ async function start(){
  splash();
  initUpdates(()=>mainWindow,log,(url)=>{try{const parsed=new URL(url);return parsed.protocol==='http:'&&parsed.hostname==='127.0.0.1'&&parsed.port===String(activePort)&&parsed.pathname==='/';}catch{return false;}});
  const has=await runNode('tools/has-admin.mjs');
+ log('PERF admin-check-ms='+String(Date.now()-bootStarted));
  if(!has.ok){error('Ошибка базы данных',has.error);app.quit();return;}
  if(has.out.trim()!=='YES'){
     settingUp=true;
