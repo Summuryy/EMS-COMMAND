@@ -88,6 +88,7 @@ async function handleAction(action,el){
    box.classList.remove('is-testing');
    if(!ready){
     label.textContent=!state.motionEnabled?'Анимации выключены переключателем выше.':reduce?'Windows ограничивает движение. Нажми «Включить полный Motion/VFX», чтобы разрешить эффекты в EMS COMMAND.':'Окно неактивно. Открой приложение для проверки.';
+    toast('Проверка движения',label.textContent,true);
     return;
    }
    const track=box.querySelector('.ems391-motion-track');
