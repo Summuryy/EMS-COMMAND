@@ -43,7 +43,7 @@ export function createToastCenter({getRoot, icon, now = () => performance.now(),
     }
   }
   function startTimer() {
-    if (timer === null) timer = every(tick, 40);
+    if (timer === null) timer = every(tick, 100);
   }
   function dismiss(entry) {
     if (!entry || entry.leaving) return;
@@ -54,7 +54,7 @@ export function createToastCenter({getRoot, icon, now = () => performance.now(),
       const index = visible.indexOf(entry);
       if (index !== -1) visible.splice(index, 1);
       flush();
-    }, 340);
+    }, 190);
   }
   function flush() {
     const container = getRoot();
