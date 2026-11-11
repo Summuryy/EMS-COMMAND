@@ -31,23 +31,19 @@ test('3.9.2 ECG has 9 P-QRS-T cycles, grid, sweep and 72-bpm illustrative cadenc
  assert.ok(html.indexOf('motion392.css')>html.indexOf('motion391.css'));
 });
 
-test('3.9.2 user opt-in can override OS motion suppression; no opt-in still respects Windows',()=>{
- assert.match(motion,/mode==='force'\|\|!reduced\(\)/);
- assert.match(motion,/dataset\.motion=!on\?'off':force\?'force':'on'/);
- assert.match(motionCss,/html:not\(\[data-motion="force"\]\) \*/);
- assert.match(css,/html\[data-motion="force"\] \.ems-ecg-moving/);
- assert.match(css,/html\[data-motion="off"\] \.ems392-ecg-scan/);
- assert.match(app,/motionOverride:localStorage\.getItem\('ems-motion-enabled'\)==='true'/);
- assert.match(app,/if\(action==='force-motion'\)/);
- assert.match(app,/ems392-motion-alert/);
- assert.match(css,/\.ems392-motion-alert/);
- assert.match(app,/if\(action==='respect-system-motion'\)/);
- assert.match(app,/setMotionPreference\(state\.motionEnabled,state\.motionOverride\)/);
+test('3.9.3 respects OS reduced-motion without asking permission',()=>{
+ assert.ok(motion.includes('const reduced='));
+ assert.ok(motion.includes("dataset.motion=!on?'off':force?'force':'on'"));
+ assert.ok(motionCss.includes('html:not([data-motion="force"]) *'));
+ assert.ok(css.includes('html[data-motion="force"] .ems-ecg-moving'));
+ assert.ok(app.includes('setMotionPreference(state.motionEnabled,state.motionOverride)'));
+ assert.ok(!app.includes("if(action==='force-motion')"));
+ assert.ok(!app.includes('ems392-motion-alert'));
  const os=renderProfile({user,motionEnabled:true,motionOverride:false,systemReducedMotion:true});
- assert.match(os,/Включить полный Motion\/VFX/);
+ assert.doesNotMatch(os,/Включить полный Motion/);
+ assert.match(os,/Windows использует уменьшенное движение/);
  assert.match(os,/aria-disabled="true"/);
  const forced=renderProfile({user,motionEnabled:true,motionOverride:true,systemReducedMotion:true});
- assert.match(forced,/Вернуть режим Windows/);
  assert.match(forced,/aria-disabled="false"/);
  const off=renderProfile({user,motionEnabled:false,motionOverride:false,systemReducedMotion:false});
  assert.match(off,/Эффекты выключены/);
@@ -109,7 +105,7 @@ test('3.9.2 actual toast lifecycle pauses, expires, exits, and drains bounded qu
   root.items[0].listeners.mouseleave();
   now=11000;interval();
   assert.equal(root.items[0].lastClass,'ems392-toast-leaving','expired toast plays exit');
-  assert.equal(delayed[0].ms,340);
+  assert.equal(delayed[0].ms,190);
   const expired=delayed.splice(0);
   expired.forEach(item=>item.fn());
   assert.equal(root.items.length,1,'queue drains after the first three notifications expire');
@@ -149,7 +145,7 @@ test('3.9.2 Electron preference survives random backend ports and rejects untrus
 
 test('3.9.2 version, safety and signed release route are unchanged',()=>{
  const pkg=JSON.parse(read('../package.json'));
- assert.equal(pkg.version,'3.9.2');
+ assert.equal(pkg.version,'3.9.3');
  assert.match(pkg.scripts.check,/node --check public\/js\/notifications\.js/);
  assert.match(app,/data-action="upload"/);
  assert.match(app,/data-action="logout"/);

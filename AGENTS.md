@@ -14,3 +14,6 @@ Reusable, MIT-licensed agent skills are vendored in [`.agents/skills/`](.agents/
 For EMS COMMAND visual work, use `design-taste-frontend` and `redesign-existing-projects`; for motion use `emil-design-eng`, `animate`, `choreograph`, `review-animations`, `animation-performance`, `improve-animations` and `find-animation-opportunities` as applicable. Only load relevant skills for the current task. Root project security, data authenticity, accessibility, user motion preferences, and signed release requirements take precedence over generic examples in third-party skills. Do not automatically add GSAP/WebGL/dependencies or replace the existing stack.
 
 Skill-only documentation changes do not change the installed app version or require a Windows binary release. Future application code changes still require tests, Windows QA and signed preview delivery.
+
+
+For navigation, task flows, and first-time user onboarding, review `[.agents/roles/navigation-architect.md](.agents/roles/navigation-architect.md)`. This is a project-scoped reviewer role for compatible agents, **not a separate process already running**. Validate the UX with actual staff tasks and data, not visuals alone.

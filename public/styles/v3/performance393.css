@@ -1,0 +1,105 @@
+/* EMS COMMAND 3.9.3 — restrained, task-first interaction layer.
+   Latest cascade deliberately neutralizes high-cost legacy ambient effects.
+   Retain meaningful P-QRS-T ECG and tactile feedback, not continuous full-page GPU load. */
+:root{--ems-ease-out:cubic-bezier(.23,1,.32,1)}
+/* The hospital art remains visible; no large, permanently blended moving sweep. */
+.ems38-layout .ems39-home-scene::before,
+.ems38-layout .ems39-home-scene::after{
+ animation:none!important;will-change:auto!important;filter:none!important;
+ mix-blend-mode:normal!important
+}
+.ems38-layout .ems39-home-scene .v3-hero-actions .btn-primary::after,
+.ems38-layout .ems39-home-scene .v3-hud-label::before,
+.ems38-layout .ems39-command-handoff::after,
+.ems38-layout .v3-shift-wave.ems391-shift-wave::before,
+.ems38-layout .ems391-shift-wave .ecg,
+.ems38-layout .ems39-path-stage.is-review .ems39-path-index,
+.ems38-layout .v3-online-ring:after{
+ animation:none!important;will-change:auto!important
+}
+/* Only the waveform group moves. Its stroke glow is expensive on software GPUs. */
+.ems-ecg-live,.ems-ecg-line{filter:none!important}
+.ems-ecg-moving{animation:ems-heart-scroll 2.5s linear infinite}
+.ems392-ecg-scan{animation:none!important;will-change:auto!important}
+.ems38-layout .page.ems391-page-enter{
+ animation:ems391-entry .18s var(--ems-ease-out) both!important
+}
+.ems38-layout .page.ems391-page-enter .v3-summary-grid>.v3-number-card,
+.ems38-layout .page.ems391-page-enter .ems39-path-stage{
+ animation:none!important
+}
+.ems38-layout .v3-reveal{opacity:1!important;transform:none!important;transition:none!important}
+/* No pointer-follow CSS variables, ripple timers, filter blur, or animated shadows. */
+.ems38-layout .btn,.ems38-layout .nav-link,.auth-page .btn{
+ transition:transform .15s var(--ems-ease-out),background-color .15s ease,border-color .15s ease!important
+}
+.ems38-layout .btn:hover:not(:disabled),.auth-page .btn:hover:not(:disabled){
+ box-shadow:none!important;transform:none
+}
+.ems38-layout .btn:active:not(:disabled),.auth-page .btn:active:not(:disabled){
+ box-shadow:none!important;transform:scale(.975)!important
+}
+.ems38-layout .v3-number-card:hover,.ems38-layout .v3-card-lift:hover{
+ transform:none!important;box-shadow:none!important
+}
+.toast.v3-toast.ems392-toast{
+ animation:ems392-toast-in .2s var(--ems-ease-out) both;
+ backdrop-filter:none!important;will-change:auto!important;
+ box-shadow:0 12px 30px #0008,inset 0 1px #ffffff1b
+}
+.toast.v3-toast.ems392-toast.ems392-toast-leaving{
+ animation:ems392-toast-out .18s var(--ems-ease-out) both
+}
+@keyframes ems393-toast-in{
+ from{opacity:0;transform:translate3d(0,8px,0) scale(.97)}
+ to{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+@keyframes ems393-toast-out{
+ from{opacity:1;transform:translate3d(0,0,0)}
+ to{opacity:0;transform:translate3d(0,6px,0)}
+}
+.toast.v3-toast.ems392-toast{animation-name:ems393-toast-in!important}
+.toast.v3-toast.ems392-toast.ems392-toast-leaving{animation-name:ems393-toast-out!important}
+.toast .ems392-toast-life i{box-shadow:none!important;transition:transform .1s linear}
+.ems38-layout .v3-sidebar-scroll .nav-label{margin-top:13px;letter-spacing:.1em}
+.ems38-layout .v3-sidebar-scroll .nav-group{margin-bottom:9px}
+.ems38-layout .nav-link{min-height:42px}
+.ems38-layout .nav-link.active{border-left:3px solid #84dbc2}
+.ems38-layout .v3-home-hero{min-height:0}
+.ems38-layout .ems39-command-handoff{margin-top:16px}
+@media(hover:none),(pointer:coarse){
+ .ems38-layout .btn:hover:not(:disabled){transform:none!important}
+}
+@media(prefers-reduced-motion:reduce){
+ html:not([data-motion="force"]) .ems38-layout .page.ems391-page-enter,
+ html:not([data-motion="force"]) .toast.v3-toast.ems392-toast{
+  animation:none!important;transform:none!important
+ }
+ html:not([data-motion="force"]) .ems-ecg-moving{animation:none!important}
+}
+html[data-motion="off"] .ems-ecg-moving,
+html[data-motion="off"] .ems38-layout .page.ems391-page-enter,
+html[data-motion="off"] .toast.v3-toast.ems392-toast{animation:none!important;transform:none!important}
+html.ems-motion-paused .ems-ecg-moving{animation-play-state:paused!important}
+
+/* Old explicit ON preference must not re-enable the expensive scan and blur. */
+html[data-motion="force"] .ems392-ecg-scan{animation:none!important;will-change:auto!important}
+html[data-motion="force"] .toast.v3-toast.ems392-toast{animation:ems393-toast-in .2s var(--ems-ease-out) both!important}
+html[data-motion="force"] .toast.v3-toast.ems392-toast.ems392-toast-leaving{animation:ems393-toast-out .18s var(--ems-ease-out) both!important}
+
+/* Guided start appears only for a truly empty account, never as fake progress. */
+.ems393-first-steps{display:grid;grid-template-columns:minmax(190px,.9fr) minmax(0,1.5fr);gap:20px;
+ margin:15px 0 20px;padding:19px 22px;border:1px solid #6d9c9580;
+ border-radius:14px;background:#10212b}
+.ems393-first-steps h2{font-size:18px;line-height:1.25;margin:7px 0 6px;color:#e3f3f0}
+.ems393-first-steps p{color:#a8c0c5;font-size:12px;line-height:1.55;max-width:42ch;margin:0}
+.ems393-first-steps ol{list-style:none;padding:0;margin:0;display:grid;gap:1px}
+.ems393-first-steps li+li{border-top:1px solid #ffffff14}
+.ems393-first-steps li button{width:100%;text-align:left;display:flex;align-items:center;justify-content:space-between;
+ gap:12px;border:0;background:transparent;color:#e5f4ef;padding:10px 3px;cursor:pointer}
+.ems393-first-steps li button:focus-visible{outline:2px solid #a3dfd0;outline-offset:2px}
+.ems393-first-steps li button:hover{color:#9be7cf}
+.ems393-first-steps li strong{font-size:12px;font-weight:600}
+.ems393-first-steps li small{color:#9eb4bb;font-size:11px}
+@media(max-width:950px){.ems393-first-steps{grid-template-columns:1fr}}
+@media(max-width:560px){.ems393-first-steps{padding:16px}.ems393-first-steps li button{align-items:flex-start;flex-direction:column;gap:3px}}

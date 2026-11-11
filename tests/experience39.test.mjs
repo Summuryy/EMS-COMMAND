@@ -111,6 +111,6 @@ test('3.9 motion is composited, cancellable and the existing 1s clock drives upd
  assert.match(css,/@media\(max-width:560px\)/);
  assert.match(app,/syncDutyTimeline\(document,shift\?\.start_at\)/);
  assert.match(app,/setInterval\(\(\)=>\{/);
- assert.match(app,/behavior:state\.motionEnabled/);
+ assert.match(app,/behavior:'auto'/);
  assert.match(app,/data-action="logout"/);
 });
