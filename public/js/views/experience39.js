@@ -1,3 +1,4 @@
+import {icon} from '../icons.js';
 // EMS COMMAND 3.9 — pure, data-driven operating-state helpers.
 // These functions NEVER infer evidence approval or promotion from a timer.
 export const DUTY_MARKS=Object.freeze([0,20,40,60]);
@@ -85,7 +86,9 @@ export function syncDutyTimeline(root,startAt,now=Date.now()){
   const minute=Number(stop.dataset.ems39Minute);
   const reached=clock.active&&clock.elapsedSeconds>=minute*60;
   const isNext=clock.active&&clock.nextMinute===minute;
+  const wasReached=stop.classList.contains('reached');
   stop.classList.toggle('reached',reached);
+  if(wasReached!==reached){const dot=stop.querySelector('.v3-timeline-dot');if(dot)dot.innerHTML=icon(reached?'check':'clock',17);}
   stop.classList.toggle('pending',!reached&&clock.active);
   if(isNext)stop.setAttribute('aria-current','step');
   else stop.removeAttribute('aria-current');
