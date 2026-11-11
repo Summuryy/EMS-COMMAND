@@ -77,7 +77,7 @@ test('3.9.2 actual toast lifecycle pauses, expires, exits, and drains bounded qu
   contains(){return false;}
   remove(){this.removed=true;root.items=root.items.filter(x=>x!==this);}
  }
- globalThis.document={hidden:false,activeElement:null,createElement:()=>new Element()};
+ globalThis.document={hidden:false,activeElement:null,createElement:()=>new Element(),listeners:{},addEventListener(name,fn){this.listeners[name]=fn;}};
  try{
   const center=createToastCenter({getRoot:()=>root,icon:()=>'<svg></svg>',
    now:()=>now,every:fn=>{interval=fn;return 7;},cancelEvery:()=>{interval=null;},
@@ -96,9 +96,11 @@ test('3.9.2 actual toast lifecycle pauses, expires, exits, and drains bounded qu
   globalThis.document.hidden=true;
   now=6000;interval();
   assert.equal(root.items[0].querySelector('.ems392-toast-life i').style.transform,'scaleX(0.5000)','background pauses life');
+  now=8000;
   globalThis.document.hidden=false;
+  globalThis.document.listeners.visibilitychange();
   root.items[0].listeners.mouseleave();
-  now=9000;interval();
+  now=11000;interval();
   assert.equal(root.items[0].lastClass,'ems392-toast-leaving','expired toast plays exit');
   assert.equal(delayed[0].ms,340);
   const expired=delayed.splice(0);
