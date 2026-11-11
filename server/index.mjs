@@ -21,7 +21,13 @@ if(config.secureCookies)headers['Strict-Transport-Security']='max-age=31536000; 
 const ocrProbe=config.ocrEnabled?spawnSync(config.ocrPath,['--version'],{timeout:1800,encoding:'utf8'}):null;
 const ocrAvailable=!!ocrProbe&&!ocrProbe.error&&ocrProbe.status===0;
 if(!ocrAvailable)console.warn('OCR: Tesseract не найден. Скриншоты будут уходить на ручную проверку.');
-resumePending();
+// Recovered OCR tasks can saturate a Windows CPU for minutes. Let the local
+// server answer auth/dashboard first, then resume unfinished work in the background.
+// Evidence data is not discarded or auto-approved by this delay.
+const pendingResumeTimer=setTimeout(()=>{
+  try{resumePending();}catch(err){console.error('[ocr-resume]',err.message);}
+},12000);
+pendingResumeTimer.unref?.();
 const server=http.createServer(async(req,res)=>{
   for(const [name,value] of Object.entries(headers))res.setHeader(name,value);
   // Reject DNS-rebinding / foreign-Host requests to the locally bound API.
