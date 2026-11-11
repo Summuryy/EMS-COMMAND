@@ -29,7 +29,6 @@ export function createToastCenter({getRoot, icon}) {
       entry.last = now;
       const left = remainingFraction(entry.elapsed, entry.duration);
       entry.life.style.transform = 'scaleX(' + left.toFixed(4) + ')';
-      entry.life.setAttribute('aria-valuenow', String(Math.round(left * 100)));
       if (left <= 0) dismiss(entry);
     }
     if (!visible.some(entry => !entry.leaving) && waiting.length === 0 && timer !== null) {
@@ -66,13 +65,12 @@ export function createToastCenter({getRoot, icon}) {
         '<div class="ems392-toast-icon" aria-hidden="true"></div>' +
         '<div class="ems392-toast-copy"><strong></strong><p></p></div>' +
         '<button type="button" class="ems392-toast-close" aria-label="Закрыть уведомление">×</button>' +
-        '<div class="ems392-toast-life" role="progressbar" aria-label="Время до закрытия" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><i></i></div>';
+        '<div class="ems392-toast-life" aria-hidden="true"><i></i></div>';
       el.querySelector('strong').textContent = escText(item.title);
       const detail = el.querySelector('p');
       detail.textContent = escText(item.detail);
       if (!item.detail) detail.hidden = true;
       el.querySelector('.ems392-toast-icon').innerHTML = icon(tone === 'error' ? 'warning' : tone === 'warning' ? 'clock' : tone === 'info' ? 'activity' : 'check', 19);
-      const life = el.querySelector('.ems392-toast-life i');
       const meter = el.querySelector('.ems392-toast-life');
       const entry = {el, life: meter, duration: item.duration, elapsed: 0, last: timestamp(), paused: false, leaving: false};
       el.querySelector('.ems392-toast-close').addEventListener('click', () => dismiss(entry));
