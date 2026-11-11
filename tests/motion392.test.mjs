@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readFileSync,mkdtempSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {createRequire} from 'node:module';
 import {remainingFraction,toastDuration,createToastCenter} from '../public/js/notifications.js';
 import {ecg} from '../public/js/views/visual.js';
 import {renderProfile} from '../public/js/views/profile.js';
@@ -11,6 +14,8 @@ const motionCss=read('../public/styles/v3/motion.css');
 const app=read('../public/js/app.js');
 const motion=read('../public/js/motion.js');
 const html=read('../public/index.html');
+const require=createRequire(import.meta.url);
+const {validMode,readMotionPreference,writeMotionPreference,isTrustedMotionSender}=require('../desktop/motion-preferences.cjs');
 const user={displayName:'Тест',serverName:'Кутузовский',rank:1,role:'member',staticVerified:false};
 
 test('3.9.2 ECG has 9 P-QRS-T cycles, grid, sweep and 72-bpm illustrative cadence',()=>{
@@ -110,6 +115,34 @@ test('3.9.2 actual toast lifecycle pauses, expires, exits, and drains bounded qu
   root.items[0].querySelector('.ems392-toast-close').listeners.click();
   assert.equal(root.items[0].lastClass,'ems392-toast-leaving','manual close plays exit');
  }finally{globalThis.document=original;}
+});
+
+test('3.9.2 Electron preference survives random backend ports and rejects untrusted frames',()=>{
+ const dir=mkdtempSync(join(tmpdir(),'ems-motion-test-'));
+ try{
+  assert.equal(readMotionPreference(dir),'system');
+  assert.equal(validMode('on'),true);
+  assert.equal(validMode('arbitrary-file'),false);
+  assert.throws(()=>writeMotionPreference(dir,'../../private'),/Invalid motion mode/);
+  assert.equal(writeMotionPreference(dir,'on'),'on');
+  assert.equal(readMotionPreference(dir),'on');
+  assert.equal(writeMotionPreference(dir,'off'),'off');
+  assert.equal(readMotionPreference(dir),'off');
+  assert.equal(writeMotionPreference(dir,'system'),'system');
+  assert.equal(readMotionPreference(dir),'system');
+  const frame={url:'http://127.0.0.1:54321/'};
+  const wc={mainFrame:frame};
+  assert.equal(isTrustedMotionSender({sender:wc,senderFrame:frame},wc,54321),true);
+  assert.equal(isTrustedMotionSender({sender:wc,senderFrame:{url:frame.url}},wc,54321),false,'subframes are denied');
+  assert.equal(isTrustedMotionSender({sender:wc,senderFrame:frame},wc,54322),false,'other localhost ports are denied');
+  assert.equal(isTrustedMotionSender({sender:wc,senderFrame:frame},wc,0),false,'uninitialized port denied');
+  assert.equal(isTrustedMotionSender({sender:wc,senderFrame:frame},{mainFrame:frame},54321),false,'other windows denied');
+  assert.equal(isTrustedMotionSender({sender:wc,senderFrame:{url:'https://example.com/'}},wc,54321),false);
+ }finally{rmSync(dir,{recursive:true,force:true});}
+ assert.match(read('../desktop/main.cjs'),/isTrustedMotionSender\(event,mainWindow\?\.webContents,activePort\)/);
+ assert.match(read('../desktop/setup-preload.cjs'),/emsMotion/);
+ assert.match(app,/await restoreMotionMode\(\)/);
+ assert.match(app,/await saveMotionMode\(state\.motionEnabled\?'on':'off'\)/);
 });
 
 test('3.9.2 version, safety and signed release route are unchanged',()=>{
