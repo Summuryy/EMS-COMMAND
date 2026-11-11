@@ -1,7 +1,7 @@
 {
-  "version": "3.7.2",
+  "version": "3.7.3",
   "approvePublicClientCode": true,
   "distribution": "public-binary-only",
-  "note": "EMS COMMAND 3.7.2 cinematic motion preview; launcher-managed test update",
-  "attempt": 3
+  "note": "EMS COMMAND 3.7.3 premium command-center preview; launcher-managed test update",
+  "attempt": 1
 }
