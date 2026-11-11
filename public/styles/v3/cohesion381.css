@@ -160,5 +160,5 @@
 html[data-motion="off"] .ems38-layout .v3-evidence-drop,
 html[data-motion="off"] .ems38-layout .v3-admin-tabs button{transition:none!important}
 @media(prefers-reduced-motion:reduce){
- .ems38-layout .v3-evidence-drop,.ems38-layout .v3-admin-tabs button{transition:none!important}
+ html:not([data-motion="force"]) .ems38-layout .v3-evidence-drop,html:not([data-motion="force"]) .ems38-layout .v3-admin-tabs button{transition:none!important}
 }
