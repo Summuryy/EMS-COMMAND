@@ -1,0 +1,133 @@
+/* EMS COMMAND 3.9.2 — motion acceptance, visible ECG and timed toast design.
+   The OS reduced-motion preference remains the default. Explicit user opt-in
+   sets html[data-motion="force"] and can override it only for this application. */
+@keyframes ems392-toast-in{
+  0%{opacity:0;transform:translate3d(34px,14px,0) scale(.93);filter:blur(5px)}
+  65%{opacity:1;transform:translate3d(-3px,0,0) scale(1.008);filter:blur(0)}
+  100%{opacity:1;transform:translate3d(0,0,0) scale(1);filter:blur(0)}
+}
+@keyframes ems392-toast-out{
+  0%{opacity:1;transform:translate3d(0,0,0) scale(1);filter:blur(0)}
+  100%{opacity:0;transform:translate3d(46px,-10px,0) scale(.94);filter:blur(4px)}
+}
+@keyframes ems392-ecg-scan{
+  0%{transform:translate3d(0,0,0);opacity:.12}
+  15%{opacity:.85}
+  90%{opacity:.9}
+  100%{transform:translate3d(240px,0,0);opacity:0}
+}
+@keyframes ems392-focus-breathe{
+  0%,100%{box-shadow:0 0 0 0 #90e6d100}
+  50%{box-shadow:0 0 0 5px #90e6d119}
+}
+/* ECG: 3 medically recognizable P-QRS-T complexes per 240-unit cycle.
+   At 2.5 seconds per cycle this is an illustrative 72 bpm, NOT patient telemetry. */
+.ems-ecg-live{overflow:hidden;filter:drop-shadow(0 0 6px #ff6c8875)}
+.ems-ecg-moving{animation:ems-heart-scroll 2.5s linear infinite;transform-box:fill-box;transform-origin:0 0}
+.ems-ecg-line{stroke-width:2.6;filter:drop-shadow(0 0 2px #ff6d8c9c)}
+.ecg-compact .ems-ecg-line{stroke-width:3}
+.ems392-ecg-grid{opacity:.55}
+.ems392-ecg-scan{animation:ems392-ecg-scan 2.5s linear infinite;will-change:transform}
+.ems-ecg-sensor{display:none}
+/* Buttons have three tactile states, without delaying the actual click action. */
+.ems38-layout .btn,.ems38-layout .nav-link,
+.auth-page .btn{
+  transition:transform .18s cubic-bezier(.18,.75,.25,1),box-shadow .18s ease,
+    border-color .18s ease,background-color .18s ease;
+  transform-origin:center center;
+}
+.ems38-layout .btn:hover:not(:disabled),
+.auth-page .btn:hover:not(:disabled){transform:translate3d(0,-2px,0);box-shadow:0 13px 26px #0007,inset 0 1px #ffffff3b}
+.ems38-layout .btn:active:not(:disabled),
+.auth-page .btn:active:not(:disabled){transform:translate3d(0,2px,0) scale(.975);box-shadow:inset 0 3px 10px #0008,0 2px 6px #0004;transition-duration:.095s}
+.ems38-layout .nav-link:active:not(:disabled){transform:translate3d(2px,1px,0) scale(.985);transition-duration:.095s}
+.ems38-layout .btn:focus-visible,.auth-page .btn:focus-visible{
+  outline:2px solid #a5f3e0;outline-offset:3px;
+}
+.ems38-layout .v3-number-card:hover,.ems38-layout .v3-card-lift:hover{
+  transform:translate3d(0,-4px,0);
+  box-shadow:0 19px 42px #0007,0 0 0 1px #89e0ce24;
+}
+/* Real notifications: queue of three, pausable 40ms time meter, 5.5–7.2s life. */
+.toast-stack{z-index:1000;gap:12px;right:22px;bottom:22px}
+.toast.v3-toast.ems392-toast{
+  --toast-accent:#86dfc1;
+  display:grid;grid-template-columns:37px minmax(0,1fr);
+  gap:11px;align-items:start;
+  position:relative;width:min(390px,calc(100vw - 30px));min-width:0;
+  padding:16px 47px 20px 16px;
+  border:1px solid #87d8c75c;border-radius:15px;
+  background:linear-gradient(140deg,#1a2c38f7,#0e1b27fa);
+  box-shadow:0 24px 56px #000b,inset 0 1px #ffffff18,0 0 26px #78d9c315;
+  backdrop-filter:blur(18px);
+  animation:ems392-toast-in .46s cubic-bezier(.16,.82,.24,1) both;
+  overflow:hidden;
+  will-change:transform,opacity;
+}
+.ems392-toast-accent{position:absolute;left:0;top:0;bottom:4px;width:3px;background:var(--toast-accent);box-shadow:0 0 16px var(--toast-accent)}
+.toast .ems392-toast-icon{
+  width:37px;height:37px;border-radius:11px;
+  display:grid;place-items:center;background:#78dbbd20;color:var(--toast-accent);
+  border:1px solid #8de2cd3d;margin:0;
+}
+.toast .ems392-toast-icon .icon{color:inherit}
+.toast .ems392-toast-copy{min-width:0;padding-top:1px}
+.toast .ems392-toast-copy strong{font-size:13px;line-height:1.4;color:#effffb;overflow-wrap:anywhere}
+.toast .ems392-toast-copy p{margin:5px 0 0;color:#b3c8d1;font-size:11px;line-height:1.55;overflow-wrap:anywhere}
+.toast .ems392-toast-close{
+  position:absolute;right:11px;top:11px;
+  width:29px;height:29px;border:1px solid #ffffff23;border-radius:8px;
+  background:#ffffff09;color:#d6e9eb;font-size:21px;line-height:1;
+  display:grid;place-items:center;cursor:pointer;
+  transition:background-color .16s,transform .16s;
+}
+.toast .ems392-toast-close:hover{background:#ffffff1b;transform:scale(1.07)}
+.toast .ems392-toast-close:focus-visible{outline:2px solid #b5f8e6;outline-offset:2px}
+.toast .ems392-toast-life{
+  position:absolute;bottom:0;left:0;right:0;height:4px;
+  background:#ffffff12;overflow:hidden;border-radius:0;
+}
+.toast .ems392-toast-life i{
+  display:block;width:100%;height:100%;
+  background:linear-gradient(90deg,var(--toast-accent),#effff4);
+  transform:scaleX(1);transform-origin:left center;
+  transition:transform .06s linear;
+  box-shadow:0 0 12px var(--toast-accent);
+}
+.toast.v3-toast.ems392-toast-warning{--toast-accent:#edc27b;border-color:#edc27b58}
+.toast.v3-toast.ems392-toast-error{--toast-accent:#f47e94;border-color:#f47e945e}
+.toast.v3-toast.ems392-toast-info{--toast-accent:#90cfff;border-color:#90cfff58}
+.toast.v3-toast.ems392-toast.ems392-toast-leaving{
+  animation:ems392-toast-out .32s cubic-bezier(.45,0,.84,.37) both;
+  pointer-events:none;
+}
+.ems392-motion-override{
+  display:flex;flex-direction:column;gap:9px;
+  margin:10px 0 14px;padding:13px;border:1px solid #eac58254;
+  border-radius:10px;background:#b98a3d12;
+}
+.ems392-motion-override p{margin:0;color:#d3c6ad;font-size:11px;line-height:1.55}
+.ems392-motion-override .btn{align-self:flex-start}
+.ems392-motion-active{border-color:#87ddc45a;background:#70d8bd0d}
+.ems392-motion-active p{color:#a7e6d5}
+@media(max-width:560px){
+ .toast-stack{right:12px;bottom:12px}
+ .toast.v3-toast.ems392-toast{width:calc(100vw - 24px)}
+ .ems392-motion-override .btn{width:100%;justify-content:center}
+}
+/* The user may explicitly choose full effects despite Windows reduced motion.
+   If no explicit opt-in, every original OS accessibility rule remains active. */
+@media(prefers-reduced-motion:reduce){
+ html[data-motion="force"] .ems-ecg-moving{animation:ems-heart-scroll 2.5s linear infinite!important}
+ html[data-motion="force"] .ems392-ecg-scan{animation:ems392-ecg-scan 2.5s linear infinite!important}
+ html[data-motion="force"] .toast.v3-toast.ems392-toast:not(.ems392-toast-leaving){
+  animation:ems392-toast-in .46s cubic-bezier(.16,.82,.24,1) both!important;
+ }
+ html[data-motion="force"] .toast.v3-toast.ems392-toast.ems392-toast-leaving{
+  animation:ems392-toast-out .32s cubic-bezier(.45,0,.84,.37) both!important;
+ }
+}
+html[data-motion="off"] .ems392-ecg-scan{animation:none!important}
+html[data-motion="off"] .toast.v3-toast.ems392-toast{animation:none!important;filter:none!important}
+html[data-motion="off"] .ems38-layout .btn:hover:not(:disabled),
+html[data-motion="off"] .ems38-layout .btn:active:not(:disabled){transform:none!important}
