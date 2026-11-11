@@ -7,6 +7,7 @@ const http = require('node:http');
 const net = require('node:net');
 const crypto = require('node:crypto');
 const {initUpdates} = require('./updates.cjs');
+const {validMode,readMotionPreference,writeMotionPreference,isTrustedMotionSender} = require('./motion-preferences.cjs');
 let mainWindow, backend, shuttingDown=false;
 let activePort=0;let dataDir,root,engineEnv;let settingUp=false;
 function log(line){
@@ -78,6 +79,17 @@ ipcMain.handle('ems:create-admin',async(event,data)=>{
  const result=await runNode('tools/bootstrap-admin.mjs',JSON.stringify({username:data?.username,displayName:data?.displayName,password:data?.password}));
  if(!result.ok){settingUp=true;return {ok:false,error:result.error||'Ошибка создания пользователя'};}
  setImmediate(()=>launchServer());return {ok:true};
+});
+// Motion preferences are only accessible to the trusted top-level EMS app frame.
+// Never expose filesystem paths or arbitrary preference keys to web content.
+ipcMain.handle('ems:motion:get',event=>{
+ if(!isTrustedMotionSender(event,mainWindow?.webContents,activePort))return {ok:false};
+ return {ok:true,mode:readMotionPreference(app.getPath('userData'))};
+});
+ipcMain.handle('ems:motion:set',(event,mode)=>{
+ if(!isTrustedMotionSender(event,mainWindow?.webContents,activePort)||!validMode(mode))return {ok:false};
+ try{return {ok:true,mode:writeMotionPreference(app.getPath('userData'),mode)};}
+ catch{return {ok:false,error:'Не удалось сохранить настройки движения'};}
 });
 app.whenReady().then(start);
 
