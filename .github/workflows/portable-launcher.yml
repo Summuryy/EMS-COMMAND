@@ -2,11 +2,15 @@ name: Portable EMS Launcher (Windows QA)
 on:
   workflow_dispatch:
   pull_request:
+concurrency:
+  group: ems-portable-qa-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 permissions:
   contents: read
 jobs:
   build:
     runs-on: windows-latest
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

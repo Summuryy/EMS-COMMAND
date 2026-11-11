@@ -1,7 +1,7 @@
 {
-  "version": "3.9.2",
+  "version": "3.9.3",
   "approvePublicClientCode": true,
   "distribution": "public-binary-only",
-  "note": "EMS COMMAND 3.9.2 Motion/VFX preview: persistent explicit Windows motion opt-in, realistic illustrative ECG, timed notifications, tactile controls and Windows QA",
+  "note": "EMS COMMAND 3.9.3 preview: faster startup via isolated OCR worker, task-first navigation, restrained Motion/VFX, and removal of the decorative motion permission prompt. Windows release is gated by production tests and signed archive verification.",
   "attempt": 1
 }

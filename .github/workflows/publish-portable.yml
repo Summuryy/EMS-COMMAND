@@ -19,6 +19,7 @@ permissions:
 jobs:
   release:
     runs-on: windows-latest
+    timeout-minutes: 90
     environment: production
     steps:
       - uses: actions/checkout@v4
@@ -81,6 +82,25 @@ jobs:
         run: |
           $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
           node launcher/create-release.cjs dist/win-unpacked "dist/EMS-COMMAND-App-$version-win-x64.zip"
+      - name: Verify signed manifest and extracted ZIP before publishing
+        shell: pwsh
+        env:
+          EMS_LAUNCHER_PUBLIC_KEY_PEM_B64: ${{ secrets.EMS_LAUNCHER_PUBLIC_KEY_PEM_B64 }}
+        run: |
+          @'
+          (async()=>{
+            const fs=require('node:fs'),fsp=require('node:fs/promises'),os=require('node:os'),path=require('node:path');
+            const {verifyEnvelope}=require('./launcher/security.cjs');
+            const {extractVerified}=require('./launcher/core.cjs');
+            const envelope=JSON.parse(fs.readFileSync('dist/ems-manifest.json','utf8'));
+            const key=Buffer.from(process.env.EMS_LAUNCHER_PUBLIC_KEY_PEM_B64||'','base64').toString('utf8');
+            const signed=verifyEnvelope(envelope,key);
+            const archive=path.resolve('dist/EMS-COMMAND-App-'+signed.version+'-win-x64.zip');
+            const temp=await fsp.mkdtemp(path.join(os.tmpdir(),'ems-release-check-'));
+            try{await extractVerified(archive,temp,signed);console.log('Signed archive verified:',signed.version);}
+            finally{await fsp.rm(temp,{recursive:true,force:true});}
+          })().catch(err=>{console.error(err);process.exitCode=1;});
+          '@ | node
       - name: Build launcher pinned to the persistent release public key
         run: npm run dist:launcher -- --publish never
       - name: Block accidental publication of unreviewed plaintext source
