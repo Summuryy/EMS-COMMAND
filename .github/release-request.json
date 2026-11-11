@@ -1,7 +1,7 @@
 {
-  "version": "3.9.1",
+  "version": "3.9.2",
   "approvePublicClientCode": true,
   "distribution": "public-binary-only",
-  "note": "EMS COMMAND 3.9.1 visible Motion/VFX acceptance preview: restore cinematic hospital lighting, waiting ECG motion and diagnostics",
+  "note": "EMS COMMAND 3.9.2 Motion/VFX preview: persistent explicit Windows motion opt-in, realistic illustrative ECG, timed notifications, tactile controls and Windows QA",
   "attempt": 1
 }
