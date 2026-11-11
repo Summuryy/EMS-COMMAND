@@ -39,6 +39,8 @@ test('3.9.2 user opt-in can override OS motion suppression; no opt-in still resp
  assert.match(css,/html\[data-motion="off"\] \.ems392-ecg-scan/);
  assert.match(app,/motionOverride:localStorage\.getItem\('ems-motion-enabled'\)==='true'/);
  assert.match(app,/if\(action==='force-motion'\)/);
+ assert.match(app,/ems392-motion-alert/);
+ assert.match(css,/\.ems392-motion-alert/);
  assert.match(app,/if\(action==='respect-system-motion'\)/);
  assert.match(app,/setMotionPreference\(state\.motionEnabled,state\.motionOverride\)/);
  const os=renderProfile({user,motionEnabled:true,motionOverride:false,systemReducedMotion:true});
