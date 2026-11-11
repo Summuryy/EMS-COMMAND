@@ -55,3 +55,6 @@ When the owner says 'Привет, работаем дальше', first fetch t
 
 ## Security and integrity
 Never commit secrets, personal screenshots, real user credentials, local DBs, tokens, private keys or signing material. Keep user data outside versioned app payload; updates must not overwrite profiles/evidence. Do not invent test results or promise background monitoring without a scheduled task. Keep this file updated when architecture, versions, owner decisions or deployment workflows change.
+
+## Pending 3.7.4 Evidence Registry iteration (branch design/evidence-workspace-374)
+This UI-only follow-up adds local archive search by filename, reason, category, review status and patient ID; real status counts; clearer empty states; and a scoped responsive visual layer. It preserves evidence API, OCR, import, approval permissions, update signing, and data persistence. Version 3.7.4 is a proposed next installable app version, not a published release until Windows CI, merge, signed assets and launcher manifest verification complete. The public production 3.7.3 preview was requested earlier and must be verified independently.
