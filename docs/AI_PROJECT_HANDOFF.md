@@ -11,7 +11,7 @@ GitHub Actions workflows: .github/workflows/publish-portable.yml, portable-launc
 The user has previously connected GitHub to ChatGPT; a NEW assistant must inspect whether the GitHub connector is actually available/authorized in its current session. Do not claim connection until a successful repo read. Never request secrets in chat or paste secrets into prompts. Do not put proprietary source in public releases except the explicitly approved inspectable Electron client payload. Public release assets may be accessible to anyone with the link: private testing is not access-controlled.
 
 ## Versioning and update path
-The user's long-lived portable launcher binary is v1.1.0 (launcher version). The last app version personally reported as installed by the owner was v3.7.1 (historical, not newly verified on-device). As of 2026-11-11 01:56 UTC, main package.json and latest published binary preview are v3.8.0. These are distinct versions; never infer the owner's locally installed version from GitHub releases.
+The user's long-lived portable launcher binary is v1.1.0 (launcher version). The last app version personally reported as installed by the owner was v3.7.1 (historical, not newly verified on-device). As of 2026-11-11 02:24 UTC, main package.json and latest published binary preview are v3.8.1. These are distinct versions; never infer the owner's locally installed version from GitHub releases.
 App 3.7.1 added dark titlebar/scrollbars and signed in-app read-only update check. In-app button checks Ed25519-signed release manifest, but app INSTALLATION is still handled by launcher. Do not promise one-click in-app installation unless you actually implement and test a safe handoff.
 Signed manifest URL: https://github.com/Summuryy/EMS-COMMAND-RELEASES/releases/latest/download/ems-manifest.json
 Release URL pattern: https://github.com/Summuryy/EMS-COMMAND-RELEASES/releases/tag/vX.Y.Z
@@ -20,7 +20,7 @@ Desktop code: desktop/main.cjs, desktop/updates.cjs, desktop/setup-preload.cjs
 Launcher code: launcher/core.cjs, launcher/security.cjs, launcher/create-release.cjs
 Release request trigger: .github/release-request.json; its version must match package.json. Main push changing this file triggers Windows production publishing. Secrets configured in Actions: EMS_MANIFEST_SIGNING_KEY_PEM_B64, EMS_LAUNCHER_PUBLIC_KEY_PEM_B64, EMS_RELEASES_TOKEN. Never read, print, or reveal them.
 Production manifest is Ed25519 signed; ZIP SHA256 and file inventory validated by launcher. Never bypass signature checks, pinning, archive path validation, or file hashes. Existing launcher must continue working without downloading another launcher.
-IMPORTANT: published GitHub release snapshot on 2026-11-11 is v3.8.0; always re-check current latest release, asset list, and production job before claiming availability. A release request alone is never proof of publication.
+IMPORTANT: published GitHub release snapshot on 2026-11-11 is v3.8.1; always re-check current latest release, asset list, and production job before claiming availability. A release request alone is never proof of publication.
 
 ## Current app features / layout
 Electron + Node.js 22+, HTML/CSS/vanilla JS modules, local server.
@@ -77,8 +77,12 @@ Never commit secrets, personal screenshots, real user credentials, local DBs, to
 - **Next focus:** User visual acceptance of 3.8.0, then component-level accessibility, window-width testing and further reduction of legacy CSS conflicts; preserve real functionality.
 
 
-## Proposed 3.8.1 screenshot-driven visual consistency pass (branch design/clinical-cohesion-381)
-- Owner's real 3.8.0 Windows screenshots show home/duty/career using new mint design, but Academy, Profile, PRO, Administration and Evidence retain conflicting rose/violet hero styles.
-- A final scoped stylesheet `public/styles/v3/cohesion381.css` unifies those five areas to dark medical mint/slate, reduces banner height and preserves the pink ECG as a restrained secondary brand signal. Amber marks PRO as deliberately offline/unavailable.
-- Academy's nested `v3-rule-list` scrollbar is removed to allow ordinary app-page scrolling and expanded <details> to remain accessible. Static ID sample `113104` was a **placeholder**, not saved user data; the input is clarified with a neutral prompt and a hint about saving/admin verification.
-- All existing routes, form submissions, admin permission controls, screenshot import/OCR, user persistence, browser sandbox, signing, launcher trust and evidence rules remain unchanged. The 3.8.1 version is **proposed within a PR only** until three CI suites succeed, merge, and the signed production release is verified. No official launch authorized.
+## Verified 3.8.1 — owner screenshot-based UI cohesion patch
+- **Owner screenshot review:** real 3.8.0 Windows screenshots showed the new compact Home/Duty/Career UI, but outdated pink/violet banner surfaces on Evidence, Academy, Profile, PRO and Administration. The screenshot also revealed a nested scrollbar in the Academy, and the Static ID placeholder could be mistaken for a stored identifier. External performance overlay, Windows activation watermark and screenshot notifications are not part of the app.
+- **Code:** PR #13 https://github.com/Summuryy/EMS-COMMAND/pull/13 merged into `main` at `bc114ea32745402fb5c2d3e674ebfa7e6b7d7955`. The patch includes `public/styles/v3/cohesion381.css`, loaded last, neutral Static ID placeholder plus accessible helper text, regression tests, and proposed v3.8.1 package version.
+- **UI:** a consistent slate/mint treatment for the five remaining screens; reduced oversized panels. ECG pink is intentionally retained as a secondary brand waveform and amber denotes PRO explicitly offline. Academy rule-list nested scroll removed without changing search or accordion behavior. No fabricated data and no backend, role, evidence OCR, security, user persistence or launcher changes.
+- **QA:** checks run `42943807852` SUCCESS, Windows NSIS smoke `42943807196` SUCCESS, Windows Portable Launcher QA `42943807210` SUCCESS (signed QA manifest and verified file inventory/launcher executable).
+- **Release:** `.github/release-request.json` changed by `630fc1377f77293db6f132bd12c7c80803ca2067`, production run `42944799683` SUCCESS. Latest GitHub binary release now `v3.8.1`.
+- **Assets:** `EMS-COMMAND-App-3.8.1-win-x64.zip` 141368147 bytes SHA-256 `c3445f6886e7caeb56364a0e87106ee2e97d5583edd7ff7a12017e29360f0be9`; `ems-manifest.json` 73656 bytes SHA-256 `532987bc6d400a55160d5583db492749b95183a1995259cebecc0e9a7080e274`; `EMS-COMMAND-Launcher-1.1.0-win-x64.exe` 414506453 bytes.
+- **Limits:** GitHub production signing and publication are verified; independently downloading and verifying the live manifest with its pinned public key, pixel testing on the owner's Windows machine, installing and running v3.8.1 on-device are **not** verified.
+- Existing launcher 1.1.0 obtains the app update via `releases/latest/download/ems-manifest.json`; no launcher re-download is required. This is a **preview**, not an authorized official public launch. Binary assets remain publicly accessible on GitHub.
