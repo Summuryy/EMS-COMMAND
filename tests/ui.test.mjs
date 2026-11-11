@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {renderHome} from '../public/js/views/home.js';
-import {renderEvidence} from '../public/js/views/evidence.js';
+import {renderEvidence,filterEvidence} from '../public/js/views/evidence.js';
 import {renderShift} from '../public/js/views/shift.js';
 import {renderCareer} from '../public/js/views/career.js';
 import {renderAcademy} from '../public/js/views/academy.js';
@@ -32,4 +32,31 @@ test('motion implementation honors reduced-motion and user preference',()=>{
  const style=fs.readFileSync(new URL('../public/styles/v3/motion.css',import.meta.url),'utf8');
  assert.match(style,/@media\(prefers-reduced-motion:reduce\)/);
  assert.match(style,/html\[data-motion="off"\]/);
+});
+
+test('archive search uses existing evidence fields and status scope',()=>{
+ const rows=[
+  {id:'1',name:'ПМП_001.PNG',reason:'Оказана помощь',category:'pmp',status:'accepted',patientId:'113104',imageUrl:'/one.png'},
+  {id:'2',name:'Hospital_002.jpg',reason:'Ожидает проверки',category:'treatment',status:'review',patientId:'42',imageUrl:'/two.jpg'},
+  {id:'3',name:'repeat.jpg',reason:'Повтор',category:'pmp',status:'duplicate',patientId:'',imageUrl:'/three.jpg'}
+ ];
+ assert.deepEqual(filterEvidence(rows,'all','пмп').map(x=>x.id),['1','3']);
+ assert.deepEqual(filterEvidence(rows,'accepted','113104').map(x=>x.id),['1']);
+ assert.deepEqual(filterEvidence(rows,'review','лечение').map(x=>x.id),['2']);
+ assert.deepEqual(filterEvidence(rows,'rejected','повтор').map(x=>x.id),['3']);
+ assert.deepEqual(filterEvidence(rows,'accepted','Hospital').map(x=>x.id),[]);
+ const html=renderEvidence({...base,evidence:{items:rows},evidenceSearch:'113104',filter:'all'});
+ assert.match(html,/id="evidence-search"/);
+ assert.match(html,/id="evidence-results"/);
+ assert.match(html,/data-action="clear-evidence-search"/);
+ assert.match(html,/Показано 1 из 3 кадров/);
+ assert.match(html,/ПМП_001.PNG/);
+ assert.doesNotMatch(html,/Hospital_002.jpg/);
+});
+test('archive search escapes text and gives a functional empty state',()=>{
+ const html=renderEvidence({...base,evidenceSearch:'"><script>alert(1)</script>',evidence:{items:[{id:'x',name:'sample.jpg',status:'accepted',category:'pmp',reason:'ok',imageUrl:'/image.jpg'}]}});
+ assert.doesNotMatch(html,/<script>alert\(1\)<\/script>/);
+ assert.match(html,/&quot;&gt;&lt;script&gt;/);
+ assert.match(html,/Ничего не найдено/);
+ assert.match(html,/data-action="clear-evidence-search"/);
 });
