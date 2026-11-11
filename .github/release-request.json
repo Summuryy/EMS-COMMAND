@@ -1,7 +1,7 @@
 {
-  "version": "3.8.0",
+  "version": "3.8.1",
   "approvePublicClientCode": true,
   "distribution": "public-binary-only",
-  "note": "EMS COMMAND 3.8.0 Clinical Command shared UI redesign preview; launcher-managed test update",
+  "note": "EMS COMMAND 3.8.1 screenshot-driven Clinical Command UX cohesion preview; launcher-managed test update",
   "attempt": 1
 }
