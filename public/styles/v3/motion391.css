@@ -194,12 +194,12 @@ html[data-motion="off"] .ems391-motion-test .ems391-motion-probe{
   animation:none!important;transform:none!important;
 }
 @media(prefers-reduced-motion:reduce){
- .ems38-layout .ems39-home-scene::before,
- .ems38-layout .ems39-home-scene::after,
- .ems38-layout .ems39-command-handoff::after,
- .ems38-layout .page.ems391-page-enter,
- .ems38-layout .ems391-shift-wave .ecg,
- .ems391-motion-test .ems391-motion-probe{
+ html:not([data-motion="force"]) .ems38-layout .ems39-home-scene::before,
+ html:not([data-motion="force"]) .ems38-layout .ems39-home-scene::after,
+ html:not([data-motion="force"]) .ems38-layout .ems39-command-handoff::after,
+ html:not([data-motion="force"]) .ems38-layout .page.ems391-page-enter,
+ html:not([data-motion="force"]) .ems38-layout .ems391-shift-wave .ecg,
+ html:not([data-motion="force"]) .ems391-motion-test .ems391-motion-probe{
   animation:none!important;transform:none!important
  }
 }
