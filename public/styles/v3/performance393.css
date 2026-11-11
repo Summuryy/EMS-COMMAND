@@ -81,3 +81,8 @@ html[data-motion="off"] .ems-ecg-moving,
 html[data-motion="off"] .ems38-layout .page.ems391-page-enter,
 html[data-motion="off"] .toast.v3-toast.ems392-toast{animation:none!important;transform:none!important}
 html.ems-motion-paused .ems-ecg-moving{animation-play-state:paused!important}
+
+/* Old explicit ON preference must not re-enable the expensive scan and blur. */
+html[data-motion="force"] .ems392-ecg-scan{animation:none!important;will-change:auto!important}
+html[data-motion="force"] .toast.v3-toast.ems392-toast{animation:ems393-toast-in .2s var(--ems-ease-out) both!important}
+html[data-motion="force"] .toast.v3-toast.ems392-toast.ems392-toast-leaving{animation:ems393-toast-out .18s var(--ems-ease-out) both!important}
