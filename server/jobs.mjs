@@ -1,12 +1,35 @@
 import path from 'node:path';
 import { db, now, notice, audit } from './db.mjs';
 import { config } from './config.mjs';
-import { analyzeFile } from './classifier.mjs';
+import { Worker } from 'node:worker_threads';
 const jobs=new Map();const queue=[];let active=false;
 export function statusJob(id,userId){const job=jobs.get(id);return job&&job.userId===userId?job:null;}
 export function enqueue(evidenceId,userId){
   const job={id:evidenceId,userId,stage:'queued',percent:3,createdAt:Date.now(),error:null};
   jobs.set(evidenceId,job);queue.push(job);setImmediate(processQueue);return job;
+}
+// In-process OCR previously decoded PNG synchronously on the local API event loop.
+// Keep one job active, but run that work on its own worker so the UI can stay responsive.
+function analyzeInWorker(filePath,info,onProgress){
+ return new Promise((resolve,reject)=>{
+  const worker=new Worker(new URL('./ocr-worker.mjs',import.meta.url));
+  let completed=false;
+  const timeout=setTimeout(()=>finish(Error('Фоновый анализ превысил лимит времени')),60000);
+  function finish(error,result){
+   if(completed)return;
+   completed=true;clearTimeout(timeout);
+   worker.terminate().catch(()=>{});
+   if(error)reject(error);else resolve(result);
+  }
+  worker.on('message',message=>{
+   if(message?.type==='progress'){onProgress(message.stage);return;}
+   if(message?.type==='result'){finish(null,message.result);return;}
+   if(message?.type==='error'){finish(Error(message.message));}
+  });
+  worker.on('error',error=>finish(error));
+  worker.on('exit',code=>{if(!completed)finish(Error('OCR worker завершился: '+code));});
+  worker.postMessage({filePath,info});
+ });
 }
 const stages={queued:['В очереди',3],reading:['Чтение изображения',20],ocr:['Распознавание текста',55],rules:['Проверка правил',87],done:['Готово',100],error:['Ошибка',100]};
 async function processQueue(){
@@ -18,7 +41,7 @@ async function processQueue(){
     const row=db.prepare('SELECT * FROM evidence WHERE id=?').get(job.id);
     if(!row)throw Error('Скриншот удалён');
     const filePath=path.join(config.dataDir,'uploads',row.stored_name);
-    const result=await analyzeFile(filePath,{mime:row.mime,width:row.width,height:row.height},change);
+    const result=await analyzeInWorker(filePath,{mime:row.mime,width:row.width,height:row.height},change);
     const duplicate=db.prepare(`SELECT id FROM evidence WHERE user_id=? AND sha256=? AND id!=? LIMIT 1`).get(row.user_id,row.sha256,row.id);
     if(duplicate){ result.status='duplicate';result.statusDetail='Такой файл уже был загружен';result.score=0;}
     db.prepare(`UPDATE evidence SET category=?,status=?,status_detail=?,patient_id=?,bodycam_state=?,ocr_text=?,ocr_engine=?,signals=?,score=?,updated_at=? WHERE id=?`)
