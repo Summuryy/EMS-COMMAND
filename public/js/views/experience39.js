@@ -66,3 +66,30 @@ export function commandFeed(dashboard={},limit=4){
   .sort((a,b)=>b.sort-a.sort||a.index-b.index)
   .slice(0,Math.max(0,Math.min(8,Math.floor(Number(limit)||0))));
 }
+
+/* This updates only visible duty clock nodes; the existing one-second app timer
+   supplies ticks. No second timer, polling, event listener or persistent state. */
+export function syncDutyTimeline(root,startAt,now=Date.now()){
+ if(!root?.querySelector?.('#duty-next-clock'))return;
+ const clock=dutyClock(startAt,now);
+ const label=root.querySelector('#duty-next-label');
+ const remaining=root.querySelector('#duty-next-clock');
+ const meter=root.querySelector('#duty-next-meter');
+ if(label)label.textContent=!clock.active?'Смена не начата':clock.nextMinute===null?'Плановые интервалы наступили':`До отметки ${clock.nextMinute} минут`;
+ if(remaining)remaining.textContent=clock.nextMinute===null?'—':dutyClockText(clock.secondsLeft);
+ if(meter){
+  meter.setAttribute('aria-valuenow',String(clock.active?clock.phasePercent:0));
+  meter.style.setProperty('--ems39-progress',`${clock.active?clock.phasePercent:0}%`);
+ }
+ root.querySelectorAll('[data-ems39-minute]').forEach(stop=>{
+  const minute=Number(stop.dataset.ems39Minute);
+  const reached=clock.active&&clock.elapsedSeconds>=minute*60;
+  const isNext=clock.active&&clock.nextMinute===minute;
+  stop.classList.toggle('reached',reached);
+  stop.classList.toggle('pending',!reached&&clock.active);
+  if(isNext)stop.setAttribute('aria-current','step');
+  else stop.removeAttribute('aria-current');
+  const status=stop.querySelector('.ems39-stop-state');
+  if(status)status.textContent=!clock.active?'Ожидает смену':reached?'Время наступило':isNext?'Следующая отметка':'Запланировано';
+ });
+}
