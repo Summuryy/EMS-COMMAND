@@ -1,0 +1,205 @@
+/* EMS COMMAND 3.9.1 — visible, restrained, composited cinematic motion.
+ * Root cause: clinical38.css disabled the hospital hero light sweep; most 3.9
+ * animations ended after ~0.3s or ran only with an active duty.
+ * This file loads last to restore observable movement while respecting both
+ * the app's motion switch and the operating-system reduced-motion setting.
+ * Never animate evidence totals or imitate approval, captures, or network data.
+ */
+@keyframes ems391-hospital-light {
+  0%,11% { transform:translate3d(-55%,0,0) rotate(-3deg);opacity:0 }
+  27% {opacity:.74}
+  50% {transform:translate3d(14%,0,0) rotate(-3deg);opacity:.85}
+  75% {transform:translate3d(52%,0,0) rotate(-3deg);opacity:.60}
+  88%,100% {transform:translate3d(55%,0,0) rotate(-3deg);opacity:0}
+}
+@keyframes ems391-hospital-breathe{
+  0%,100%{opacity:.95}
+  50%{opacity:.73}
+}
+@keyframes ems391-entry{
+  0%{opacity:.05;transform:translate3d(0,20px,0)}
+  65%{opacity:.91}
+  100%{opacity:1;transform:translate3d(0,0,0)}
+}
+@keyframes ems391-stagger{
+  0%{opacity:.08;transform:translate3d(0,18px,0)}
+  100%{opacity:1;transform:translate3d(0,0,0)}
+}
+@keyframes ems391-strip-sweep{
+  0%,7%{transform:translate3d(-180%,0,0);opacity:0}
+  23%{opacity:1}
+  72%{opacity:1}
+  88%,100%{transform:translate3d(460%,0,0);opacity:0}
+}
+@keyframes ems391-ecg-presence{
+  0%,100%{opacity:.76}
+  50%{opacity:1}
+}
+@keyframes ems391-review-pulse{
+  0%,100%{box-shadow:0 0 0 0 #e3bb7c14;border-color:#e3bb7c66}
+  50%{box-shadow:0 0 0 7px #e3bb7c12;border-color:#e3bb7c9b}
+}
+@keyframes ems391-motion-check{
+  0%{transform:translate3d(0,0,0);opacity:.1}
+  12%{opacity:1}
+  82%{opacity:1}
+  100%{transform:translate3d(var(--ems391-travel,230px),0,0);opacity:0}
+}
+@keyframes ems391-grid-breathe{
+  0%,100%{opacity:.12}
+  50%{opacity:.26}
+}
+@keyframes ems391-button-sheen{
+  0%,60%{transform:translate3d(-135%,0,0);opacity:0}
+  67%{opacity:.8}
+  87%{transform:translate3d(135%,0,0);opacity:.8}
+  93%,100%{transform:translate3d(135%,0,0);opacity:0}
+}
+
+/* 1. The actual hospital scene visibly changes even before a shift starts.
+   Overrides v3.8's "animation:none" selectors by greater specificity. */
+.ems38-layout .ems39-home-scene::before{
+  animation:ems391-hospital-breathe 6.8s ease-in-out infinite;
+}
+.ems38-layout .ems39-home-scene::after{
+  background:linear-gradient(108deg,transparent 30%,#b2fff207 39%,
+    #77d5c340 48%,#ec799a20 52%,#97d0ff10 58%,transparent 68%);
+  opacity:.7;
+  mix-blend-mode:screen;
+  animation:ems391-hospital-light 6.6s cubic-bezier(.36,.05,.52,.95) infinite;
+  will-change:transform,opacity;
+}
+.ems38-layout .ems39-home-scene .v3-hero-actions .btn-primary::after{
+  animation:ems391-button-sheen 8s ease-in-out infinite;
+  will-change:transform;
+}
+.ems38-layout .ems39-home-scene .v3-hud-label::before {
+  animation:ems-beacon-heart 2.6s ease-in-out infinite;
+}
+.ems38-layout .ems39-home-scene .ems38-home-brief {
+  background:linear-gradient(135deg,#0d2632ed,#0a1824f5);
+  box-shadow:0 14px 39px #0006,0 0 0 1px #84d5c01b;
+}
+.ems38-layout .ems39-home-scene .ems38-brief-label .icon{
+  animation:ems391-ecg-presence 2.5s ease-in-out infinite;
+}
+
+/* 2. Navigation has an observable entrance. It is not an endless page-wide
+   animation; only the hero/ambient light and real active signals loop. */
+.ems38-layout .page.ems391-page-enter{
+  animation:ems391-entry .62s cubic-bezier(.19,.79,.25,1) both;
+}
+.ems38-layout .page.ems391-page-enter .v3-summary-grid>.v3-number-card {
+  animation:ems391-stagger .56s cubic-bezier(.17,.79,.23,1) both;
+}
+.ems38-layout .page.ems391-page-enter .v3-summary-grid>.v3-number-card:nth-child(1){animation-delay:.10s}
+.ems38-layout .page.ems391-page-enter .v3-summary-grid>.v3-number-card:nth-child(2){animation-delay:.17s}
+.ems38-layout .page.ems391-page-enter .v3-summary-grid>.v3-number-card:nth-child(3){animation-delay:.24s}
+.ems38-layout .page.ems391-page-enter .v3-summary-grid>.v3-number-card:nth-child(4){animation-delay:.31s}
+.ems38-layout .page.ems391-page-enter .ems39-path-stage{
+  animation:ems391-stagger .60s cubic-bezier(.17,.79,.23,1) both;
+}
+.ems38-layout .page.ems391-page-enter .ems39-path-stage:nth-child(1){animation-delay:.10s}
+.ems38-layout .page.ems391-page-enter .ems39-path-stage:nth-child(2){animation-delay:.17s}
+.ems38-layout .page.ems391-page-enter .ems39-path-stage:nth-child(3){animation-delay:.24s}
+.ems38-layout .page.ems391-page-enter .ems39-path-stage:nth-child(4){animation-delay:.31s}
+
+/* 3. Workspaces are never dead even in authentic empty/waiting states.
+   Decorative activity does not claim evidence or administrative progress. */
+.ems38-layout .ems39-command-handoff{
+  position:relative;overflow:hidden;
+}
+.ems38-layout .ems39-command-handoff::after{
+  content:'';position:absolute;left:0;bottom:0;width:34%;height:2px;
+  background:linear-gradient(90deg,transparent,#a9f1de,#78cdbc,transparent);
+  pointer-events:none;
+  animation:ems391-strip-sweep 7.6s linear infinite;
+  will-change:transform,opacity;
+}
+.ems38-layout .v3-shift-wave.ems391-shift-wave{
+  position:relative;overflow:hidden;isolation:isolate;
+}
+.ems38-layout .v3-shift-wave.ems391-shift-wave::before{
+  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse at center,#fa849923,transparent 68%);
+  animation:ems391-grid-breathe 3.4s ease-in-out infinite;
+}
+.ems38-layout .ems391-shift-wave .ecg{
+  position:relative;z-index:1;
+  animation:ems391-ecg-presence 2.9s ease-in-out infinite;
+}
+.ems38-layout .ems391-shift-wave .v3-wave-caption{
+  position:relative;z-index:1;
+}
+.ems38-layout .ems39-path-stage.is-review .ems39-path-index{
+  animation:ems391-review-pulse 3.3s ease-in-out infinite;
+}
+.ems38-layout .v3-online-ring:after{
+  animation:v3-online 1.9s ease-out infinite;
+}
+
+/* 4. Explicit, user-visible animation diagnostic in Profile.
+   A manually triggered cue must be demonstrable even without duty/evidence. */
+.ems391-motion-test{
+  margin-top:15px;border:1px solid #8bdccc40;background:#0e222e;
+  border-radius:11px;padding:14px;display:grid;gap:12px;
+}
+.ems391-motion-test-head{display:flex;gap:9px;align-items:flex-start;justify-content:space-between}
+.ems391-motion-test-head strong{font-size:12px;color:#e7f6f3}
+.ems391-motion-test-head small{
+  display:block;margin-top:5px;color:#a8c4c9;font-size:11px;line-height:1.5;
+}
+.ems391-motion-track{
+  position:relative;overflow:hidden;width:100%;height:30px;border-radius:8px;
+  border:1px solid #93c9c43c;
+  background:repeating-linear-gradient(90deg,#112a34 0,#112a34 19px,#173a4255 20px);
+}
+.ems391-motion-track::before{
+  content:'';position:absolute;inset:13px 11px;opacity:.55;
+  background:linear-gradient(90deg,#85d6c59c,#f492a4b0);
+  height:2px;border-radius:3px;
+}
+.ems391-motion-probe{
+  position:absolute;top:3px;left:3px;width:23px;height:23px;border-radius:7px;
+  display:grid;place-items:center;background:#a8f1dc;color:#0b2630;
+  box-shadow:0 0 15px #9ce9d481;
+}
+.ems391-motion-test.is-testing .ems391-motion-probe{
+  animation:ems391-motion-check 2.7s cubic-bezier(.21,.65,.46,1) both;
+}
+.ems391-motion-test button{justify-self:start}
+.ems391-motion-test button:focus-visible{outline:2px solid #a9f2df;outline-offset:3px}
+.ems391-motion-test[aria-disabled="true"] .ems391-motion-probe{opacity:.45}
+
+/* Preserve controls, performance and accessibility. */
+@media(max-width:810px){
+  .ems38-layout .page.ems391-page-enter{animation-duration:.46s}
+  .ems38-layout .ems39-home-scene::after{animation-duration:8s}
+}
+@media(max-width:560px){
+  .ems391-motion-test-head{flex-direction:column}
+  .ems391-motion-test button{width:100%;justify-content:center}
+}
+html.ems-motion-paused .ems38-layout .ems39-home-scene::before,
+html.ems-motion-paused .ems38-layout .ems39-home-scene::after,
+html.ems-motion-paused .ems38-layout .ems39-command-handoff::after{
+  animation-play-state:paused!important;
+}
+html[data-motion="off"] .ems38-layout .ems39-home-scene::before,
+html[data-motion="off"] .ems38-layout .ems39-home-scene::after,
+html[data-motion="off"] .ems38-layout .ems39-command-handoff::after,
+html[data-motion="off"] .ems38-layout .page.ems391-page-enter,
+html[data-motion="off"] .ems38-layout .ems391-shift-wave .ecg,
+html[data-motion="off"] .ems391-motion-test .ems391-motion-probe{
+  animation:none!important;transform:none!important;
+}
+@media(prefers-reduced-motion:reduce){
+ .ems38-layout .ems39-home-scene::before,
+ .ems38-layout .ems39-home-scene::after,
+ .ems38-layout .ems39-command-handoff::after,
+ .ems38-layout .page.ems391-page-enter,
+ .ems38-layout .ems391-shift-wave .ecg,
+ .ems391-motion-test .ems391-motion-probe{
+  animation:none!important;transform:none!important
+ }
+}
