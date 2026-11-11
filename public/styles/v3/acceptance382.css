@@ -1,0 +1,193 @@
+/* EMS COMMAND 3.8.2 — real Windows screenshot acceptance follow-up.
+   Cohesive authenticated/login/update/empty-state UI without modifying game, data,
+   Electron signing, trust, or launch semantics. */
+.auth-page {
+  background:#0b1520;
+  grid-template-columns:minmax(0,1.04fr) minmax(400px,.96fr);
+}
+.auth-art {
+  background-image:linear-gradient(90deg,#07121cc9,#0b1825cf 80%),
+     url('/assets/ems-cinematic-hospital.svg');
+  border-right:1px solid #8bdccc29;
+  padding:clamp(26px,4vw,60px);
+}
+.auth-art:after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 45% 70%,#5fb8a414,transparent 54%);
+}
+.auth-art .auth-inner{
+  width:min(100%,520px);
+  padding:12px 0 20px;
+}
+.auth-art .auth-inner h1 {
+  font-size:clamp(40px,4vw,60px);
+  letter-spacing:-.05em;
+  line-height:1.1;
+  margin:30px 0 18px;
+  text-shadow:0 8px 28px #030812af;
+}
+.auth-art .auth-inner h1 .ems382-auth-accent {
+  color:#99e5d6!important;
+}
+.auth-art .auth-inner p{color:#bfd4db;font-size:13px;line-height:1.7}
+.auth-art .caps{color:#b2d4d7;letter-spacing:.12em;line-height:1.5}
+.auth-art .auth-visual{height:165px;margin-bottom:23px}
+.auth-art .auth-visual .core-orbit:first-child{border-color:#8bdccc4c}
+.auth-art .auth-visual .core-orbit:nth-child(2){border-color:#8bdccc24}
+.auth-art .auth-visual .core-mark {
+  background:linear-gradient(145deg,#285c58,#1a2d42);
+  border-color:#b2f1df4f;color:#b7f5e2;
+  box-shadow:0 0 40px #70dcc528;
+}
+.auth-form-wrap {
+  background:radial-gradient(circle at 60% 35%,#3e7b6720,transparent 54%),
+    linear-gradient(145deg,#142431,#0d1723);
+  padding:clamp(20px,4vw,58px);
+}
+.auth-form{
+  width:min(435px,100%);
+  padding:clamp(23px,3vw,33px);
+  border-radius:17px;
+  background:linear-gradient(155deg,#1b313d,#12212d 90%);
+  border:1px solid #8bdccc47;
+  box-shadow:0 25px 72px #0006,inset 0 1px #ffffff0b;
+}
+.auth-form .eyebrow{color:#9edfd2;font-size:10px;letter-spacing:.105em}
+.auth-form h2{color:#f0faf7;font-size:30px;letter-spacing:-.04em;line-height:1.1}
+.auth-form>p{color:#b6ccd2;font-size:12px;line-height:1.6;margin-bottom:24px}
+.auth-form .input-group{margin-bottom:15px}
+.auth-form .input-group label{display:block;color:#d3e6e9;margin-bottom:7px;font-size:11px}
+.auth-form .field{
+  height:45px;min-height:45px;
+  background:#0d1c29;border:1px solid #92b9bf3a;
+  color:#effbf9;border-radius:9px;
+}
+.auth-form .field:focus{
+  border-color:#a4e8d8;box-shadow:0 0 0 3px #8bdccc24;
+}
+.auth-form .btn-primary {
+  height:43px;min-height:43px;border:1px solid #a8f0df6e;
+  background:linear-gradient(115deg,#a6eadb,#75c9b7);color:#0b2631;
+  box-shadow:0 12px 30px #3b9f8d32;
+}
+.auth-form .btn-primary:hover:not(:disabled){background:linear-gradient(115deg,#c2f5e8,#8cdbc8);color:#08242c}
+.auth-form .auth-switch{color:#b2c9ce;font-size:12px}
+.auth-form .text-btn{color:#a5e9d9}
+.auth-form .tiny.muted{color:#99b6c1;line-height:1.65}
+.auth-form .dotted{border-color:#88b6c42a}
+.auth-form input:focus-visible,.auth-form button:focus-visible{
+  outline:2px solid #a6eee0;outline-offset:3px;
+}
+
+/* Native modal is preserved; only the update hub receives the new visual treatment. */
+.modal:has(>.modal-header + .ems-update-hub){
+  border:1px solid #9bdcca44;
+  background:linear-gradient(145deg,#192b38,#111e2b 85%);
+  padding:24px;border-radius:16px;max-width:780px;
+  box-shadow:0 32px 110px #000a,inset 0 1px #ffffff0a;
+}
+.modal:has(.ems382-update-hub) .modal-header{
+  border-bottom:1px solid #8bdccc2b;padding-bottom:12px;margin-bottom:18px;
+}
+.modal:has(.ems382-update-hub) .modal-header h2{color:#eef9f7;font-size:20px}
+.modal-backdrop:has(.ems382-update-hub){background:#030b15d4;backdrop-filter:blur(7px)}
+.ems382-update-hub{gap:15px;color:#e8f5f4}
+.ems382-update-hub .ems-update-version{
+  background:linear-gradient(124deg,#1a3940,#102530 82%);
+  border-color:#8bdccc4b;border-radius:12px;padding:20px;
+  grid-template-columns:minmax(0,1fr) 62px minmax(0,1fr);
+}
+.ems382-update-hub .ems-update-version strong{color:#eafaf6;font-size:19px}
+.ems382-update-hub .ems-update-eyebrow{color:#b1d2d2;font-size:10px}
+.ems382-update-hub .ems-update-orbit{
+  border-color:#8bdccc64;background:#8bdccc14;color:#b9f5e6;
+  width:53px;height:53px;box-shadow:0 0 30px #8bdccc18;
+}
+.ems382-update-hub h3{font-size:18px;color:#e8f6f3;margin-top:1px}
+.ems382-update-hub p{font-size:13px;color:#b4cbd0;line-height:1.65}
+.ems382-update-hub .ems-update-track{
+  background:#0b1b27;height:7px;border:1px solid #8bdccc24;
+}
+.ems382-update-hub .ems-update-track>span{
+  background:linear-gradient(95deg,#65b6aa,#a2eedb);
+  box-shadow:0 0 11px #8bdccc48;
+}
+.ems382-update-hub .ems382-update-progress.is-checking .ems-update-track>span{
+  width:37%!important;animation:ems382-indeterminate 1.7s ease-in-out infinite;
+}
+@keyframes ems382-indeterminate{
+ from{transform:translateX(-110%)}to{transform:translateX(295%)}
+}
+.ems382-update-hub .ems-update-bottom>span{color:#b1c7cf;line-height:1.5;font-size:11.5px}
+.ems382-update-hub .ems-update-bottom .btn-primary{
+  min-height:39px;border-radius:9px;
+  color:#0e2830;background:linear-gradient(110deg,#afeedf,#7fd0bd);
+  border-color:#adf6e25c;
+}
+.ems382-update-hub .ems-update-safe{
+  border-color:#8bdccc28;color:#a6c8c9;font-size:11.5px;line-height:1.55;
+}
+.ems382-update-hub[data-update-status="error"] .ems-update-version{border-color:#e89c9b6b}
+.ems382-update-hub[data-update-status="error"] .ems-update-version strong:last-child{color:#f2b1af}
+.ems382-update-hub[data-update-status="managed-available"] .ems-update-version,
+.ems382-update-hub[data-update-status="available"] .ems-update-version{border-color:#e3bb7c69}
+.ems382-update-hub[data-update-status="managed-available"] .ems-update-version strong:last-child{color:#eacb92}
+
+/* Empty states on Home and evidence now take less space but remain readable. */
+.ems38-layout .empty {
+  padding:23px 20px;min-height:112px;
+  gap:8px;border-color:#8ebdc731;
+  background:linear-gradient(130deg,#102330,#0e1c29 90%);
+  color:#adbec9;
+}
+.ems38-layout .empty .icon{color:#9adfd0;width:22px;height:22px}
+.ems38-layout .empty strong{color:#dff4f0;font-size:12px}
+.ems38-layout .empty p{color:#adc2ca;font-size:11.5px;line-height:1.6}
+.ems38-layout .section-space.panel:has(>.panel-head + .empty){
+  padding:18px 20px;
+}
+.ems38-layout .v3-pulse-panel{
+  min-height:225px;gap:13px;justify-content:flex-start;
+}
+.ems38-layout .v3-pulse-panel .v3-pulse-header{margin-top:4px}
+.ems38-layout .v3-pulse-panel>.ecg{height:32px;margin:0}
+.ems38-layout .ems382-no-metric {
+  width:65px;height:65px;flex:0 0 65px;border-radius:50%;
+  display:grid;place-items:center;
+  border:1px dashed #8bdccc46;
+  background:#0f202c;color:#b1dacf;
+  font:750 23px var(--heading-font);
+}
+.ems38-layout .v3-progress-ring .ring-content small{color:#a9ded1}
+@media(max-width:980px){
+ .auth-page{grid-template-columns:1fr}
+ .auth-art{min-height:320px;padding:24px 30px}
+ .auth-art .auth-inner{max-width:680px}
+ .auth-art .auth-inner h1{font-size:clamp(36px,5vw,50px);margin:14px 0}
+ .auth-art .auth-visual{display:none}
+ .auth-form-wrap{padding:27px;min-height:470px}
+ .auth-form{width:min(540px,100%)}
+}
+@media(max-width:620px){
+ .auth-art{min-height:235px;padding:26px 20px}
+ .auth-art .auth-inner h1{font-size:36px}
+ .auth-art .auth-inner p{font-size:12px}
+ .auth-art .caps{display:none}
+ .auth-form-wrap{padding:20px 14px;min-height:420px}
+ .auth-form{padding:24px 20px}
+ .modal:has(.ems382-update-hub){padding:18px}
+ .ems382-update-hub .ems-update-version{padding:12px;grid-template-columns:1fr 40px 1fr}
+ .ems382-update-hub .ems-update-version strong{font-size:15px}
+ .ems382-update-hub .ems-update-orbit{width:38px;height:38px;font-size:20px}
+ .ems382-update-hub .ems-update-bottom{flex-direction:column;align-items:stretch}
+ .ems382-update-hub .ems-update-bottom>span{max-width:none}
+ .ems382-update-hub .ems-update-bottom button{width:100%}
+}
+html[data-motion="off"] .ems382-update-hub .ems-update-orbit,
+html[data-motion="off"] .ems382-update-hub .ems-update-track>span,
+html[data-motion="off"] .auth-visual .core-orbit{animation:none!important;transition:none!important}
+@media(prefers-reduced-motion:reduce){
+ .ems382-update-hub .ems-update-orbit,
+ .ems382-update-hub .ems-update-track>span,
+ .auth-visual .core-orbit{animation:none!important;transition:none!important}
+}
