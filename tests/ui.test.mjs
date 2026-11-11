@@ -60,3 +60,43 @@ test('archive search escapes text and gives a functional empty state',()=>{
  assert.match(html,/Ничего не найдено/);
  assert.match(html,/data-action="clear-evidence-search"/);
 });
+
+test('duty operations renders real readiness and history without proof claims',()=>{
+ const started=new Date(Date.now()-45*60*1000).toISOString(),ended=new Date(Date.now()-90*60*1000).toISOString();
+ const html=renderShift({...base,shifts:{shifts:[
+  {start_at:started,end_at:null,checklist:{camera:true,uniform:true}},
+  {start_at:new Date(Date.now()-120*60*1000).toISOString(),end_at:ended,checklist:{}}
+ ]}});
+ assert.match(html,/Дежурство продолжается/);
+ assert.match(html,/2 <small>\/ 6<\/small>/);
+ assert.match(html,/aria-valuenow="33"/);
+ assert.match(html,/Следующий пункт: Связь с отделением установлена/);
+ assert.match(html,/Завершённые из последних 2 записей/);
+ assert.match(html,/data-action="end-shift"/);
+ assert.match(html,/data-nav="evidence"/);
+ assert.match(html,/не считает кадр доказательством только по таймеру/);
+ const idle=renderShift(base);
+ assert.match(idle,/Ожидание начала смены/);
+ assert.match(idle,/data-action="start-shift"/);
+ assert.match(idle,/aria-valuenow="0"/);
+});
+test('career only counts accepted non-location-sensitive goals as complete',()=>{
+ const html=renderCareer({...base,career:{rank:3,goals:[
+  {category:'pmp',needed:2,label:'ПМП',description:'Подтверждённые кадры'},
+  {category:'treatment',needed:4,label:'Лечение',description:'Проверить место'}
+ ],stats:{categories:[{category:'pmp',count:2},{category:'treatment',count:5}]} }});
+ assert.match(html,/Нормативы по кадрам/);
+ assert.match(html,/1 <small>\/ 2<\/small>/);
+ assert.match(html,/Норматив по кадрам выполнен/);
+ assert.match(html,/Нужна проверка места/);
+ assert.match(html,/Принято лечений: 5\. Место не подтверждено/);
+ assert.match(html,/data-nav="evidence"/);
+ assert.match(html,/Ранг изменяется администратором/);
+ assert.doesNotMatch(html,/Место подтверждено/);
+});
+test('duty and career motion respects reduced-motion and in-app toggle',()=>{
+ const css=fs.readFileSync(new URL('../public/styles/v3/operations375.css',import.meta.url),'utf8');
+ assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
+ assert.match(css,/html\[data-motion="off"\]/);
+ assert.match(css,/@keyframes ems375-bar/);
+});
