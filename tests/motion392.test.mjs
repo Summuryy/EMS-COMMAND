@@ -103,10 +103,10 @@ test('3.9.2 actual toast lifecycle pauses, expires, exits, and drains bounded qu
   assert.equal(delayed[0].ms,340);
   const expired=delayed.splice(0);
   expired.forEach(item=>item.fn());
-  assert.equal(root.items.length,2,'queue stays bounded after expiration');
-  assert.equal(root.items[1].querySelector('strong').textContent,'Four','queued notification becomes visible');
-  root.items[1].querySelector('.ems392-toast-close').listeners.click();
-  assert.equal(root.items[1].lastClass,'ems392-toast-leaving','manual close plays exit');
+  assert.equal(root.items.length,1,'queue drains after the first three notifications expire');
+  assert.equal(root.items[0].querySelector('strong').textContent,'Four','queued notification becomes visible');
+  root.items[0].querySelector('.ems392-toast-close').listeners.click();
+  assert.equal(root.items[0].lastClass,'ems392-toast-leaving','manual close plays exit');
  }finally{globalThis.document=original;}
 });
 
