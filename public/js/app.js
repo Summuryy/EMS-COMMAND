@@ -7,6 +7,7 @@ import {renderHome} from './views/home.js';
 import {renderEvidence} from './views/evidence.js';
 import {renderShift} from './views/shift.js';
 import {renderCareer} from './views/career.js';
+import {syncDutyTimeline} from './views/experience39.js';
 import {renderAcademy} from './views/academy.js';
 import {renderProfile} from './views/profile.js';
 import {renderAdmin} from './views/admin.js';
@@ -32,7 +33,7 @@ async function refreshPage(){if(!state.user)return;try{
   const notices=await request('/api/notices');state.notices=notices.items||[];
  }catch(e){toast('Не удалось загрузить данные',e.message,true)}render();}
 async function refreshAdmin(){const tab=state.adminTab;const k={reviews:'reviews',users:'users',audit:'audit'}[tab];if(k){state.admin[k]=await request('/api/admin/'+(k==='reviews'?'reviews':k==='users'?'users':'audit'));}}
-async function goto(page){if(!viewFns[page]||page==='admin'&&!['admin','reviewer'].includes(state.user.role))return;state.page=page;state.mobile=false;state.charterSearch='';render();await refreshPage();window.scrollTo({top:0,behavior:'smooth'});}
+async function goto(page){if(!viewFns[page]||page==='admin'&&!['admin','reviewer'].includes(state.user.role))return;state.page=page;state.mobile=false;state.charterSearch='';render();await refreshPage();window.scrollTo({top:0,behavior:state.motionEnabled&&!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches?'smooth':'auto'});}
 async function upload(files){if(!state.user)return;const list=[...files].filter(f=>/\.(png|jpg|jpeg)$/i.test(f.name)||['image/png','image/jpeg'].includes(f.type));if(!list.length)return toast('Нет подходящих файлов','Выбери PNG или JPG.',true);
  const invalid=list.filter(f=>f.size>12*1024*1024||f.size<300);if(invalid.length)toast('Часть файлов пропущена',`${invalid.length}: размер не подходит`,true);
  const accepted=list.filter(f=>f.size<=12*1024*1024&&f.size>=300);
@@ -146,6 +147,6 @@ window.addEventListener('drop',e=>{e.preventDefault();$('#dropzone')?.classList.
 window.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();if(e.ctrlKey&&e.shiftKey&&e.key.toLowerCase()==='u'&&state.user){e.preventDefault();$('#global-files')?.click();}if(e.key==='Enter'&&(e.target.id==='dropzone'||e.target.closest('.rail-person'))){e.target.id==='dropzone'?$('#global-files').click():goto('profile');}});
 let lastNotices=null;
 setInterval(async()=>{if(!state.user)return;try{const r=await request('/api/notices');const items=r.items||[];const newer=lastNotices===null?[]:items.filter(n=>!n.read_at&&!lastNotices.has(n.id));lastNotices=new Set(items.map(n=>n.id));state.notices=items;for(const n of newer.slice(0,2))toast(n.title,n.message);const bell=document.querySelector('[data-action=notices]');if(bell&&items.some(n=>!n.read_at)&&!bell.querySelector('.icon-count'))bell.insertAdjacentHTML('beforeend','<span class="icon-count"></span>');}catch{}},20000);
-setInterval(()=>{const el=$('#shift-clock');const shift=state.shifts?.shifts?.find(x=>!x.end_at);if(el&&shift)el.textContent=duration(shift.start_at);const home=$('#home-shift-clock');if(home&&state.dashboard?.shift&&!state.dashboard.shift.end_at)home.textContent=duration(state.dashboard.shift.start_at);},1000);
+setInterval(()=>{const el=$('#shift-clock');const shift=state.shifts?.shifts?.find(x=>!x.end_at);if(el&&shift)el.textContent=duration(shift.start_at);const home=$('#home-shift-clock');if(home&&state.dashboard?.shift&&!state.dashboard.shift.end_at)home.textContent=duration(state.dashboard.shift.start_at);syncDutyTimeline(document,shift?.start_at);},1000);
 installCinematicPointer();installMotionEffects();
 (async function start(){try{state.health=await request('/api/health');const r=await request('/api/auth/me');state.user=r.user;setCsrf(r.csrf);if(state.user){await refreshPage();if(state.user.mustChangePassword)toast('Обнови пароль','Пароль необходимо сменить в профиле.');}else render();}catch(e){render();toast('Не удалось связаться с сервером',e.message,true);}})();
