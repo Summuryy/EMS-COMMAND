@@ -16,6 +16,12 @@ export function createToastCenter({getRoot, icon, now = () => performance.now(),
   const maxVisible = 3;
   const maxWaiting = 16;
   const timestamp = now;
+  // Browsers throttle timers in background; reset the clock on visibility changes
+  // so hidden time is never mistaken for notification lifetime.
+  document.addEventListener?.('visibilitychange', () => {
+    const at = timestamp();
+    for (const entry of visible) entry.last = at;
+  });
   const escText = value => String(value ?? '');
   function tick() {
     const now = timestamp();
