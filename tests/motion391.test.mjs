@@ -41,7 +41,7 @@ test('3.9.1 Profile has a functional accessible test action and honest user/OS m
  assert.match(on,/id="ems391-motion-test"/);
  assert.match(on,/data-action="test-motion"/);
  assert.match(on,/id="ems391-motion-status" aria-live="polite"/);
- assert.match(on,/Эффекты разрешены/);
+ assert.match(on,/Проверить плавность перехода/);
  assert.match(on,/id="motion-switch"/);
  assert.match(on,/aria-disabled="false"/);
  const off=renderProfile({...base,motionEnabled:false});
