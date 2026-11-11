@@ -14,7 +14,7 @@
   0%{transform:translate3d(0,0,0);opacity:.12}
   15%{opacity:.85}
   90%{opacity:.9}
-  100%{transform:translate3d(240px,0,0);opacity:0}
+  100%{transform:translate3d(100%,0,0);opacity:0}
 }
 @keyframes ems392-focus-breathe{
   0%,100%{box-shadow:0 0 0 0 #90e6d100}
@@ -27,7 +27,7 @@
 .ems-ecg-line{stroke-width:2.6;filter:drop-shadow(0 0 2px #ff6d8c9c)}
 .ecg-compact .ems-ecg-line{stroke-width:3}
 .ems392-ecg-grid{opacity:.55}
-.ems392-ecg-scan{animation:ems392-ecg-scan 2.5s linear infinite;will-change:transform}
+.ems392-ecg-scan{animation:ems392-ecg-scan 2.5s linear infinite;transform-box:view-box;will-change:transform}
 .ems-ecg-sensor{display:none}
 /* Buttons have three tactile states, without delaying the actual click action. */
 .ems38-layout .btn,.ems38-layout .nav-link,
