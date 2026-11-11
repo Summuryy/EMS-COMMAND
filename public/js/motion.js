@@ -5,7 +5,9 @@ const running=new Set();
 let pointerInstalled=false,mouseFrame=0;
 let effectsInstalled=false;
 let activeRippleTimeouts=new Set();
-function enabled(){return document.documentElement.dataset.motion!=='off'&&!reduced();}
+// An explicit in-app ON choice may override Windows reduced motion.
+// Without that opt-in, the OS preference remains authoritative.
+function enabled(){const mode=document.documentElement.dataset.motion;return mode!=='off'&&(mode==='force'||!reduced());}
 function clearAnimations(){
   observer?.disconnect();observer=null;
   for(const id of running)cancelAnimationFrame(id);
@@ -14,9 +16,9 @@ function clearAnimations(){
   activeRippleTimeouts.clear();
   document.querySelectorAll('.ems-tap-ripple').forEach(el=>el.remove());
 }
-export function setMotionPreference(on){
-  document.documentElement.dataset.motion=on?'on':'off';
-  if(!on)clearAnimations();
+export function setMotionPreference(on,force=false){
+  document.documentElement.dataset.motion=!on?'off':force?'force':'on';
+  if(!enabled())clearAnimations();
 }
 export function applyMotion(root){
   clearAnimations();
