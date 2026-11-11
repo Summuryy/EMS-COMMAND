@@ -1,7 +1,7 @@
 {
-  "version": "3.7.5",
+  "version": "3.8.0",
   "approvePublicClientCode": true,
   "distribution": "public-binary-only",
-  "note": "EMS COMMAND 3.7.5 Duty Operations and Career Progress premium UI preview; launcher-managed test update",
+  "note": "EMS COMMAND 3.8.0 Clinical Command shared UI redesign preview; launcher-managed test update",
   "attempt": 1
 }
