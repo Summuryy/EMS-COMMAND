@@ -63,7 +63,7 @@ async function refreshPage(){if(!state.user)return;try{
   const notices=await request('/api/notices');state.notices=notices.items||[];
  }catch(e){toast('Не удалось загрузить данные',e.message,true)}render();}
 async function refreshAdmin(){const tab=state.adminTab;const k={reviews:'reviews',users:'users',audit:'audit'}[tab];if(k){state.admin[k]=await request('/api/admin/'+(k==='reviews'?'reviews':k==='users'?'users':'audit'));}}
-async function goto(page){if(!viewFns[page]||page==='admin'&&!['admin','reviewer'].includes(state.user.role))return;state.page=page;state.mobile=false;state.charterSearch='';render();await refreshPage();window.scrollTo({top:0,behavior:'instant'});}
+async function goto(page){if(!viewFns[page]||page==='admin'&&!['admin','reviewer'].includes(state.user.role))return;state.page=page;state.mobile=false;state.charterSearch='';render();await refreshPage();window.scrollTo({top:0,behavior:'auto'});}
 async function upload(files){if(!state.user)return;const list=[...files].filter(f=>/\.(png|jpg|jpeg)$/i.test(f.name)||['image/png','image/jpeg'].includes(f.type));if(!list.length)return toast('Нет подходящих файлов','Выбери PNG или JPG.',true);
  const invalid=list.filter(f=>f.size>12*1024*1024||f.size<300);if(invalid.length)toast('Часть файлов пропущена',`${invalid.length}: размер не подходит`,true);
  const accepted=list.filter(f=>f.size<=12*1024*1024&&f.size>=300);
