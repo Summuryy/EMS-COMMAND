@@ -75,3 +75,10 @@ Never commit secrets, personal screenshots, real user credentials, local DBs, to
 - **Acceptance caveat:** Full pixel-accurate Windows display testing at 960/1280/1536px and high DPI and end-user installation have not been performed by this assistant. API/QA success is not screenshot acceptance. The third-party performance overlays visible in user screenshots cannot be fixed by window CSS.
 - **Launch:** This is a publicly accessible binary-only *preview*, not an authorized official product launch. Existing launcher 1.1.0 fetches `releases/latest/download/ems-manifest.json` and will offer 3.8.0 without reinstalling the launcher.
 - **Next focus:** User visual acceptance of 3.8.0, then component-level accessibility, window-width testing and further reduction of legacy CSS conflicts; preserve real functionality.
+
+
+## Proposed 3.8.1 screenshot-driven visual consistency pass (branch design/clinical-cohesion-381)
+- Owner's real 3.8.0 Windows screenshots show home/duty/career using new mint design, but Academy, Profile, PRO, Administration and Evidence retain conflicting rose/violet hero styles.
+- A final scoped stylesheet `public/styles/v3/cohesion381.css` unifies those five areas to dark medical mint/slate, reduces banner height and preserves the pink ECG as a restrained secondary brand signal. Amber marks PRO as deliberately offline/unavailable.
+- Academy's nested `v3-rule-list` scrollbar is removed to allow ordinary app-page scrolling and expanded <details> to remain accessible. Static ID sample `113104` was a **placeholder**, not saved user data; the input is clarified with a neutral prompt and a hint about saving/admin verification.
+- All existing routes, form submissions, admin permission controls, screenshot import/OCR, user persistence, browser sandbox, signing, launcher trust and evidence rules remain unchanged. The 3.8.1 version is **proposed within a PR only** until three CI suites succeed, merge, and the signed production release is verified. No official launch authorized.
