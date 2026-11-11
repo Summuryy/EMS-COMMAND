@@ -86,3 +86,20 @@ html.ems-motion-paused .ems-ecg-moving{animation-play-state:paused!important}
 html[data-motion="force"] .ems392-ecg-scan{animation:none!important;will-change:auto!important}
 html[data-motion="force"] .toast.v3-toast.ems392-toast{animation:ems393-toast-in .2s var(--ems-ease-out) both!important}
 html[data-motion="force"] .toast.v3-toast.ems392-toast.ems392-toast-leaving{animation:ems393-toast-out .18s var(--ems-ease-out) both!important}
+
+/* Guided start appears only for a truly empty account, never as fake progress. */
+.ems393-first-steps{display:grid;grid-template-columns:minmax(190px,.9fr) minmax(0,1.5fr);gap:20px;
+ margin:15px 0 20px;padding:19px 22px;border:1px solid #6d9c9580;
+ border-radius:14px;background:#10212b}
+.ems393-first-steps h2{font-size:18px;line-height:1.25;margin:7px 0 6px;color:#e3f3f0}
+.ems393-first-steps p{color:#a8c0c5;font-size:12px;line-height:1.55;max-width:42ch;margin:0}
+.ems393-first-steps ol{list-style:none;padding:0;margin:0;display:grid;gap:1px}
+.ems393-first-steps li+li{border-top:1px solid #ffffff14}
+.ems393-first-steps li button{width:100%;text-align:left;display:flex;align-items:center;justify-content:space-between;
+ gap:12px;border:0;background:transparent;color:#e5f4ef;padding:10px 3px;cursor:pointer}
+.ems393-first-steps li button:focus-visible{outline:2px solid #a3dfd0;outline-offset:2px}
+.ems393-first-steps li button:hover{color:#9be7cf}
+.ems393-first-steps li strong{font-size:12px;font-weight:600}
+.ems393-first-steps li small{color:#9eb4bb;font-size:11px}
+@media(max-width:950px){.ems393-first-steps{grid-template-columns:1fr}}
+@media(max-width:560px){.ems393-first-steps{padding:16px}.ems393-first-steps li button{align-items:flex-start;flex-direction:column;gap:3px}}
