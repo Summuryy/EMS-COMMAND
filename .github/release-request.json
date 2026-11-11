@@ -1,7 +1,7 @@
 {
-  "version": "3.8.2",
+  "version": "3.9.0",
   "approvePublicClientCode": true,
   "distribution": "public-binary-only",
-  "note": "EMS COMMAND 3.8.2 screenshot-driven login, update-center and no-data UX preview; launcher-managed test update",
+  "note": "EMS COMMAND 3.9.0 Premium Experience preview: live operational command feed, Duty 2.0 timeline, Career 2.0 roadmap and accessible motion",
   "attempt": 1
 }
