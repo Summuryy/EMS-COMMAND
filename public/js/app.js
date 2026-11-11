@@ -45,7 +45,7 @@ async function upload(files){if(!state.user)return;const list=[...files].filter(
  if(count)toast('Файлы загружены',`${count} шт. направлено на автоматическую проверку`);
  await pollJobs();
 }
-function updateQueue(){if(state.page!=='evidence')return;const node=$('#page');if(!node)return;const oldScroll=window.scrollY;node.innerHTML=renderEvidence(state);applyMotion(node);window.scrollTo(0,oldScroll);}
+function updateQueue(){if(state.page!=='evidence')return;const node=$('#page');if(!node)return;const oldScroll=window.scrollY,active=document.activeElement,restoreSearch=active?.id==='evidence-search',start=restoreSearch?active.selectionStart:null,end=restoreSearch?active.selectionEnd:null;node.innerHTML=renderEvidence(state);applyMotion(node);if(restoreSearch){const input=$('#evidence-search');if(input){input.focus({preventScroll:true});if(start!==null&&end!==null)input.setSelectionRange(start,end);}}window.scrollTo(0,oldScroll);}
 let polling=false;
 async function pollJobs(){if(polling)return;polling=true;try{for(let round=0;round<180;round++){
  let pending=state.queue.filter(j=>!j.finished&&!j.id.startsWith('local-'));if(!pending.length)break;
