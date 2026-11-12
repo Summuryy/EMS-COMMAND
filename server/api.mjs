@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { db, now, audit, notice } from './db.mjs';
+import {getAcademyState,importLegacyAcademy,setAcademyStep,setAcademyBookmark} from './academy-state.mjs';
 import { config } from './config.mjs';
 import {hashPassword,verifyPassword,sha256,randomToken,createSession,clearSession,readSession,rateLimit,checkOrigin,verifyCSRF,safeUser} from './security.mjs';
 import {imageInfo} from './vision.mjs';
@@ -91,6 +92,19 @@ export async function api(req,res,url){
     }
     requireAuth(session);
     if(session.user.mustChangePassword&&pathName!=='/api/auth/change-password'&&pathName!=='/api/auth/logout')throw fail(403,'Сначала смените пароль');
+    if(pathName.startsWith('/api/academy/')){
+      // The authenticated session owns the record. A client-provided user ID is never used.
+      const owner=session.user.id;
+      if(method==='GET'&&pathName==='/api/academy/state')return send(res,getAcademyState(owner)),true;
+      if(method==='POST'){
+        if(!rateLimit('academy-write:'+owner,240,60_000))throw fail(429,'Слишком частое сохранение Академии');
+        const body=await jsonBody(req);
+        if(pathName==='/api/academy/import')return send(res,importLegacyAcademy(owner,body.progress,body.bookmark)),true;
+        if(pathName==='/api/academy/step')return send(res,setAcademyStep(owner,body.key,body.completed)),true;
+        if(pathName==='/api/academy/bookmark')return send(res,setAcademyBookmark(owner,{course:body.course,step:body.step})),true;
+      }
+      throw fail(404,'Действие Академии не найдено');
+    }
     if(method==='POST'&&pathName==='/api/auth/logout'){
       clearSession(res,session.token);audit(session.user.id,'auth.logout',session.user.id);return send(res,{ok:true}),true;
     }
