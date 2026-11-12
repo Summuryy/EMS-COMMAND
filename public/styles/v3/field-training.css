@@ -25,3 +25,35 @@
 .ems-learning-step input{width:17px;height:17px;flex:none;margin:3px 0 0;accent-color:#8bdccc;cursor:pointer}
 .ems-learning-step input:checked+span{text-decoration:line-through;color:#8eaaa8}
 .ems-learning-completion{font-size:11px;border-radius:7px;padding:4px 7px;background:#8bdccc15;color:#a6e5d4;white-space:nowrap}
+
+/* Academy 3.11: step-linked, locally bundled gameplay screenshots. */
+.ems-learning-tools{display:grid;gap:11px;padding:18px 20px;background:linear-gradient(135deg,#152c36,#10232f);border:1px solid #89c9bb3a;border-radius:14px}
+.ems-learning-tools>label{font-size:12px;font-weight:750;color:#dafaf2}
+.ems-learning-tools input{width:100%;min-height:44px;border-radius:9px;color:#effffc;background:#0b1b26;border:1px solid #6a958d66;padding:10px 14px}
+.ems-learning-tools input::placeholder{color:#87a8b0}
+.ems-learning-filters{display:flex;flex-wrap:wrap;gap:7px}
+.ems-learning-filters button{background:#1b3642;border:1px solid #56777b80;color:#d3e9ea;border-radius:999px;min-height:36px;padding:7px 12px;font-size:12px;cursor:pointer}
+.ems-learning-filters button.is-active{background:#9de9d5;border-color:#9de9d5;color:#0b2630;font-weight:800}
+.ems-learning-filters button:focus-visible,.ems-training-shot:focus-visible,.ems-training-lightbox button:focus-visible{outline:2px solid #c2fff2;outline-offset:3px}
+.ems-learning-results{font-size:12px;color:#adc8c9}
+.ems-learning-section[hidden],.ems-learning-card[hidden],.ems-training-gallery[hidden],.ems-learning-empty[hidden],.ems-training-shot[hidden]{display:none!important}
+.ems-learning-empty{padding:22px;color:#e5faf7;background:#172c36;border:1px dashed #6a9d91;border-radius:12px}
+.ems-learning-summary{display:inline-flex;gap:5px;align-items:center;padding:7px 12px;margin-top:16px;background:#74d4b418;border:1px solid #8cdec652;border-radius:8px;color:#d3f5ed;font-size:12px}
+.ems-learning-summary strong{color:#c0ffed}
+.ems-training-lesson-intro{font-size:12px;color:#a4c5c8;line-height:1.55}
+.ems-learning-step{line-height:1.65}
+.ems-training-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:9px;margin:8px 0 14px 27px}
+.ems-training-shot{min-width:0;padding:0;background:#081822;color:#bcd8dc;text-align:left;border:1px solid #81b7af55;border-radius:10px;overflow:hidden;cursor:zoom-in;transition:transform .18s ease,border-color .18s ease}
+.ems-training-shot:hover{transform:translateY(-2px);border-color:#a5e9d8}
+.ems-training-shot img{width:100%;height:auto;max-height:160px;aspect-ratio:16/9;display:block;object-fit:contain;background:#071722}
+.ems-training-shot span{display:block;padding:10px 11px;color:#bddfdd;font-size:11px;line-height:1.4}
+.ems-learning-links{padding-top:8px}
+.ems-training-lightbox{width:min(96vw,1100px);max-height:95vh;background:#101d28;border:1px solid #75b4a7;border-radius:12px;box-shadow:0 28px 90px #000b;padding:17px;color:#eafefa}
+.ems-training-lightbox::backdrop{background:#06121cdb;backdrop-filter:blur(7px)}
+.ems-training-lightbox img{display:block;max-width:100%;max-height:75vh;margin:0 auto;object-fit:contain;border-radius:5px}
+.ems-training-lightbox button{display:block;margin:0 0 12px auto;padding:9px 15px;background:#214b4d;color:#f0fffb;border:1px solid #7ec8b7;border-radius:8px;cursor:pointer}
+.ems-training-lightbox p{font-size:12px;line-height:1.5;color:#b7dbd5;margin:12px 0 2px;text-align:center}
+@media(max-width:680px){.ems-learning-tools{padding:13px}.ems-training-gallery{margin-left:0}.ems-training-shot img{max-height:220px}}
+@media(prefers-reduced-motion:reduce){.ems-training-shot{transition:none}.ems-training-shot:hover{transform:none}.ems-training-lightbox::backdrop{backdrop-filter:none}}
+[data-motion=off] .ems-training-shot{transition:none}
+[data-motion=off] .ems-training-shot:hover{transform:none}
