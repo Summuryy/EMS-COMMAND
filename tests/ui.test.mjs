@@ -145,12 +145,13 @@ test('3.8 shared UI system loads last and protects Windows caption and motion',(
  assert.match(js,/data-action="logout"/);
 });
 
-test('3.8.1 screenshot review: academy search and native page scroll',()=>{
- const html=renderAcademy(base);
+test('3.8.1 charter search and native page scroll remain intact on dedicated charter screen',()=>{
+ const html=renderCharter(base);
  assert.match(html,/class="v3-academy-banner"/);
  assert.match(html,/id="charter-search"/);
  assert.match(html,/class="rule v3-rule"/);
  assert.match(html,/Общее положение/);
+ assert.doesNotMatch(html,/data-academy-panel/);
  const css=fs.readFileSync(new URL('../public/styles/v3/cohesion381.css',import.meta.url),'utf8');
  assert.match(css,/\.ems38-layout \.v3-academy-panel \.v3-rule-list\s*\{\s*max-height:none;overflow:visible/);
  assert.match(css,/\.v3-academy-panel \.v3-rule summary:focus-visible/);
