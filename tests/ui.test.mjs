@@ -5,14 +5,14 @@ import {renderHome} from '../public/js/views/home.js';
 import {renderEvidence,filterEvidence} from '../public/js/views/evidence.js';
 import {renderShift} from '../public/js/views/shift.js';
 import {renderCareer} from '../public/js/views/career.js';
-import {renderAcademy} from '../public/js/views/academy.js';
+import {renderAcademy,renderCharter} from '../public/js/views/academy.js';
 import {renderProfile} from '../public/js/views/profile.js';
 import {renderPro} from '../public/js/views/pro.js';
 import {renderAdmin} from '../public/js/views/admin.js';
 const user={displayName:'Тестовый сотрудник',username:'tester',staticId:'12345',serverName:'Кутузовский',rank:3,role:'admin',department:'ОПП',staticVerified:false};
 const base={user,dashboard:{stats:{total:10,accepted:5,review:4,rejected:1},shift:null,recent:[],notices:[]},evidence:{items:[]},queue:[],filter:'all',shifts:{shifts:[]},career:{rank:3,goals:[],stats:{categories:[]}},charter:[{number:1,title:'Общее положение',text:'Тест'}],charterSearch:'',motionEnabled:true,adminTab:'reviews',admin:{reviews:{items:[]}},notices:[]};
 test('every navigation page renders in isolation',()=>{
-  for(const [name,fn] of Object.entries({home:renderHome,evidence:renderEvidence,shift:renderShift,career:renderCareer,academy:renderAcademy,profile:renderProfile,pro:renderPro,admin:renderAdmin})){
+  for(const [name,fn] of Object.entries({home:renderHome,evidence:renderEvidence,shift:renderShift,career:renderCareer,academy:renderAcademy,charter:renderCharter,profile:renderProfile,pro:renderPro,admin:renderAdmin})){
     const html=fn(base);assert.ok(html.length>400,name);assert.ok(/(?:<section|<header)/.test(html),name);assert.doesNotMatch(html,/\bundefined\b/,name);
   }
 });
