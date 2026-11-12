@@ -97,13 +97,17 @@ export const lessons = [
  'Все процедуры являются игровыми RP-механиками, не руководством к реальной медпомощи.'
  ]}
 ];
-export function renderFieldTraining(){
+export function renderFieldTraining(user){
+ const profile=(user&&user.id)||'local';const storageKey='ems-field-lessons:'+profile;let done={};
+ try{done=JSON.parse(globalThis.localStorage?.getItem(storageKey)||'{}')||{}}catch{}
+
  const cats=['Интернатура','Практика','Карьера','ОМП','Доказательства'];
  let out='<section class="ems-learning" aria-label="Пошаговое обучение"><header class="ems-learning-head"><div class="v3-panel-kicker">ПОЛЕВОЙ УЧЕБНИК / EMS</div><h2>Научись работать в больнице</h2><p>Практические маршруты для интернов, врачей и ОМП. Открывайте урок и выполняйте шаги по порядку.</p></header>';
  for(const cat of cats){
   out+='<h3 class="ems-learning-group">'+esc(cat)+'</h3><div class="ems-learning-grid">';
   for(const l of lessons.filter(x=>x.category===cat)){
-   out+='<details class="ems-learning-card"><summary>'+esc(l.title)+'</summary><div class="ems-learning-body"><ol>'+l.steps.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol>';
+   const doneCount=l.steps.filter((s,j)=>done[l.title+':'+j]).length;
+   out+='<details class="ems-learning-card"><summary>'+esc(l.title)+'<small class="ems-learning-completion">'+doneCount+'/'+l.steps.length+'</small></summary><div class="ems-learning-body"><ol>'+l.steps.map((s,j)=>'<li><label class="ems-learning-step"><input type="checkbox" data-learn-key="'+esc(l.title+':'+j)+'" '+(done[l.title+':'+j]?'checked':'')+'><span>'+esc(s)+'</span></label></li>').join('')+'</ol>';
    if(l.links)out+='<p>'+l.links.map(p=>'<a target="_blank" rel="noopener noreferrer" href="'+esc(p[1])+'">'+esc(p[0])+' ↗</a>').join(' · ')+'</p>';
    out+='</div></details>';
   }
