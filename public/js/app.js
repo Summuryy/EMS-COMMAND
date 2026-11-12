@@ -325,7 +325,7 @@ window.addEventListener('input',e=>{
   window.scrollTo(0,scroll);
   return;
  }
- if(e.target.id==='charter-search'){const caret=e.target.selectionStart;state.charterSearch=e.target.value;const scroll=window.scrollY;$('#page').innerHTML=renderAcademy(state);const el=$('#charter-search');el.focus();el.setSelectionRange(caret,caret);window.scrollTo(0,scroll);}
+ if(e.target.id==='charter-search'){const caret=e.target.selectionStart;state.charterSearch=e.target.value;const scroll=window.scrollY;$('#page').innerHTML=renderCharter(state);const el=$('#charter-search');el.focus();el.setSelectionRange(caret,caret);window.scrollTo(0,scroll);}
 });
 window.addEventListener('dragover',e=>{e.preventDefault();$('#dropzone')?.classList.add('dragover');});
 window.addEventListener('dragleave',e=>{if(!e.relatedTarget||!document.contains(e.relatedTarget))$('#dropzone')?.classList.remove('dragover');});
