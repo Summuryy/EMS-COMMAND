@@ -1,6 +1,9 @@
 # EMS COMMAND — AI PROJECT HANDOFF (living source of truth)
 Updated: 2026-11-12. Read this before making changes. This document describes the owner's intent, not a guarantee of current release status.
 
+## EMS Hospital training knowledge (owner materials, 2026-11-12)
+The owner supplied extensive Discord regulations and 79 game screenshots for practical learning, internship, OMP, OPP, evidence, shifts and reports. Read [EMS_HOSPITAL_KNOWLEDGE.md](EMS_HOSPITAL_KNOWLEDGE.md) before training/academy/career work. Full original PNG pack and optimized 79-image WebP pack are preserved in the user's ChatGPT Library folder `/EMS COMMAND/` as `EMS_COMMAND_training_source_images.zip` and `EMS_COMMAND_training_assets_for_app.zip` (not yet embedded in GitHub/Windows release). Do not re-request original screenshots. PR #21 introduces 12 textual role-based courses and a per-account local checklist; only claim images are in the app after a verified binary-assets commit. Check current PR/CI status before release and keep owner restrictions on approval and signing.
+
 ## Mission and owner preferences
 Build a polished, responsive, cinematic Windows desktop companion for GTA 5 RP EMS / state hospital staff. The owner is currently the only tester. This is a private *product development / acceptance* phase; do not announce a public product launch without explicit approval. However, to test each iteration, the owner REQUIRES the latest changes to be delivered as an installable signed app update visible from their EXISTING launcher. A commit or PR alone is NOT delivery. Speak Russian, be direct, and show proof. Do not repeatedly ask the owner to test basic issues that Windows CI can test.
 

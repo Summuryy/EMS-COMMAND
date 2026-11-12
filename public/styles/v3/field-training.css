@@ -1,0 +1,27 @@
+/* Field training: calm, accessible learning surfaces. */
+.ems-learning{display:grid;gap:12px;margin:24px 0 36px}
+.ems-learning-head{padding:25px;border:1px solid #87d9c34d;border-radius:16px;background:linear-gradient(115deg,#1a353b,#101f2c 75%)}
+.ems-learning-head h2{font-size:clamp(23px,2.4vw,32px);margin:7px 0;color:#f4fcfc;line-height:1.15}
+.ems-learning-head p{max-width:65ch;color:#b7d1d5;line-height:1.6;font-size:13px}
+.ems-learning-group{font-size:16px;font-weight:800;margin:14px 0 2px;color:#d2f3eb}
+.ems-learning-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:10px}
+.ems-learning-card{align-self:start;min-width:0;border:1px solid #8fbac032;border-radius:12px;background:linear-gradient(150deg,#1b2c38,#111d29);overflow:hidden}
+.ems-learning-card[open]{border-color:#8bdccc86;box-shadow:0 16px 37px #0004}
+.ems-learning-card summary{list-style:none;cursor:pointer;padding:18px 20px;color:#f2fbfa;font-size:13px;font-weight:750;display:flex;justify-content:space-between;gap:12px;align-items:center;min-height:58px}
+.ems-learning-card summary::-webkit-details-marker{display:none}
+.ems-learning-card summary:after{content:'+';font-size:21px;color:#91d9c9}
+.ems-learning-card[open] summary:after{content:'−'}
+.ems-learning-card summary:focus-visible{outline:2px solid #b9fff0;outline-offset:-3px}
+.ems-learning-body{padding:0 22px 19px;border-top:1px solid #8fbac024;color:#d3e5e8;font-size:12px;line-height:1.65}
+.ems-learning-body ol{padding-left:21px}
+.ems-learning-body li{padding:6px 0 6px 4px}
+.ems-learning-body li::marker{font-weight:800;color:#91dccb}
+.ems-learning-body a{color:#9de6d6;text-decoration:underline;text-underline-offset:3px}
+.ems-learning-disclaimer{font-size:11px;color:#a9bbc5;line-height:1.5;border-left:3px solid #8bdccc88;padding:11px 14px;background:#8bdccc0b}
+@media(max-width:700px){.ems-learning-head{padding:18px}.ems-learning-grid{grid-template-columns:minmax(0,1fr)}}
+@media(prefers-reduced-motion:reduce){.ems-learning-card{animation:none!important;transition:none!important}}
+
+.ems-learning-step{display:flex;align-items:flex-start;gap:11px;cursor:pointer}
+.ems-learning-step input{width:17px;height:17px;flex:none;margin:3px 0 0;accent-color:#8bdccc;cursor:pointer}
+.ems-learning-step input:checked+span{text-decoration:line-through;color:#8eaaa8}
+.ems-learning-completion{font-size:11px;border-radius:7px;padding:4px 7px;background:#8bdccc15;color:#a6e5d4;white-space:nowrap}
