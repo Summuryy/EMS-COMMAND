@@ -17,6 +17,67 @@ import {applyMotion,setMotionPreference,installCinematicPointer,installMotionEff
 import {ecg} from './views/visual.js';
 import {createToastCenter} from './notifications.js';
 const $=sel=>document.querySelector(sel);
+// Practical Academy enhancements use event delegation because pages are re-rendered dynamically.
+const academyNormalize=s=>String(s||'').toLocaleLowerCase('ru').replaceAll('ё','е');
+function filterAcademyLessons(){
+ const root=document.querySelector('.ems-learning');
+ if(!root)return;
+ const query=academyNormalize(root.querySelector('#ems-learning-search')?.value.trim());
+ const category=root.querySelector('[data-academy-filter][aria-pressed="true"]')?.dataset.academyFilter||'all';
+ let matches=0;
+ root.querySelectorAll('[data-academy-card]').forEach(card=>{
+  const found=(category==='all'||card.dataset.academyCategory===category)&&(!query||academyNormalize(card.textContent).includes(query));
+  card.hidden=!found;
+  if(found)matches++;
+ });
+ root.querySelectorAll('[data-academy-section]').forEach(group=>{
+  group.hidden=!group.querySelector('[data-academy-card]:not([hidden])');
+ });
+ const counter=root.querySelector('#ems-learning-results');
+ if(counter)counter.textContent=matches+' учебных маршрутов';
+ const empty=root.querySelector('#ems-learning-empty');
+ if(empty)empty.hidden=matches!==0;
+}
+document.addEventListener('input',event=>{
+ if(event.target?.id==='ems-learning-search')filterAcademyLessons();
+});
+document.addEventListener('click',event=>{
+ const filter=event.target.closest?.('[data-academy-filter]');
+ if(filter){
+  const root=filter.closest('.ems-learning');
+  root?.querySelectorAll('[data-academy-filter]').forEach(button=>{
+   const active=button===filter;
+   button.classList.toggle('is-active',active);
+   button.setAttribute('aria-pressed',String(active));
+  });
+  filterAcademyLessons();return;
+ }
+ const media=event.target.closest?.('[data-academy-open]');
+ if(media){
+  const dialog=document.getElementById('ems-training-lightbox');
+  const image=document.getElementById('ems-training-enlarged');
+  const caption=document.getElementById('ems-training-caption');
+  if(dialog&&image&&caption&&typeof dialog.showModal==='function'){
+   image.src=media.dataset.academyOpen;
+   image.alt=media.dataset.academyCaption||'Учебный скриншот';
+   caption.textContent=media.dataset.academyCaption||'Учебный скриншот';
+   dialog.showModal();
+  }return;
+ }
+ if(event.target.closest?.('[data-academy-close]')){
+  document.getElementById('ems-training-lightbox')?.close();
+ }
+});
+window.addEventListener('error',event=>{
+ const target=event.target;
+ if(!(target instanceof HTMLImageElement)||!target.classList.contains('ems-training-image'))return;
+ const button=target.closest('.ems-training-shot');
+ if(!button)return;
+ button.hidden=true; // No broken images if the binary media pack is not installed.
+ const gallery=button.closest('.ems-training-gallery');
+ if(gallery&&!gallery.querySelector('.ems-training-shot:not([hidden])'))gallery.hidden=true;
+},true);
+
 const state={user:null,page:'home',filter:'all',evidenceSearch:'',dashboard:null,evidence:null,shifts:null,career:null,charter:[],charterSearch:'',queue:[],admin:{},adminTab:'reviews',inviteCode:null,mobile:false,notices:[],authMode:'login',busy:false,health:null,motionEnabled:localStorage.getItem('ems-motion-enabled')!=='false',motionOverride:localStorage.getItem('ems-motion-enabled')==='true'||localStorage.getItem('ems-motion-force')==='true'};
 // Navigation sections are rendered by responsibility, not as a flat feature inventory.
 const viewFns={home:renderHome,evidence:renderEvidence,shift:renderShift,career:renderCareer,academy:renderAcademy,profile:renderProfile,admin:renderAdmin,pro:renderPro};
