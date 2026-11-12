@@ -36,7 +36,7 @@ export function academySelect(root,id,step=0,{focus=false,persist=true}={}){
  }
  if(focus){
   const heading=panel.querySelector('h3');
-  heading?.focus({preventScroll:true});
+  steps[index]?.focus({preventScroll:false});
  }
  return true;
 }
