@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,existsSync} from 'node:fs';
-import {resolve,dirname} from 'node:path';
+import {resolve,dirname,relative,isAbsolute} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {trainingMediaByCourse} from '../public/js/views/training-media.js';
 
@@ -13,7 +13,8 @@ test('all Academy screenshots are included in the signed app payload',()=>{
  for(const name of names){
   assert.match(name,/^[a-z][a-z0-9-]*$/);
   const path=resolve(assets,name+'.webp');
-  assert.ok(path.startsWith(assets+'/'),'no path traversal');
+  const rel=relative(assets,path);
+  assert.ok(rel&&!rel.startsWith('..')&&!isAbsolute(rel),'no path traversal');
   assert.ok(existsSync(path),'missing media: '+name);
   const body=readFileSync(path);
   assert.equal(body.toString('ascii',0,4),'RIFF','invalid RIFF image: '+name);
