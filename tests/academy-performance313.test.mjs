@@ -53,4 +53,8 @@ test('Course search is indexed and app navigation skips Academy double rendering
  assert.match(app,/if\(page==='academy'\)\{/);
  assert.match(app,/if\(root\?\.isConnected\)academyFilter\(root\)/);
  assert.match(app,/if\(state\.page==='shift'\)syncDutyTimeline/);
+ assert.match(app,/async function refreshPage\(\{partial=false\}=\{\}\)/);
+ assert.match(app,/await refreshPage\(\{partial:true\}\)/);
+ assert.match(app,/if\(state\.page!==p\)return;/);
+ assert.match(app,/node\.innerHTML=\(viewFns\[p\]\|\|renderHome\)\(state\)/);
 });
