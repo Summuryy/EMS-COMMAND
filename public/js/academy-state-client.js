@@ -6,7 +6,7 @@ const keys=new Set(lessons.flatMap(lesson=>lesson.steps.map((_,index)=>lesson.ti
 const courses=new Map(lessons.map(lesson=>[lesson.title.slice(0,2),lesson.steps.length]));
 const emptyBookmark=()=>({course:'01',step:0});
 export function validAcademyBookmark(value){
- return !!value&&typeof value==='object'&&courses.has(value.course)&&
+ return !!value&&typeof value==='object'&&!Array.isArray(value)&&courses.has(value.course)&&
   Number.isInteger(value.step)&&value.step>=0&&value.step<courses.get(value.course);
 }
 export function readLegacyAcademy(userId,storage=globalThis.localStorage){
@@ -26,7 +26,7 @@ export function readLegacyAcademy(userId,storage=globalThis.localStorage){
 export async function loadAcademyAccount(userId,requestApi,storage=globalThis.localStorage){
  if(!userId||typeof requestApi!=='function')throw Error('Неизвестный аккаунт Академии');
  let saved=await requestApi('/api/academy/state');
- if(!saved||typeof saved!=='object'||!saved.progress||typeof saved.progress!=='object')throw Error('Некорректное состояние Академии');
+ if(!saved||typeof saved!=='object'||!saved.progress||typeof saved.progress!=='object'||Array.isArray(saved.progress))throw Error('Некорректное состояние Академии');
  if(!saved.initialized){
   const old=readLegacyAcademy(userId,storage);
   if(old.hasData)saved=await requestApi('/api/academy/import',{method:'POST',body:{progress:old.progress,bookmark:old.bookmark}});
