@@ -10,7 +10,8 @@ import {renderShift} from './views/shift.js';
 import {renderCareer} from './views/career.js';
 import {syncDutyTimeline} from './views/experience39.js';
 import {renderAcademy,renderCharter} from './views/academy.js';
-import {academySelect,academyMove,academyFilter,academyProgress,academyThumbnail} from './views/academy-workspace.js';
+import {academySelect,academyMove,academyFilter,academyProgress,academyThumbnail,setAcademyBookmarkListener} from './views/academy-workspace.js';
+import {loadAcademyAccount} from './academy-state-client.js';
 import {renderProfile} from './views/profile.js';
 import {renderAdmin} from './views/admin.js';
 import {renderPro} from './views/pro.js';
@@ -77,10 +78,31 @@ window.addEventListener('error',event=>{
  if(gallery&&!gallery.querySelector('.ems-training-shot:not([hidden])'))gallery.hidden=true;
 },true);
 
-const state={user:null,page:'home',filter:'all',evidenceSearch:'',dashboard:null,evidence:null,shifts:null,career:null,charter:[],charterSearch:'',queue:[],admin:{},adminTab:'reviews',inviteCode:null,mobile:false,notices:[],authMode:'login',busy:false,health:null,motionEnabled:localStorage.getItem('ems-motion-enabled')!=='false',motionOverride:localStorage.getItem('ems-motion-enabled')==='true'||localStorage.getItem('ems-motion-force')==='true'};
+const state={user:null,page:'home',filter:'all',evidenceSearch:'',dashboard:null,evidence:null,shifts:null,career:null,charter:[],charterSearch:'',academyState:null,queue:[],admin:{},adminTab:'reviews',inviteCode:null,mobile:false,notices:[],authMode:'login',busy:false,health:null,motionEnabled:localStorage.getItem('ems-motion-enabled')!=='false',motionOverride:localStorage.getItem('ems-motion-enabled')==='true'||localStorage.getItem('ems-motion-force')==='true'};
 // Navigation sections are rendered by responsibility, not as a flat feature inventory.
 const viewFns={home:renderHome,evidence:renderEvidence,shift:renderShift,career:renderCareer,academy:renderAcademy,charter:renderCharter,profile:renderProfile,admin:renderAdmin,pro:renderPro};
 const toastCenter=createToastCenter({getRoot:()=>$('#toast-stack'),icon});
+let academyWrites=Promise.resolve();
+function queueAcademySave(owner,url,body){
+ const task=academyWrites.catch(()=>{}).then(()=>{
+  if(state.user?.id!==owner)throw Error('Смена аккаунта — сохранение отменено');
+  return request(url,{method:'POST',body});
+ });
+ academyWrites=task.catch(()=>{});
+ return task;
+}
+function academySaveLabel(root,message){
+ const node=root?.querySelector?.('[data-academy-save-status]');
+ if(node)node.textContent=message;
+}
+setAcademyBookmarkListener(({profile,course,step,root})=>{
+ if(!state.user||state.user.id!==profile||!state.academyState)return;
+ state.academyState.bookmark={course,step};
+ academySaveLabel(root,'Сохранение позиции в профиле…');
+ queueAcademySave(profile,'/api/academy/bookmark',{course,step})
+  .then(()=>academySaveLabel(root,'Прогресс и позиция сохраняются в профиле EMS COMMAND.'))
+  .catch(err=>{academySaveLabel(root,'Позиция не сохранена на сервере. Повторите переход.');toast('Не удалось сохранить позицию Академии',err.message,true);});
+});
 function toast(title,detail='',error=false){toastCenter.notify(title,detail,{tone:error?'error':'success'});}
 async function saveMotionMode(mode){
  if(!window.emsMotion?.set)return;
@@ -140,10 +162,16 @@ async function refreshPage({partial=false}={}){if(!state.user)return;const p=sta
  }
  render();}
 async function refreshAdmin(){const tab=state.adminTab;const k={reviews:'reviews',users:'users',audit:'audit'}[tab];if(k){state.admin[k]=await request('/api/admin/'+(k==='reviews'?'reviews':k==='users'?'users':'audit'));}}
-async function goto(page){if(!viewFns[page]||page==='admin'&&!['admin','reviewer'].includes(state.user.role))return;state.page=page;state.mobile=false;state.charterSearch='';render();if(page==='academy'){
- // Academy is bundled static content: no extra API request and no second full-shell render.
- window.scrollTo({top:0,behavior:'auto'});return;
-}await refreshPage({partial:true});window.scrollTo({top:0,behavior:'auto'});}
+async function goto(page){if(!viewFns[page]||page==='admin'&&!['admin','reviewer'].includes(state.user.role))return;state.page=page;state.mobile=false;state.charterSearch='';if(page==='academy'){
+ // Read this account's persistent state before constructing the Academy once.
+ const owner=state.user.id;
+ try{
+  await academyWrites.catch(()=>{});
+  state.academyState=await loadAcademyAccount(owner,request);
+ }catch(e){state.academyState=null;toast('Не удалось загрузить прогресс Академии','Доступен локальный режим: '+e.message,true);}
+ if(state.user?.id!==owner||state.page!==page)return;
+ render();window.scrollTo({top:0,behavior:'auto'});return;
+}render();await refreshPage({partial:true});window.scrollTo({top:0,behavior:'auto'});}
 async function upload(files){if(!state.user)return;const list=[...files].filter(f=>/\.(png|jpg|jpeg)$/i.test(f.name)||['image/png','image/jpeg'].includes(f.type));if(!list.length)return toast('Нет подходящих файлов','Выбери PNG или JPG.',true);
  const invalid=list.filter(f=>f.size>12*1024*1024||f.size<300);if(invalid.length)toast('Часть файлов пропущена',`${invalid.length}: размер не подходит`,true);
  const accepted=list.filter(f=>f.size<=12*1024*1024&&f.size>=300);
@@ -206,7 +234,7 @@ async function handleAction(action,el){
  if(action==='export-report'){const items=state.evidence?.items||[];const output={generatedAt:new Date().toISOString(),profile:{name:state.user.displayName,staticId:state.user.staticId,server:state.user.serverName},evidence:items.map(x=>({id:x.id,file:x.name,category:x.category,status:x.status,patientId:x.patientId,reason:x.reason,createdAt:x.createdAt}))};const url=URL.createObjectURL(new Blob([JSON.stringify(output,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='EMS_Evidence_Report.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Отчёт выгружен',`${items.length} кадров · JSON`);return;}
  if(action==='notices'){await openNotifications();return;}
  if(action==='detail'){await detail(el.dataset.id);return;}
- if(action==='logout'){try{await request('/api/auth/logout',{method:'POST',body:{}});state.user=null;state.queue=[];state.evidenceSearch='';setCsrf(null);render();toast('Вы вышли из аккаунта');}catch(e){toast('Ошибка',e.message,true)}return;}
+ if(action==='logout'){try{await request('/api/auth/logout',{method:'POST',body:{}});state.user=null;state.academyState=null;state.queue=[];state.evidenceSearch='';setCsrf(null);render();toast('Вы вышли из аккаунта');}catch(e){toast('Ошибка',e.message,true)}return;}
  if(action==='start-shift'||action==='end-shift'){
  try{if(action==='start-shift')await request('/api/shifts/start',{method:'POST',body:{}});else{const cur=state.shifts?.shifts?.find(s=>!s.end_at);if(!cur)return;await request(`/api/shifts/${cur.id}/end`,{method:'POST',body:{}});}toast(action==='start-shift'?'Смена началась':'Смена завершена');await refreshPage();}catch(e){toast('Не удалось изменить смену',e.message,true)}return;}
  if(action==='delete-evidence'){
@@ -252,7 +280,7 @@ window.addEventListener('click',async e=>{
  try{const u=window.emsUpdates;const s=await (action==='update-check'?u.check():action==='update-download'?u.download():u.install());paintUpdateStatus({...await u.status(),...s});}catch(err){toast('Ошибка обновления',err.message,true);}finally{b.disabled=false;}
 });
 async function onSubmit(form){const data=Object.fromEntries(new FormData(form));const id=form.id;const btn=form.querySelector('button[type=submit]');if(btn)btn.disabled=true;try{
- if(id==='auth-form'){const route=state.authMode==='login'?'login':'register';const r=await request('/api/auth/'+route,{method:'POST',body:data});state.user=r.user;setCsrf(r.csrf);state.page='home';state.authMode='login';toast('Добро пожаловать',r.user.displayName);await refreshPage();return;}
+ if(id==='auth-form'){const route=state.authMode==='login'?'login':'register';const r=await request('/api/auth/'+route,{method:'POST',body:data});state.user=r.user;state.academyState=null;setCsrf(r.csrf);state.page='home';state.authMode='login';toast('Добро пожаловать',r.user.displayName);await refreshPage();return;}
  if(id==='profile-form'){const r=await request('/api/profile',{method:'PATCH',body:data});state.user=r.user;toast('Профиль обновлён','Если Static ID изменился, нужна новая проверка.');await refreshPage();return;}
  if(id==='password-form'){await request('/api/auth/change-password',{method:'POST',body:data});toast('Пароль обновлён');form.reset();return;}
  if(id==='decision-form'){await request(`/api/admin/evidence/${data.id}/decision`,{method:'POST',body:{decision:data.decision,category:data.category,reason:data.reason}});closeModal();toast('Решение сохранено');await refreshPage();return;}
@@ -261,7 +289,20 @@ async function onSubmit(form){const data=Object.fromEntries(new FormData(form));
  }catch(e){toast('Не удалось выполнить действие',e.message,true)}finally{if(btn)btn.disabled=false;}}
 window.addEventListener('click',e=>{if(e.target.closest('#dropzone')&&!e.target.closest('[data-action]')){document.querySelector('#global-files')?.click();return;}const nav=e.target.closest('[data-nav]');if(nav){goto(nav.dataset.nav);return;}const filter=e.target.closest('[data-filter]');if(filter){state.filter=filter.dataset.filter;render();return;}const adminTab=e.target.closest('[data-admin-tab]');if(adminTab){state.adminTab=adminTab.dataset.adminTab;refreshPage();return;}const action=e.target.closest('[data-action]');if(action){handleAction(action.dataset.action,action);return;}if(e.target.id==='modal-root')closeModal();});
 window.addEventListener('submit',e=>{if(e.target.matches('form')){e.preventDefault();onSubmit(e.target);}});
-window.addEventListener('change',async e=>{if(e.target.matches('[data-learn-key]')){const key='ems-field-lessons:'+(state.user?.id||'local');try{const progress=JSON.parse(localStorage.getItem(key)||'{}');progress[e.target.dataset.learnKey]=e.target.checked;localStorage.setItem(key,JSON.stringify(progress));academyProgress(e.target.closest('.ems-learning'));}catch{toast('Прогресс не сохранился','Не удалось записать локальные отметки.',true);}return;}if(e.target.id==='motion-switch'){
+window.addEventListener('change',async e=>{if(e.target.matches('[data-learn-key]')){
+ const owner=state.user?.id,key=e.target.dataset.learnKey,completed=e.target.checked,root=e.target.closest('.ems-learning');
+ if(!owner||!root)return;
+ try{const old=JSON.parse(localStorage.getItem('ems-field-lessons:'+owner)||'{}');old[key]=completed;localStorage.setItem('ems-field-lessons:'+owner,JSON.stringify(old));}catch{}
+ if(state.academyState){
+  if(completed)state.academyState.progress[key]=true;
+  else delete state.academyState.progress[key];
+  academySaveLabel(root,'Сохранение отметки в профиле…');
+  queueAcademySave(owner,'/api/academy/step',{key,completed})
+   .then(()=>academySaveLabel(root,'Прогресс и позиция сохраняются в профиле EMS COMMAND.'))
+   .catch(err=>{academySaveLabel(root,'Отметка не сохранена на сервере. Повторите действие.');toast('Не удалось сохранить отметку Академии',err.message,true);});
+ }else academySaveLabel(root,'Локальный режим: отметка не сохранена в аккаунте.');
+ academyProgress(root);return;
+}if(e.target.id==='motion-switch'){
   state.motionEnabled=e.target.checked;
   // Switching ON is an explicit app-level opt-in, even if Windows requests less motion.
   state.motionOverride=e.target.checked;
