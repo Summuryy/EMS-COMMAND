@@ -1,7 +1,7 @@
 {
-  "version": "3.12.0",
+  "version": "3.13.0",
   "approvePublicClientCode": true,
   "distribution": "public-binary-only",
-  "note": "EMS COMMAND 3.12.0 UX preview: screenshot-driven Academy redesign in separate Training and Charter navigation screens; 12 compact course routes, one-step reader, selected gameplay photo with thumbnails, accessible step navigation and filters. 25 curated offline screenshots preserved, legacy per-user checklists retained, Windows/Launcher QA passed. This is an owner-testing preview, not an official product launch.",
+  "note": "EMS COMMAND 3.13.0 performance preview: Academy requests gameplay WebP files only for the visible step; search is indexed and debounced; opening Academy skips duplicate shell rendering; other pages refresh only their content rather than rebuilding sidebar and topbar; duty timeline updates only on shift page. Existing 12 courses, 25 screenshots, user checklists and signed launcher workflow are unchanged. 92 Node tests plus Windows NSIS and Portable Launcher QA passed. This is a test preview, not an authorized official launch.",
   "attempt": 1
 }
