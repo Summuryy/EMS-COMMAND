@@ -1,4 +1,5 @@
 import {esc} from '../util.js';
+import {renderTrainingStepMedia,mediaForLesson} from './training-media.js';
 // Source: owner-supplied Discord materials, September-November 2026.
 // This is a reference course, not automatic permission to approve or promote.
 export const lessons = [
@@ -98,21 +99,30 @@ export const lessons = [
  ]}
 ];
 export function renderFieldTraining(user){
- const profile=(user&&user.id)||'local';const storageKey='ems-field-lessons:'+profile;let done={};
+ const profile=(user&&user.id)||'local';
+ const storageKey='ems-field-lessons:'+profile;
+ let done={};
  try{done=JSON.parse(globalThis.localStorage?.getItem(storageKey)||'{}')||{}}catch{}
-
  const cats=['Интернатура','Практика','Карьера','ОМП','Доказательства'];
- let out='<section class="ems-learning" aria-label="Пошаговое обучение"><header class="ems-learning-head"><div class="v3-panel-kicker">ПОЛЕВОЙ УЧЕБНИК / EMS</div><h2>Научись работать в больнице</h2><p>Практические маршруты для интернов, врачей и ОМП. Открывайте урок и выполняйте шаги по порядку.</p></header>';
+ const sum=lessons.reduce((n,l)=>n+l.steps.length,0);
+ const completed=lessons.reduce((n,l)=>n+l.steps.filter((s,i)=>done[l.title+':'+i]).length,0);
+ let out='<section class="ems-learning" aria-label="Пошаговое обучение"><header class="ems-learning-head"><div class="v3-panel-kicker">EMS ACADEMY / ПРАКТИЧЕСКИЕ МАРШРУТЫ</div><h2>Учись на реальных игровых ситуациях</h2><p>От первого удостоверения до ПМП, проверки отчётов и собеседований. У каждого шага — действие, визуальная подсказка и подтверждение результата. Отметки означают только личный прогресс, не допуск к повышению.</p><div class="ems-learning-summary" aria-live="polite">Выполнено <strong data-academy-complete="'+completed+'">'+completed+'</strong> из '+sum+' шагов</div></header>';
+ out+='<div class="ems-learning-tools"><label for="ems-learning-search">Найти инструкцию</label><input type="search" class="field" id="ems-learning-search" placeholder="Например: ПМП, 204, таблетка, отчёт" autocomplete="off"><div class="ems-learning-filters" role="group" aria-label="Учебные направления"><button type="button" data-academy-filter="all" aria-pressed="true" class="is-active">Все</button>'+cats.map(cat=>'<button type="button" data-academy-filter="'+esc(cat)+'" aria-pressed="false">'+esc(cat)+'</button>').join('')+'</div><p class="ems-learning-results" id="ems-learning-results" aria-live="polite">'+lessons.length+' учебных маршрутов</p></div>';
  for(const cat of cats){
-  out+='<h3 class="ems-learning-group">'+esc(cat)+'</h3><div class="ems-learning-grid">';
+  out+='<div class="ems-learning-section" data-academy-section="'+esc(cat)+'"><h3 class="ems-learning-group">'+esc(cat)+'</h3><div class="ems-learning-grid">';
   for(const l of lessons.filter(x=>x.category===cat)){
    const doneCount=l.steps.filter((s,j)=>done[l.title+':'+j]).length;
-   out+='<details class="ems-learning-card"><summary>'+esc(l.title)+'<small class="ems-learning-completion">'+doneCount+'/'+l.steps.length+'</small></summary><div class="ems-learning-body"><ol>'+l.steps.map((s,j)=>'<li><label class="ems-learning-step"><input type="checkbox" data-learn-key="'+esc(l.title+':'+j)+'" '+(done[l.title+':'+j]?'checked':'')+'><span>'+esc(s)+'</span></label></li>').join('')+'</ol>';
-   if(l.links)out+='<p>'+l.links.map(p=>'<a target="_blank" rel="noopener noreferrer" href="'+esc(p[1])+'">'+esc(p[0])+' ↗</a>').join(' · ')+'</p>';
+   out+='<details class="ems-learning-card" data-academy-card data-academy-category="'+esc(cat)+'"><summary><span>'+esc(l.title)+'</span><small class="ems-learning-completion">'+doneCount+'/'+l.steps.length+'</small></summary><div class="ems-learning-body"><p class="ems-training-lesson-intro">Следуйте шагам по порядку. Откройте изображение, чтобы рассмотреть игровой интерфейс.</p><ol>';
+   out+=l.steps.map((s,j)=>{const pics=renderTrainingStepMedia(l,j);return '<li><label class="ems-learning-step"><input type="checkbox" data-learn-key="'+esc(l.title+':'+j)+'" '+(done[l.title+':'+j]?'checked':'')+'><span>'+esc(s)+'</span></label>'+(pics?'<div class="ems-training-gallery">'+pics+'</div>':'')+'</li>';}).join('');
+   out+='</ol>';
+   if(l.links)out+='<p class="ems-learning-links">'+l.links.map(p=>'<a target="_blank" rel="noopener noreferrer" href="'+esc(p[1])+'">'+esc(p[0])+' ↗</a>').join(' · ')+'</p>';
+   if(!mediaForLesson(l).length)out+='<p class="ems-training-lesson-intro">Этот маршрут доступен в текстовом виде. Порядок действий и доказательства описаны выше.</p>';
    out+='</div></details>';
   }
-  out+='</div>';
+  out+='</div></div>';
  }
- out+='<p class="ems-learning-disclaimer">Материалы из инструкций больницы в Discord. Приоритет у актуального устава и закреплённых сообщений. Ссылки на разные версии теста следует проверять в Discord. Приложение не одобряет отчёты и не повышает сотрудников автоматически.</p></section>';
+ out+='<p class="ems-learning-empty" id="ems-learning-empty" hidden>Ничего не найдено. Попробуйте другое название действия.</p>';
+ out+='<p class="ems-learning-disclaimer">Основано на присланных инструкциях больницы. Приоритет — действующий устав и закреплённые сообщения Discord. Не размещайте чужие профили и личные данные в общих отчётах. Скриншот должен соответствовать месту, плашке и дате последнего повышения. Приложение не одобряет отчёты и не повышает сотрудников автоматически.</p>';
+ out+='<dialog class="ems-training-lightbox" id="ems-training-lightbox" aria-label="Увеличенный учебный скриншот"><button type="button" data-academy-close aria-label="Закрыть увеличенный скриншот">Закрыть ×</button><img id="ems-training-enlarged" alt=""><p id="ems-training-caption"></p></dialog></section>';
  return out;
 }
