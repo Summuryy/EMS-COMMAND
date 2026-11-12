@@ -1,6 +1,6 @@
 import {renderFieldTraining} from './field-training.js';
 import {icon} from '../icons.js';import {esc} from '../util.js';import {empty} from './shared.js';import {pageIntro,sectionTitle,ecg} from './visual.js';
-export function renderAcademy(s){return `${pageIntro('05 / ОБУЧЕНИЕ','АКАДЕМИЯ EMS','Практическое обучение','Работайте с курсами в своём темпе: один шаг, один результат, наглядные игровые кадры.')}${renderFieldTraining(s.user)}`;}
+export function renderAcademy(s){return renderFieldTraining(s.user);}
 export function renderCharter(s){const q=s.charterSearch.toLowerCase().replaceAll('ё','е'),rules=(s.charter||[]).filter(r=>!q||`${r.number} ${r.title} ${r.text}`.toLowerCase().replaceAll('ё','е').includes(q));return `${pageIntro('05 / СПРАВОЧНИК','НОРМАТИВНЫЕ ДОКУМЕНТЫ','Устав больницы','Служебные правила, обязанности и ограничения.')}
  <section class="v3-academy-banner"><div><div class="v3-panel-kicker">${icon('book',17)} БАЗА ЗНАНИЙ / EMS</div><h2>Знай порядок.<br><em>Работай уверенно.</em></h2><p>Поиск по пунктам и названиям глав. Актуальная редакция правил сервера имеет приоритет.</p></div><div class="v3-academy-mark">${icon('medical',72)}${ecg('academy')}</div></section>
  ${sectionTitle('01','Справочник','Встроенная копия устава — для быстрого поиска во время службы.')}
