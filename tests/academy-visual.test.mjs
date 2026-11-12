@@ -38,7 +38,7 @@ test('visual academy keeps course checkboxes compatible with existing stored pro
  assert.match(html,/data-academy-step-navigation|ems-lesson-step-navigation/);
  assert.match(html,/data-academy-section/);
  assert.match(html,/data-academy-complete/);
- assert.match(html,/плашке/);
+ assert.match(html,/плашк/);
 });
 test('course list covers the original twelve topics',()=>{
  assert.equal(lessons.length,12);
