@@ -19,8 +19,12 @@ import {ecg} from './views/visual.js';
 import {createToastCenter} from './notifications.js';
 const $=sel=>document.querySelector(sel);
 // Training UI uses delegated controls so it survives normal app page redraws.
+let academySearchTimer=null;
 document.addEventListener('input',event=>{
- if(event.target?.id==='ems-learning-search')academyFilter(event.target.closest('.ems-learning'));
+ if(event.target?.id!=='ems-learning-search')return;
+ const root=event.target.closest('.ems-learning');
+ clearTimeout(academySearchTimer);
+ academySearchTimer=setTimeout(()=>{if(root?.isConnected)academyFilter(root);},90);
 });
 document.addEventListener('click',event=>{
  const root=event.target.closest?.('.ems-learning');
@@ -108,8 +112,7 @@ function renderSidebarNavigation(){
 }
 function shell(){const pageLabel=navTitle(state.page)==='Обзор'&&state.page==='profile'?'Мой профиль':navTitle(state.page);const unreads=state.notices.filter(n=>!n.read_at).length;return `<div class="layout ems38-layout ${state.mobile?'menu-open':''}"><aside class="rail"><div class="brand"><div class="brandmark v3-brandmark">${icon('medical',25)}</div><div><div class="brandtitle">EMS COMMAND</div><div class="branddesc">ГОСБОЛЬНИЦА / RP</div></div></div><div class="v3-sidebar-scroll">${renderSidebarNavigation()}</div><div class="rail-bottom"><button class="rail-person" data-nav="profile" aria-label="Открыть профиль"><div class="avatar">${userInitial(state.user)}</div><div class="v3-person-copy"><strong>${esc(state.user.displayName)}</strong><span>#${esc(state.user.staticId||'—')} · Ранг ${esc(state.user.rank)}</span></div>${icon('chevron',15)}</button></div></aside><main class="main"><header class="topbar ems38-topbar"><div class="v3-crumb-line"><button class="btn btn-ghost btn-icon mobile-menu" data-action="toggle-menu" aria-label="Меню">${icon('menu',20)}</button><span class="station-dot"></span><div class="crumb"><span class="ems38-crumb-label">EMS COMMAND</span> <span class="v3-crumb-divider">/</span> <span>${esc(state.user.serverName||'Сервер не указан')}</span> <span class="v3-crumb-divider">/</span> <strong>${esc(pageLabel)}</strong></div></div><div class="top-actions" aria-label="Действия приложения"><span class="online-pill ${state.health?.ok?'':'disconnected'}"><i class="v3-online-ring"></i>${state.health?.ok?'На связи':'Нет связи'}</span><button class="btn btn-ghost btn-icon" data-action="desktop-updates" title="Проверить обновления" aria-label="Проверить обновления">${icon('clock',18)}</button><button class="btn btn-ghost btn-icon v3-bell" data-action="notices" title="Уведомления" aria-label="Уведомления${unreads?' · '+unreads+' непрочитанных':''}">${icon('bell',18)}${unreads?`<span class="icon-count"></span>`:''}</button><button class="btn btn-ghost btn-icon" data-action="logout" title="Выйти" aria-label="Выйти">${icon('out',18)}</button><button class="btn btn-primary v3-upload-top" data-action="upload" aria-label="Добавить скриншоты" title="Горячая клавиша: Ctrl+Shift+U">${icon('plus',17)}<span> Добавить скриншоты</span></button></div></header><div class="page ems391-page-enter" id="page">${(viewFns[state.page]||renderHome)(state)}</div></main></div>`;}
 function render(){state.systemReducedMotion=Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);const focusId=document.activeElement?.id;let sel=null;try{if(focusId){const el=document.activeElement;sel={start:el.selectionStart,end:el.selectionEnd};}}catch{}$('#app').innerHTML=state.user?shell():authView();setMotionPreference(state.motionEnabled,state.motionOverride);applyMotion($('#app'));if(focusId&&sel){try{let el=document.getElementById(focusId);if(el){el.focus();el.setSelectionRange(sel.start,sel.end);}}catch{}}}
-async function refreshPage(){if(!state.user)return;try{
-  const p=state.page;
+async function refreshPage({partial=false}={}){if(!state.user)return;const p=state.page;try{
   if(p==='home')state.dashboard=await request('/api/dashboard');
   if(p==='evidence')state.evidence=await request('/api/evidence');
   if(p==='shift')state.shifts=await request('/api/shifts');
@@ -117,9 +120,30 @@ async function refreshPage(){if(!state.user)return;try{
   if(p==='charter'&&!state.charter.length){const rsp=await fetch('/data/charter.json');if(!rsp.ok)throw Error('Устав недоступен');state.charter=await rsp.json();}
   if(p==='admin')await refreshAdmin();
   const notices=await request('/api/notices');state.notices=notices.items||[];
- }catch(e){toast('Не удалось загрузить данные',e.message,true)}render();}
+ }catch(e){toast('Не удалось загрузить данные',e.message,true)}
+ if(partial){
+  // Preserve sidebar/topbar and avoid replacing the entire Electron app for an API response.
+  if(state.page!==p)return;
+  const node=$('#page');
+  if(node){
+   node.innerHTML=(viewFns[p]||renderHome)(state);
+   applyMotion(node);
+   const bell=document.querySelector('[data-action="notices"]');
+   if(bell){
+    const unread=state.notices.filter(n=>!n.read_at).length;
+    bell.querySelector('.icon-count')?.remove();
+    if(unread)bell.insertAdjacentHTML('beforeend','<span class="icon-count"></span>');
+    bell.setAttribute('aria-label','Уведомления'+(unread?' · '+unread+' непрочитанных':''));
+   }
+   return;
+  }
+ }
+ render();}
 async function refreshAdmin(){const tab=state.adminTab;const k={reviews:'reviews',users:'users',audit:'audit'}[tab];if(k){state.admin[k]=await request('/api/admin/'+(k==='reviews'?'reviews':k==='users'?'users':'audit'));}}
-async function goto(page){if(!viewFns[page]||page==='admin'&&!['admin','reviewer'].includes(state.user.role))return;state.page=page;state.mobile=false;state.charterSearch='';render();await refreshPage();window.scrollTo({top:0,behavior:'auto'});}
+async function goto(page){if(!viewFns[page]||page==='admin'&&!['admin','reviewer'].includes(state.user.role))return;state.page=page;state.mobile=false;state.charterSearch='';render();if(page==='academy'){
+ // Academy is bundled static content: no extra API request and no second full-shell render.
+ window.scrollTo({top:0,behavior:'auto'});return;
+}await refreshPage({partial:true});window.scrollTo({top:0,behavior:'auto'});}
 async function upload(files){if(!state.user)return;const list=[...files].filter(f=>/\.(png|jpg|jpeg)$/i.test(f.name)||['image/png','image/jpeg'].includes(f.type));if(!list.length)return toast('Нет подходящих файлов','Выбери PNG или JPG.',true);
  const invalid=list.filter(f=>f.size>12*1024*1024||f.size<300);if(invalid.length)toast('Часть файлов пропущена',`${invalid.length}: размер не подходит`,true);
  const accepted=list.filter(f=>f.size<=12*1024*1024&&f.size>=300);
@@ -268,6 +292,6 @@ window.addEventListener('drop',e=>{e.preventDefault();$('#dropzone')?.classList.
 window.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();if(e.ctrlKey&&e.shiftKey&&e.key.toLowerCase()==='u'&&state.user){e.preventDefault();$('#global-files')?.click();}if(e.key==='Enter'&&(e.target.id==='dropzone'||e.target.closest('.rail-person'))){e.target.id==='dropzone'?$('#global-files').click():goto('profile');}});
 let lastNotices=null;
 setInterval(async()=>{if(!state.user)return;try{const r=await request('/api/notices');const items=r.items||[];const newer=lastNotices===null?[]:items.filter(n=>!n.read_at&&!lastNotices.has(n.id));lastNotices=new Set(items.map(n=>n.id));state.notices=items;for(const n of newer.slice(0,2))toast(n.title,n.message);const bell=document.querySelector('[data-action=notices]');if(bell&&items.some(n=>!n.read_at)&&!bell.querySelector('.icon-count'))bell.insertAdjacentHTML('beforeend','<span class="icon-count"></span>');}catch{}},20000);
-setInterval(()=>{const el=$('#shift-clock');const shift=state.shifts?.shifts?.find(x=>!x.end_at);if(el&&shift)el.textContent=duration(shift.start_at);const home=$('#home-shift-clock');if(home&&state.dashboard?.shift&&!state.dashboard.shift.end_at)home.textContent=duration(state.dashboard.shift.start_at);syncDutyTimeline(document,shift?.start_at);},1000);
+setInterval(()=>{const el=$('#shift-clock');const shift=state.shifts?.shifts?.find(x=>!x.end_at);if(el&&shift)el.textContent=duration(shift.start_at);const home=$('#home-shift-clock');if(home&&state.dashboard?.shift&&!state.dashboard.shift.end_at)home.textContent=duration(state.dashboard.shift.start_at);if(state.page==='shift')syncDutyTimeline(document,shift?.start_at);},1000);
 installCinematicPointer();installMotionEffects();
 (async function start(){try{await restoreMotionMode();state.health=await request('/api/health');const r=await request('/api/auth/me');state.user=r.user;setCsrf(r.csrf);if(state.user){await refreshPage();if(state.user.mustChangePassword)toast('Обнови пароль','Пароль необходимо сменить в профиле.');}else render();}catch(e){render();toast('Не удалось связаться с сервером',e.message,true);}})();
