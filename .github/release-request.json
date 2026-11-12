@@ -1,7 +1,7 @@
 {
-  "version": "3.14.1",
+  "version": "3.14.2",
   "approvePublicClientCode": true,
   "distribution": "public-binary-only",
-  "note": "EMS COMMAND 3.14.1 owner-test preview fixes blank charter chapters caused by CSS class collision. The decorative 1px line had applied to chapter details .v3-rule and clipped their real text; scoped divider and explicit auto chapter height restore all 14 searchable hospital rules chapters. 100 Node tests, Windows NSIS smoke and Portable Launcher QA passed. No change to Academy progress SQLite, authentication, evidence, signing keys or launcher trust. Not an official public launch.",
+  "note": "EMS COMMAND 3.14.2 owner-test preview: fix Charter search navigation (PR #29), add Academy persistence regression coverage. CI Node, Windows installer and Portable Launcher QA passed on PR #29. No database migration, signing-key or launcher trust changes. Not an official public launch.",
   "attempt": 1
 }
