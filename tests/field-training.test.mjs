@@ -16,7 +16,10 @@ test('training lessons have titles and concrete steps',()=>{
 });
 test('rendered guide includes mandatory evidence limits and accessible details',()=>{
  const html=renderFieldTraining();
- assert.match(html,/<details class="ems-learning-card"/);
+ assert.match(html,/data-academy-panel="01"/);
+ assert.match(html,/data-academy-step="0"/);
+ assert.match(html,/data-academy-next/);
+ assert.match(html,/id="ems-learning-search"/);
  assert.match(html,/11\.6/);
  assert.match(html,/40 минут/);
  assert.match(html,/30 таблеток/);
