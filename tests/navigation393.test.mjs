@@ -59,7 +59,7 @@ test('3.9.3 OCR resumes pending work after local server can start',()=>{
  assert.match(server,/resumePending\(\)/);
  assert.match(server,/12000/);
  assert.match(read('../desktop/main.cjs'),/setPermissionRequestHandler/);
- assert.equal(JSON.parse(read('../package.json')).version,'3.9.3');
+ assert.equal(JSON.parse(read('../package.json')).version,JSON.parse(read('../.github/release-request.json')).version);
 });
 
 test('new players see an actionable, truthful first-shift guide',()=>{
