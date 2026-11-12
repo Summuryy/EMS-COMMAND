@@ -9,7 +9,8 @@ export const NAV_SECTIONS = Object.freeze([
   {id:'career',title:'Повышение',icon:'trophy'}
  ]},
  {label:'СПРАВКА И СЕРВИСЫ',items:[
-  {id:'academy',title:'Устав и правила',icon:'book'},
+  {id:'academy',title:'Обучение',icon:'book'},
+  {id:'charter',title:'Устав и правила',icon:'shield'},
   {id:'pro',title:'Автозахват · PRO',icon:'scan'}
  ]},
  {label:'УПРАВЛЕНИЕ',roles:['admin','reviewer'],items:[
