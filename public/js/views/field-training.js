@@ -114,11 +114,16 @@ const stepTips={
  '09':{2:'Наличие действующего дисциплинарного взыскания блокирует повышение.'},
  '11':{0:'Фото с выключенной боди-камерой не засчитывается.'}
 };
-export function renderFieldTraining(user){
+export function renderFieldTraining(user,persisted=null){
  const profile=String((user&&user.id)||'local');
  let done={};let last={};
- try{done=JSON.parse(globalThis.localStorage?.getItem('ems-field-lessons:'+profile)||'{}')||{}}catch{}
- try{last=JSON.parse(globalThis.localStorage?.getItem('ems-academy-workspace:'+profile)||'{}')||{}}catch{}
+ if(persisted){
+  done=persisted.progress||{};
+  last=persisted.bookmark||{};
+ }else{
+  try{done=JSON.parse(globalThis.localStorage?.getItem('ems-field-lessons:'+profile)||'{}')||{}}catch{}
+  try{last=JSON.parse(globalThis.localStorage?.getItem('ems-academy-workspace:'+profile)||'{}')||{}}catch{}
+ }
  const valid=lessons.some(l=>courseId(l)===last.course);
  const currentCourse=valid?last.course:courseId(lessons[0]);
  const currentLesson=lessons.find(l=>courseId(l)===currentCourse);
@@ -129,6 +134,7 @@ export function renderFieldTraining(user){
  const completed=lessons.reduce((n,l)=>n+countFinished(l,done),0);
  let out='<section class="ems-learning" aria-label="Академия EMS" data-academy-profile="'+esc(profile)+'" data-academy-current-course="'+esc(currentCourse)+'" data-academy-current-step="'+currentStep+'">';
  out+='<header class="ems-learning-head"><div class="v3-panel-kicker">EMS ACADEMY / ОБУЧЕНИЕ НА ПРАКТИКЕ</div><div class="ems-learning-head-grid"><div><h2>От первого дня до уверенной смены</h2><p>Выберите маршрут, изучайте по одному шагу и смотрите, куда нажимать в игре. Без длинных списков и смешивания инструкций.</p></div><div class="ems-learning-summary" aria-live="polite"><span>Ваш прогресс</span><strong><span data-academy-complete>'+completed+'</span> / '+total+'</strong><progress data-academy-global-progress max="'+total+'" value="'+completed+'"></progress></div></div></header>';
+ out+='<p class="ems-learning-save-state" role="status" data-academy-save-status>'+ (persisted?'Прогресс сохраняется в вашем аккаунте EMS COMMAND.':'Локальный режим: прогресс может не сохраниться после перезапуска.')+'</p>';
  out+='<div class="ems-learning-layout"><aside class="ems-learning-index" aria-label="Выбор учебного маршрута"><div class="ems-learning-index-head"><h3>Маршруты</h3><p>'+lessons.length+' курсов · от интерна до ОМП</p><label for="ems-learning-search">Поиск по темам и шагам</label><input id="ems-learning-search" type="search" placeholder="Например: ПМП, таблетки, К.А." autocomplete="off"></div>';
  out+='<div class="ems-learning-filters" role="group" aria-label="Направление обучения"><button type="button" data-academy-filter="all" aria-pressed="true" class="is-active">Все</button>'+categories.map(cat=>'<button type="button" data-academy-filter="'+esc(cat)+'" aria-pressed="false">'+esc(cat)+'</button>').join('')+'</div>';
  out+='<p class="ems-learning-results" id="ems-learning-results" aria-live="polite">'+lessons.length+' курсов доступно</p><nav class="ems-learning-course-list" aria-label="Курсы Академии">';
