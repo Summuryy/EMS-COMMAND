@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {TRAINING_LESSONS,TRAINING_RESOURCES,INTERN_RANKS,OMP_RANKS,OPP_RANKS,GNEWS_TEMPLATES} from '../public/js/views/training-data.js';
+import {TRAINING_LESSONS,TRAINING_RESOURCES,INTERN_RANKS,OMP_RANKS,OPP_RANKS,GNEWS_TEMPLATES,TRAINING_CAPTIONS} from '../public/js/views/training-data.js';
 import {makeInternReport,makeGnews,allowedEvidenceUrl} from '../public/js/views/training-interactions.js';
 import {renderAcademy} from '../public/js/views/academy.js';
 
@@ -40,7 +40,7 @@ test('training report uses manual entry, forbids invented evidence and includes 
 });
 
 test('state news generator requires real times and never posts automatically',()=>{
- assert.ok(GNEWS_TEMPLATES.length>=3);
+ assert.equal(GNEWS_TEMPLATES.length,10);
  assert.match(makeGnews({template:1,start:'15:00',end:'16:15'}),/^\/gnews/);
  assert.match(makeGnews({template:1,start:'15:00',end:'16:15'}),/15:00/);
  assert.match(makeGnews({template:1,start:'15:00',end:'16:15'}),/16:15/);
@@ -68,5 +68,6 @@ test('training screenshot policy is local-only and respects reduced motion',()=>
  assert.match(styles,/html\[data-motion="off"\]/);
  assert.ok(index.indexOf('training310.css')>index.indexOf('performance393.css'));
  for(const lesson of TRAINING_LESSONS){for(const f of lesson.media||[]){assert.match(f,/^image\(\d{8}-\d{6}(?:-\d+)?\)\.png$/);}}
+ assert.match(TRAINING_CAPTIONS['image(20261112-000655).png'],/бодикамера/);
  assert.ok(TRAINING_RESOURCES.intro.startsWith('https://docs.google.com/'));
 });
