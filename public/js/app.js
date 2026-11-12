@@ -9,7 +9,8 @@ import {renderEvidence} from './views/evidence.js';
 import {renderShift} from './views/shift.js';
 import {renderCareer} from './views/career.js';
 import {syncDutyTimeline} from './views/experience39.js';
-import {renderAcademy} from './views/academy.js';
+import {renderAcademy,renderCharter} from './views/academy.js';
+import {academySelect,academyMove,academyFilter,academyProgress,academyThumbnail} from './views/academy-workspace.js';
 import {renderProfile} from './views/profile.js';
 import {renderAdmin} from './views/admin.js';
 import {renderPro} from './views/pro.js';
@@ -17,55 +18,49 @@ import {applyMotion,setMotionPreference,installCinematicPointer,installMotionEff
 import {ecg} from './views/visual.js';
 import {createToastCenter} from './notifications.js';
 const $=sel=>document.querySelector(sel);
-// Practical Academy enhancements use event delegation because pages are re-rendered dynamically.
-const academyNormalize=s=>String(s||'').toLocaleLowerCase('ru').replaceAll('ё','е');
-function filterAcademyLessons(){
- const root=document.querySelector('.ems-learning');
- if(!root)return;
- const query=academyNormalize(root.querySelector('#ems-learning-search')?.value.trim());
- const category=root.querySelector('[data-academy-filter][aria-pressed="true"]')?.dataset.academyFilter||'all';
- let matches=0;
- root.querySelectorAll('[data-academy-card]').forEach(card=>{
-  const found=(category==='all'||card.dataset.academyCategory===category)&&(!query||academyNormalize(card.textContent).includes(query));
-  card.hidden=!found;
-  if(found)matches++;
- });
- root.querySelectorAll('[data-academy-section]').forEach(group=>{
-  group.hidden=!group.querySelector('[data-academy-card]:not([hidden])');
- });
- const counter=root.querySelector('#ems-learning-results');
- if(counter)counter.textContent=matches+' учебных маршрутов';
- const empty=root.querySelector('#ems-learning-empty');
- if(empty)empty.hidden=matches!==0;
-}
+// Training UI uses delegated controls so it survives normal app page redraws.
 document.addEventListener('input',event=>{
- if(event.target?.id==='ems-learning-search')filterAcademyLessons();
+ if(event.target?.id==='ems-learning-search')academyFilter(event.target.closest('.ems-learning'));
 });
 document.addEventListener('click',event=>{
- const filter=event.target.closest?.('[data-academy-filter]');
+ const root=event.target.closest?.('.ems-learning');
+ if(!root)return;
+ const filter=event.target.closest('[data-academy-filter]');
  if(filter){
-  const root=filter.closest('.ems-learning');
-  root?.querySelectorAll('[data-academy-filter]').forEach(button=>{
+  root.querySelectorAll('[data-academy-filter]').forEach(button=>{
    const active=button===filter;
    button.classList.toggle('is-active',active);
    button.setAttribute('aria-pressed',String(active));
   });
-  filterAcademyLessons();return;
+  academyFilter(root);return;
  }
- const media=event.target.closest?.('[data-academy-open]');
+ const course=event.target.closest('[data-academy-course]');
+ if(course){
+  const panel=[...root.querySelectorAll('[data-academy-panel]')].find(p=>p.dataset.academyPanel===course.dataset.academyCourse);
+  const checks=[...(panel?.querySelectorAll('[data-learn-key]')||[])];
+  const next=checks.findIndex(c=>!c.checked);
+  academySelect(root,course.dataset.academyCourse,next<0?0:next,{focus:true});return;
+ }
+ const goto=event.target.closest('[data-academy-goto-step]');
+ if(goto){academySelect(root,root.dataset.academyCurrentCourse,Number(goto.dataset.academyGotoStep),{focus:true});return;}
+ if(event.target.closest('[data-academy-previous]')){academyMove(root,-1);return;}
+ if(event.target.closest('[data-academy-next]')){academyMove(root,1);return;}
+ const thumbnail=event.target.closest('[data-academy-thumbnail]');
+ if(thumbnail){academyThumbnail(thumbnail);return;}
+ const media=event.target.closest('[data-academy-open]');
  if(media){
-  const dialog=document.getElementById('ems-training-lightbox');
-  const image=document.getElementById('ems-training-enlarged');
-  const caption=document.getElementById('ems-training-caption');
+  const dialog=root.querySelector('#ems-training-lightbox');
+  const image=root.querySelector('#ems-training-enlarged');
+  const caption=root.querySelector('#ems-training-caption');
   if(dialog&&image&&caption&&typeof dialog.showModal==='function'){
    image.src=media.dataset.academyOpen;
    image.alt=media.dataset.academyCaption||'Учебный скриншот';
    caption.textContent=media.dataset.academyCaption||'Учебный скриншот';
-   dialog.showModal();
+   if(!dialog.open)dialog.showModal();
   }return;
  }
- if(event.target.closest?.('[data-academy-close]')){
-  document.getElementById('ems-training-lightbox')?.close();
+ if(event.target.closest('[data-academy-close]')){
+  root.querySelector('#ems-training-lightbox')?.close();
  }
 });
 window.addEventListener('error',event=>{
@@ -73,14 +68,14 @@ window.addEventListener('error',event=>{
  if(!(target instanceof HTMLImageElement)||!target.classList.contains('ems-training-image'))return;
  const button=target.closest('.ems-training-shot');
  if(!button)return;
- button.hidden=true; // No broken images if the binary media pack is not installed.
+ button.hidden=true;
  const gallery=button.closest('.ems-training-gallery');
  if(gallery&&!gallery.querySelector('.ems-training-shot:not([hidden])'))gallery.hidden=true;
 },true);
 
 const state={user:null,page:'home',filter:'all',evidenceSearch:'',dashboard:null,evidence:null,shifts:null,career:null,charter:[],charterSearch:'',queue:[],admin:{},adminTab:'reviews',inviteCode:null,mobile:false,notices:[],authMode:'login',busy:false,health:null,motionEnabled:localStorage.getItem('ems-motion-enabled')!=='false',motionOverride:localStorage.getItem('ems-motion-enabled')==='true'||localStorage.getItem('ems-motion-force')==='true'};
 // Navigation sections are rendered by responsibility, not as a flat feature inventory.
-const viewFns={home:renderHome,evidence:renderEvidence,shift:renderShift,career:renderCareer,academy:renderAcademy,profile:renderProfile,admin:renderAdmin,pro:renderPro};
+const viewFns={home:renderHome,evidence:renderEvidence,shift:renderShift,career:renderCareer,academy:renderAcademy,charter:renderCharter,profile:renderProfile,admin:renderAdmin,pro:renderPro};
 const toastCenter=createToastCenter({getRoot:()=>$('#toast-stack'),icon});
 function toast(title,detail='',error=false){toastCenter.notify(title,detail,{tone:error?'error':'success'});}
 async function saveMotionMode(mode){
@@ -119,7 +114,7 @@ async function refreshPage(){if(!state.user)return;try{
   if(p==='evidence')state.evidence=await request('/api/evidence');
   if(p==='shift')state.shifts=await request('/api/shifts');
   if(p==='career')state.career=await request('/api/career');
-  if(p==='academy'&&!state.charter.length){const rsp=await fetch('/data/charter.json');if(!rsp.ok)throw Error('Устав недоступен');state.charter=await rsp.json();}
+  if(p==='charter'&&!state.charter.length){const rsp=await fetch('/data/charter.json');if(!rsp.ok)throw Error('Устав недоступен');state.charter=await rsp.json();}
   if(p==='admin')await refreshAdmin();
   const notices=await request('/api/notices');state.notices=notices.items||[];
  }catch(e){toast('Не удалось загрузить данные',e.message,true)}render();}
@@ -242,7 +237,7 @@ async function onSubmit(form){const data=Object.fromEntries(new FormData(form));
  }catch(e){toast('Не удалось выполнить действие',e.message,true)}finally{if(btn)btn.disabled=false;}}
 window.addEventListener('click',e=>{if(e.target.closest('#dropzone')&&!e.target.closest('[data-action]')){document.querySelector('#global-files')?.click();return;}const nav=e.target.closest('[data-nav]');if(nav){goto(nav.dataset.nav);return;}const filter=e.target.closest('[data-filter]');if(filter){state.filter=filter.dataset.filter;render();return;}const adminTab=e.target.closest('[data-admin-tab]');if(adminTab){state.adminTab=adminTab.dataset.adminTab;refreshPage();return;}const action=e.target.closest('[data-action]');if(action){handleAction(action.dataset.action,action);return;}if(e.target.id==='modal-root')closeModal();});
 window.addEventListener('submit',e=>{if(e.target.matches('form')){e.preventDefault();onSubmit(e.target);}});
-window.addEventListener('change',async e=>{if(e.target.matches('[data-learn-key]')){const key='ems-field-lessons:'+(state.user?.id||'local');try{const progress=JSON.parse(localStorage.getItem(key)||'{}');progress[e.target.dataset.learnKey]=e.target.checked;localStorage.setItem(key,JSON.stringify(progress));const box=e.target.closest('.ems-learning-card');if(box){const summary=box.querySelector('.ems-learning-completion');if(summary)summary.textContent=box.querySelectorAll('input[data-learn-key]:checked').length+'/'+box.querySelectorAll('input[data-learn-key]').length;}const sum=document.querySelector('[data-academy-complete]');if(sum)sum.textContent=document.querySelectorAll('.ems-learning input[data-learn-key]:checked').length;}catch{toast('Прогресс не сохранился','Не удалось записать локальные отметки.',true);}return;}if(e.target.id==='motion-switch'){
+window.addEventListener('change',async e=>{if(e.target.matches('[data-learn-key]')){const key='ems-field-lessons:'+(state.user?.id||'local');try{const progress=JSON.parse(localStorage.getItem(key)||'{}');progress[e.target.dataset.learnKey]=e.target.checked;localStorage.setItem(key,JSON.stringify(progress));academyProgress(e.target.closest('.ems-learning'));}catch{toast('Прогресс не сохранился','Не удалось записать локальные отметки.',true);}return;}if(e.target.id==='motion-switch'){
   state.motionEnabled=e.target.checked;
   // Switching ON is an explicit app-level opt-in, even if Windows requests less motion.
   state.motionOverride=e.target.checked;
