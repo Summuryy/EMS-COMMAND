@@ -55,6 +55,13 @@ CREATE TABLE IF NOT EXISTS goals (
   id TEXT PRIMARY KEY, label TEXT NOT NULL, category TEXT NOT NULL,
   needed INTEGER NOT NULL, description TEXT NOT NULL, active INTEGER NOT NULL DEFAULT 1
 );
+CREATE TABLE IF NOT EXISTS academy_state (
+  user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  progress TEXT NOT NULL DEFAULT '{}',
+  course TEXT NOT NULL DEFAULT '01',
+  step INTEGER NOT NULL DEFAULT 0,
+  updated_at TEXT NOT NULL
+);
 `);
 // Non-destructive migration for existing installations.
 if (!db.prepare('PRAGMA table_info(users)').all().some(c=>c.name==='rank_updated_at')) db.exec('ALTER TABLE users ADD COLUMN rank_updated_at TEXT');
