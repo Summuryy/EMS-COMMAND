@@ -145,7 +145,7 @@ test('3.9.2 Electron preference survives random backend ports and rejects untrus
 
 test('3.9.2 version, safety and signed release route are unchanged',()=>{
  const pkg=JSON.parse(read('../package.json'));
- assert.equal(pkg.version,'3.9.3');
+ assert.equal(pkg.version,'3.10.0');
  assert.match(pkg.scripts.check,/node --check public\/js\/notifications\.js/);
  assert.match(app,/data-action="upload"/);
  assert.match(app,/data-action="logout"/);
