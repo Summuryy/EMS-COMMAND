@@ -56,12 +56,13 @@ export function mediaForLesson(lesson){
 }
 // Each learning step shows one large, legible image; the other images
 // are selected from compact thumbnails rather than stacking huge cards.
-export function renderTrainingStepMedia(lesson,step){
+export function renderTrainingStepMedia(lesson,step,{active=true}={}){
  const images=mediaForLesson(lesson).filter(item=>item.step===step);
  if(!images.length)return '';
  const first=images[0],firstSrc='/assets/training/'+first.file+'.webp';
+ const imageAttribute=active?'src':'data-src';
  let out='<div class="ems-training-gallery" data-academy-gallery>';
- out+='<button type="button" class="ems-training-shot ems-training-focus" data-academy-open="'+esc(firstSrc)+'" data-academy-caption="'+esc(first.caption)+'" aria-label="Увеличить скриншот: '+esc(first.caption)+'"><img class="ems-training-image" src="'+esc(firstSrc)+'" alt="'+esc(first.caption)+'" loading="lazy" decoding="async"><span class="ems-training-caption">'+esc(first.caption)+'</span><span class="ems-training-zoom">Увеличить ↗</span></button>';
+ out+='<button type="button" class="ems-training-shot ems-training-focus" data-academy-open="'+esc(firstSrc)+'" data-academy-caption="'+esc(first.caption)+'" aria-label="Увеличить скриншот: '+esc(first.caption)+'"><img class="ems-training-image" '+imageAttribute+'="'+esc(firstSrc)+'" alt="'+esc(first.caption)+'" loading="lazy" decoding="async"><span class="ems-training-caption">'+esc(first.caption)+'</span><span class="ems-training-zoom">Увеличить ↗</span></button>';
  if(images.length>1){
   out+='<div class="ems-training-thumbnails" role="group" aria-label="Другие скриншоты к этому шагу">';
   out+=images.map((item,i)=>{const src='/assets/training/'+item.file+'.webp';return '<button type="button" class="ems-training-thumb'+(i===0?' is-active':'')+'" data-academy-thumbnail="'+esc(src)+'" data-academy-caption="'+esc(item.caption)+'" aria-label="Показать: '+esc(item.caption)+'" aria-pressed="'+(i===0?'true':'false')+'"><img src="'+esc(src)+'" alt="" loading="lazy" decoding="async"><span>'+(i+1)+'</span></button>';}).join('');
