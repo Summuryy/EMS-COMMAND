@@ -16,7 +16,7 @@ test('training lessons have titles and concrete steps',()=>{
 });
 test('rendered guide includes mandatory evidence limits and accessible details',()=>{
  const html=renderFieldTraining();
- assert.match(html,/<details class="ems-learning-card">/);
+ assert.match(html,/<details class="ems-learning-card"/);
  assert.match(html,/11\.6/);
  assert.match(html,/40 минут/);
  assert.match(html,/30 таблеток/);
