@@ -1,7 +1,7 @@
 {
-  "version": "3.14.0",
+  "version": "3.14.1",
   "approvePublicClientCode": true,
   "distribution": "public-binary-only",
-  "note": "EMS COMMAND 3.14.0 Academy persistence preview: per-account learning checklist and last lesson now live in durable userData SQLite instead of random-port browser localStorage; authenticated CSRF-checked API, validated 70 steps and 12 course bookmarks, one-time import only from accessible legacy origin, explicit local fallback status. Never overwrite existing stored progress. 97 Node tests, Windows NSIS smoke-install, and Portable Launcher QA completed successfully. No change to evidence approval, signing keys or launcher trust. Owner testing only, not an official public launch.",
+  "note": "EMS COMMAND 3.14.1 owner-test preview fixes blank charter chapters caused by CSS class collision. The decorative 1px line had applied to chapter details .v3-rule and clipped their real text; scoped divider and explicit auto chapter height restore all 14 searchable hospital rules chapters. 100 Node tests, Windows NSIS smoke and Portable Launcher QA passed. No change to Academy progress SQLite, authentication, evidence, signing keys or launcher trust. Not an official public launch.",
   "attempt": 1
 }
