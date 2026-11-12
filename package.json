@@ -1,6 +1,6 @@
 {
   "name": "ems-command-desktop",
-  "version": "3.11.0",
+  "version": "3.12.0",
   "private": true,
   "type": "module",
   "description": "EMS COMMAND - cinematic desktop and controlled release updates",

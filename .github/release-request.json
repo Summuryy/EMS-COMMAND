@@ -1,7 +1,7 @@
 {
-  "version": "3.11.0",
+  "version": "3.12.0",
   "approvePublicClientCode": true,
   "distribution": "public-binary-only",
-  "note": "EMS COMMAND 3.11.0 visual Academy preview: 25 curated and cropped offline gameplay screenshots embedded in 12 role-based courses; onboarding, government ID, PMP/ambulance, pills, OMP reports, search, filters, accessible image gallery; Windows smoke and launcher QA. This is a preview, NOT an official product launch.",
+  "note": "EMS COMMAND 3.12.0 UX preview: screenshot-driven Academy redesign in separate Training and Charter navigation screens; 12 compact course routes, one-step reader, selected gameplay photo with thumbnails, accessible step navigation and filters. 25 curated offline screenshots preserved, legacy per-user checklists retained, Windows/Launcher QA passed. This is an owner-testing preview, not an official product launch.",
   "attempt": 1
 }
