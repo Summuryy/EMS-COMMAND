@@ -173,3 +173,12 @@ These files do **not** change EMS COMMAND 3.9.2 application runtime or Electron 
 - **Release assets:** `EMS-COMMAND-App-3.9.3-win-x64.zip` (141392616 B, SHA-256 `d4628eba8786d6ccf9d6ea8f57d5f8b365dd08e06d11c7318ce2a6214f79e811`); `EMS-COMMAND-Launcher-1.1.0-win-x64.exe` (414609699 B, SHA-256 `a1fa2df50051a14e0eff00606d0a02986deee10c6b4d25515cbe66989c9310f9`); `ems-manifest.json` (75529 B, SHA-256 `e64ac264919c70e18aa9ad93e69565700169f3ed3d4706ae9837a35357e23175`). Hashes are GitHub release asset digests; independent client download/reverification was not performed in this environment.
 - **Owner installation:** still needs confirmation that existing Launcher 1.1.0 offers and installs 3.9.3 on Windows. Do not assert 3.9.3 is locally installed or that the 5–10 minute lag is fixed without real-world acceptance/performance profiling.
 - **Release policy:** this is an owner-test preview with publicly accessible binary assets, **not** permission for an official product launch.
+
+
+## EMS Academy 3.10.0 — user-provided hospital training (proposed PR)
+
+The owner provided 79 private in-game/Discord screenshots plus detailed OMP, OPP, internship, hospital, evidence, career, qualifications and report rules. A comprehensive private knowledge file and image archive were saved to the owner's ChatGPT Library under `/EMS COMMAND/Training-2026-11-12/`; future agents should locate those files using Files rather than ask the owner for a repeat upload. Public GitHub must not receive the original screenshots or personal data.
+
+Feature branch: `feat/academy-rp-training-310`. `public/js/views/training-data.js`, `training.js`, `training-interactions.js`, `training310.css`, and tests add 15 lessons, three *separate* role-specific promotion tracks, local-only screenshot galleries (selected from the owner's private archive in each app session), and clipboard generators for internship reports and recruitment announcements. The original charter view, launcher, user database, server permissions, OCR and evidence decisions remain untouched. See `docs/TRAINING_SYSTEM_RU.md` for source-of-truth boundaries, image privacy and testing instructions.
+
+The branch may be labelled 3.10.0 in package/release-request, but **DO NOT CALL IT A DELIVERED UPDATE** until QA, merge, signed production publication, and matching `EMS-COMMAND-RELEASES/releases/latest` are verified. Owner acceptance of actual Windows visuals is separate. No official public product launch is authorized.
