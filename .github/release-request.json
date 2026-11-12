@@ -1,7 +1,7 @@
 {
-  "version": "3.13.0",
+  "version": "3.14.0",
   "approvePublicClientCode": true,
   "distribution": "public-binary-only",
-  "note": "EMS COMMAND 3.13.0 performance preview: Academy requests gameplay WebP files only for the visible step; search is indexed and debounced; opening Academy skips duplicate shell rendering; other pages refresh only their content rather than rebuilding sidebar and topbar; duty timeline updates only on shift page. Existing 12 courses, 25 screenshots, user checklists and signed launcher workflow are unchanged. 92 Node tests plus Windows NSIS and Portable Launcher QA passed. This is a test preview, not an authorized official launch.",
+  "note": "EMS COMMAND 3.14.0 Academy persistence preview: per-account learning checklist and last lesson now live in durable userData SQLite instead of random-port browser localStorage; authenticated CSRF-checked API, validated 70 steps and 12 course bookmarks, one-time import only from accessible legacy origin, explicit local fallback status. Never overwrite existing stored progress. 97 Node tests, Windows NSIS smoke-install, and Portable Launcher QA completed successfully. No change to evidence approval, signing keys or launcher trust. Owner testing only, not an official public launch.",
   "attempt": 1
 }
