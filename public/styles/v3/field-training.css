@@ -20,3 +20,8 @@
 .ems-learning-disclaimer{font-size:11px;color:#a9bbc5;line-height:1.5;border-left:3px solid #8bdccc88;padding:11px 14px;background:#8bdccc0b}
 @media(max-width:700px){.ems-learning-head{padding:18px}.ems-learning-grid{grid-template-columns:minmax(0,1fr)}}
 @media(prefers-reduced-motion:reduce){.ems-learning-card{animation:none!important;transition:none!important}}
+
+.ems-learning-step{display:flex;align-items:flex-start;gap:11px;cursor:pointer}
+.ems-learning-step input{width:17px;height:17px;flex:none;margin:3px 0 0;accent-color:#8bdccc;cursor:pointer}
+.ems-learning-step input:checked+span{text-decoration:line-through;color:#8eaaa8}
+.ems-learning-completion{font-size:11px;border-radius:7px;padding:4px 7px;background:#8bdccc15;color:#a6e5d4;white-space:nowrap}
