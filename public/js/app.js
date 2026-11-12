@@ -112,8 +112,7 @@ function renderSidebarNavigation(){
 }
 function shell(){const pageLabel=navTitle(state.page)==='Обзор'&&state.page==='profile'?'Мой профиль':navTitle(state.page);const unreads=state.notices.filter(n=>!n.read_at).length;return `<div class="layout ems38-layout ${state.mobile?'menu-open':''}"><aside class="rail"><div class="brand"><div class="brandmark v3-brandmark">${icon('medical',25)}</div><div><div class="brandtitle">EMS COMMAND</div><div class="branddesc">ГОСБОЛЬНИЦА / RP</div></div></div><div class="v3-sidebar-scroll">${renderSidebarNavigation()}</div><div class="rail-bottom"><button class="rail-person" data-nav="profile" aria-label="Открыть профиль"><div class="avatar">${userInitial(state.user)}</div><div class="v3-person-copy"><strong>${esc(state.user.displayName)}</strong><span>#${esc(state.user.staticId||'—')} · Ранг ${esc(state.user.rank)}</span></div>${icon('chevron',15)}</button></div></aside><main class="main"><header class="topbar ems38-topbar"><div class="v3-crumb-line"><button class="btn btn-ghost btn-icon mobile-menu" data-action="toggle-menu" aria-label="Меню">${icon('menu',20)}</button><span class="station-dot"></span><div class="crumb"><span class="ems38-crumb-label">EMS COMMAND</span> <span class="v3-crumb-divider">/</span> <span>${esc(state.user.serverName||'Сервер не указан')}</span> <span class="v3-crumb-divider">/</span> <strong>${esc(pageLabel)}</strong></div></div><div class="top-actions" aria-label="Действия приложения"><span class="online-pill ${state.health?.ok?'':'disconnected'}"><i class="v3-online-ring"></i>${state.health?.ok?'На связи':'Нет связи'}</span><button class="btn btn-ghost btn-icon" data-action="desktop-updates" title="Проверить обновления" aria-label="Проверить обновления">${icon('clock',18)}</button><button class="btn btn-ghost btn-icon v3-bell" data-action="notices" title="Уведомления" aria-label="Уведомления${unreads?' · '+unreads+' непрочитанных':''}">${icon('bell',18)}${unreads?`<span class="icon-count"></span>`:''}</button><button class="btn btn-ghost btn-icon" data-action="logout" title="Выйти" aria-label="Выйти">${icon('out',18)}</button><button class="btn btn-primary v3-upload-top" data-action="upload" aria-label="Добавить скриншоты" title="Горячая клавиша: Ctrl+Shift+U">${icon('plus',17)}<span> Добавить скриншоты</span></button></div></header><div class="page ems391-page-enter" id="page">${(viewFns[state.page]||renderHome)(state)}</div></main></div>`;}
 function render(){state.systemReducedMotion=Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);const focusId=document.activeElement?.id;let sel=null;try{if(focusId){const el=document.activeElement;sel={start:el.selectionStart,end:el.selectionEnd};}}catch{}$('#app').innerHTML=state.user?shell():authView();setMotionPreference(state.motionEnabled,state.motionOverride);applyMotion($('#app'));if(focusId&&sel){try{let el=document.getElementById(focusId);if(el){el.focus();el.setSelectionRange(sel.start,sel.end);}}catch{}}}
-async function refreshPage(){if(!state.user)return;try{
-  const p=state.page;
+async function refreshPage({partial=false}={}){if(!state.user)return;const p=state.page;try{
   if(p==='home')state.dashboard=await request('/api/dashboard');
   if(p==='evidence')state.evidence=await request('/api/evidence');
   if(p==='shift')state.shifts=await request('/api/shifts');
@@ -121,12 +120,30 @@ async function refreshPage(){if(!state.user)return;try{
   if(p==='charter'&&!state.charter.length){const rsp=await fetch('/data/charter.json');if(!rsp.ok)throw Error('Устав недоступен');state.charter=await rsp.json();}
   if(p==='admin')await refreshAdmin();
   const notices=await request('/api/notices');state.notices=notices.items||[];
- }catch(e){toast('Не удалось загрузить данные',e.message,true)}render();}
+ }catch(e){toast('Не удалось загрузить данные',e.message,true)}
+ if(partial){
+  // Preserve sidebar/topbar and avoid replacing the entire Electron app for an API response.
+  if(state.page!==p)return;
+  const node=$('#page');
+  if(node){
+   node.innerHTML=(viewFns[p]||renderHome)(state);
+   applyMotion(node);
+   const bell=document.querySelector('[data-action="notices"]');
+   if(bell){
+    const unread=state.notices.filter(n=>!n.read_at).length;
+    bell.querySelector('.icon-count')?.remove();
+    if(unread)bell.insertAdjacentHTML('beforeend','<span class="icon-count"></span>');
+    bell.setAttribute('aria-label','Уведомления'+(unread?' · '+unread+' непрочитанных':''));
+   }
+   return;
+  }
+ }
+ render();}
 async function refreshAdmin(){const tab=state.adminTab;const k={reviews:'reviews',users:'users',audit:'audit'}[tab];if(k){state.admin[k]=await request('/api/admin/'+(k==='reviews'?'reviews':k==='users'?'users':'audit'));}}
 async function goto(page){if(!viewFns[page]||page==='admin'&&!['admin','reviewer'].includes(state.user.role))return;state.page=page;state.mobile=false;state.charterSearch='';render();if(page==='academy'){
  // Academy is bundled static content: no extra API request and no second full-shell render.
  window.scrollTo({top:0,behavior:'auto'});return;
-}await refreshPage();window.scrollTo({top:0,behavior:'auto'});}
+}await refreshPage({partial:true});window.scrollTo({top:0,behavior:'auto'});}
 async function upload(files){if(!state.user)return;const list=[...files].filter(f=>/\.(png|jpg|jpeg)$/i.test(f.name)||['image/png','image/jpeg'].includes(f.type));if(!list.length)return toast('Нет подходящих файлов','Выбери PNG или JPG.',true);
  const invalid=list.filter(f=>f.size>12*1024*1024||f.size<300);if(invalid.length)toast('Часть файлов пропущена',`${invalid.length}: размер не подходит`,true);
  const accepted=list.filter(f=>f.size<=12*1024*1024&&f.size>=300);
