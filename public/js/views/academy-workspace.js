@@ -1,6 +1,24 @@
+import {lessons} from './field-training.js';
+import {mediaForLesson} from './training-media.js';
 // Academy UI controller: only local state. No game/API permissions.
 const normalized=value=>String(value||'').toLocaleLowerCase('ru').replaceAll('ё','е');
 const asArray=nodes=>Array.from(nodes||[]);
+// Build once per app load, never scan every hidden course/step on each keystroke.
+const searchIndex=new Map(lessons.map(lesson=>[lesson.title.slice(0,2),normalized([lesson.category,lesson.title,...lesson.steps,...mediaForLesson(lesson).map(image=>image.caption)].join(' '))]));
+const localWebP=/^\/assets\/training\/[a-z][a-z0-9-]*\.webp$/;
+export function hydrateAcademyStep(step){
+ if(!step?.querySelectorAll)return 0;
+ let count=0;
+ for(const img of step.querySelectorAll('img[data-src]')){
+  const source=img.getAttribute?.('data-src');
+  if(!localWebP.test(source||''))continue;
+  img.setAttribute('src',source);
+  img.removeAttribute('data-src');
+  count++;
+ }
+ return count;
+}
+
 const getPanel=(root,id)=>asArray(root.querySelectorAll('[data-academy-panel]')).find(p=>p.dataset.academyPanel===id);
 const getCourse=(root,id)=>asArray(root.querySelectorAll('[data-academy-course]')).find(b=>b.dataset.academyCourse===id);
 
@@ -21,6 +39,8 @@ export function academySelect(root,id,step=0,{focus=false,persist=true}={}){
  });
  asArray(root.querySelectorAll('[data-academy-panel]')).forEach(p=>{p.hidden=p!==panel});
  steps.forEach((p,i)=>{p.hidden=i!==index});
+ // Attach image sources only to the selected step, after hidden panels are collapsed.
+ hydrateAcademyStep(steps[index]);
  asArray(panel.querySelectorAll('[data-academy-goto-step]')).forEach(b=>{
   const current=Number(b.dataset.academyGotoStep)===index;
   b.classList.toggle('is-active',current);
@@ -51,8 +71,7 @@ export function academyFilter(root){
  let matching=0;
  const buttons=asArray(root.querySelectorAll('[data-academy-course]'));
  buttons.forEach(button=>{
-  const panel=getPanel(root,button.dataset.academyCourse);
-  const searchable=normalized(button.textContent+' '+(panel?.textContent||''));
+  const searchable=searchIndex.get(button.dataset.academyCourse)||normalized(button.textContent);
   const match=(category==='all'||button.dataset.academyCategory===category)&&(!value||searchable.includes(value));
   button.hidden=!match;
   if(match)matching++;
