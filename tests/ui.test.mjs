@@ -5,14 +5,14 @@ import {renderHome} from '../public/js/views/home.js';
 import {renderEvidence,filterEvidence} from '../public/js/views/evidence.js';
 import {renderShift} from '../public/js/views/shift.js';
 import {renderCareer} from '../public/js/views/career.js';
-import {renderAcademy} from '../public/js/views/academy.js';
+import {renderAcademy,renderCharter} from '../public/js/views/academy.js';
 import {renderProfile} from '../public/js/views/profile.js';
 import {renderPro} from '../public/js/views/pro.js';
 import {renderAdmin} from '../public/js/views/admin.js';
 const user={displayName:'Тестовый сотрудник',username:'tester',staticId:'12345',serverName:'Кутузовский',rank:3,role:'admin',department:'ОПП',staticVerified:false};
 const base={user,dashboard:{stats:{total:10,accepted:5,review:4,rejected:1},shift:null,recent:[],notices:[]},evidence:{items:[]},queue:[],filter:'all',shifts:{shifts:[]},career:{rank:3,goals:[],stats:{categories:[]}},charter:[{number:1,title:'Общее положение',text:'Тест'}],charterSearch:'',motionEnabled:true,adminTab:'reviews',admin:{reviews:{items:[]}},notices:[]};
 test('every navigation page renders in isolation',()=>{
-  for(const [name,fn] of Object.entries({home:renderHome,evidence:renderEvidence,shift:renderShift,career:renderCareer,academy:renderAcademy,profile:renderProfile,pro:renderPro,admin:renderAdmin})){
+  for(const [name,fn] of Object.entries({home:renderHome,evidence:renderEvidence,shift:renderShift,career:renderCareer,academy:renderAcademy,charter:renderCharter,profile:renderProfile,pro:renderPro,admin:renderAdmin})){
     const html=fn(base);assert.ok(html.length>400,name);assert.ok(/(?:<section|<header)/.test(html),name);assert.doesNotMatch(html,/\bundefined\b/,name);
   }
 });
@@ -145,12 +145,13 @@ test('3.8 shared UI system loads last and protects Windows caption and motion',(
  assert.match(js,/data-action="logout"/);
 });
 
-test('3.8.1 screenshot review: academy search and native page scroll',()=>{
- const html=renderAcademy(base);
+test('3.8.1 charter search and native page scroll remain intact on dedicated charter screen',()=>{
+ const html=renderCharter(base);
  assert.match(html,/class="v3-academy-banner"/);
  assert.match(html,/id="charter-search"/);
  assert.match(html,/class="rule v3-rule"/);
  assert.match(html,/Общее положение/);
+ assert.doesNotMatch(html,/data-academy-panel/);
  const css=fs.readFileSync(new URL('../public/styles/v3/cohesion381.css',import.meta.url),'utf8');
  assert.match(css,/\.ems38-layout \.v3-academy-panel \.v3-rule-list\s*\{\s*max-height:none;overflow:visible/);
  assert.match(css,/\.v3-academy-panel \.v3-rule summary:focus-visible/);

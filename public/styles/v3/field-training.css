@@ -1,59 +1,104 @@
-/* Field training: calm, accessible learning surfaces. */
-.ems-learning{display:grid;gap:12px;margin:24px 0 36px}
-.ems-learning-head{padding:25px;border:1px solid #87d9c34d;border-radius:16px;background:linear-gradient(115deg,#1a353b,#101f2c 75%)}
-.ems-learning-head h2{font-size:clamp(23px,2.4vw,32px);margin:7px 0;color:#f4fcfc;line-height:1.15}
-.ems-learning-head p{max-width:65ch;color:#b7d1d5;line-height:1.6;font-size:13px}
-.ems-learning-group{font-size:16px;font-weight:800;margin:14px 0 2px;color:#d2f3eb}
-.ems-learning-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:10px}
-.ems-learning-card{align-self:start;min-width:0;border:1px solid #8fbac032;border-radius:12px;background:linear-gradient(150deg,#1b2c38,#111d29);overflow:hidden}
-.ems-learning-card[open]{border-color:#8bdccc86;box-shadow:0 16px 37px #0004}
-.ems-learning-card summary{list-style:none;cursor:pointer;padding:18px 20px;color:#f2fbfa;font-size:13px;font-weight:750;display:flex;justify-content:space-between;gap:12px;align-items:center;min-height:58px}
-.ems-learning-card summary::-webkit-details-marker{display:none}
-.ems-learning-card summary:after{content:'+';font-size:21px;color:#91d9c9}
-.ems-learning-card[open] summary:after{content:'−'}
-.ems-learning-card summary:focus-visible{outline:2px solid #b9fff0;outline-offset:-3px}
-.ems-learning-body{padding:0 22px 19px;border-top:1px solid #8fbac024;color:#d3e5e8;font-size:12px;line-height:1.65}
-.ems-learning-body ol{padding-left:21px}
-.ems-learning-body li{padding:6px 0 6px 4px}
-.ems-learning-body li::marker{font-weight:800;color:#91dccb}
-.ems-learning-body a{color:#9de6d6;text-decoration:underline;text-underline-offset:3px}
-.ems-learning-disclaimer{font-size:11px;color:#a9bbc5;line-height:1.5;border-left:3px solid #8bdccc88;padding:11px 14px;background:#8bdccc0b}
-@media(max-width:700px){.ems-learning-head{padding:18px}.ems-learning-grid{grid-template-columns:minmax(0,1fr)}}
-@media(prefers-reduced-motion:reduce){.ems-learning-card{animation:none!important;transition:none!important}}
-
-.ems-learning-step{display:flex;align-items:flex-start;gap:11px;cursor:pointer}
-.ems-learning-step input{width:17px;height:17px;flex:none;margin:3px 0 0;accent-color:#8bdccc;cursor:pointer}
-.ems-learning-step input:checked+span{text-decoration:line-through;color:#8eaaa8}
-.ems-learning-completion{font-size:11px;border-radius:7px;padding:4px 7px;background:#8bdccc15;color:#a6e5d4;white-space:nowrap}
-
-/* Academy 3.11: step-linked, locally bundled gameplay screenshots. */
-.ems-learning-tools{display:grid;gap:11px;padding:18px 20px;background:linear-gradient(135deg,#152c36,#10232f);border:1px solid #89c9bb3a;border-radius:14px}
-.ems-learning-tools>label{font-size:12px;font-weight:750;color:#dafaf2}
-.ems-learning-tools input{width:100%;min-height:44px;border-radius:9px;color:#effffc;background:#0b1b26;border:1px solid #6a958d66;padding:10px 14px}
-.ems-learning-tools input::placeholder{color:#87a8b0}
-.ems-learning-filters{display:flex;flex-wrap:wrap;gap:7px}
-.ems-learning-filters button{background:#1b3642;border:1px solid #56777b80;color:#d3e9ea;border-radius:999px;min-height:36px;padding:7px 12px;font-size:12px;cursor:pointer}
-.ems-learning-filters button.is-active{background:#9de9d5;border-color:#9de9d5;color:#0b2630;font-weight:800}
-.ems-learning-filters button:focus-visible,.ems-training-shot:focus-visible,.ems-training-lightbox button:focus-visible{outline:2px solid #c2fff2;outline-offset:3px}
-.ems-learning-results{font-size:12px;color:#adc8c9}
-.ems-learning-section[hidden],.ems-learning-card[hidden],.ems-training-gallery[hidden],.ems-learning-empty[hidden],.ems-training-shot[hidden]{display:none!important}
-.ems-learning-empty{padding:22px;color:#e5faf7;background:#172c36;border:1px dashed #6a9d91;border-radius:12px}
-.ems-learning-summary{display:inline-flex;gap:5px;align-items:center;padding:7px 12px;margin-top:16px;background:#74d4b418;border:1px solid #8cdec652;border-radius:8px;color:#d3f5ed;font-size:12px}
-.ems-learning-summary strong{color:#c0ffed}
-.ems-training-lesson-intro{font-size:12px;color:#a4c5c8;line-height:1.55}
-.ems-learning-step{line-height:1.65}
-.ems-training-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:9px;margin:8px 0 14px 27px}
-.ems-training-shot{min-width:0;padding:0;background:#081822;color:#bcd8dc;text-align:left;border:1px solid #81b7af55;border-radius:10px;overflow:hidden;cursor:zoom-in;transition:transform .18s ease,border-color .18s ease}
-.ems-training-shot:hover{transform:translateY(-2px);border-color:#a5e9d8}
-.ems-training-shot img{width:100%;height:auto;max-height:160px;aspect-ratio:16/9;display:block;object-fit:contain;background:#071722}
-.ems-training-shot span{display:block;padding:10px 11px;color:#bddfdd;font-size:11px;line-height:1.4}
-.ems-learning-links{padding-top:8px}
-.ems-training-lightbox{width:min(96vw,1100px);max-height:95vh;background:#101d28;border:1px solid #75b4a7;border-radius:12px;box-shadow:0 28px 90px #000b;padding:17px;color:#eafefa}
-.ems-training-lightbox::backdrop{background:#06121cdb;backdrop-filter:blur(7px)}
-.ems-training-lightbox img{display:block;max-width:100%;max-height:75vh;margin:0 auto;object-fit:contain;border-radius:5px}
-.ems-training-lightbox button{display:block;margin:0 0 12px auto;padding:9px 15px;background:#214b4d;color:#f0fffb;border:1px solid #7ec8b7;border-radius:8px;cursor:pointer}
-.ems-training-lightbox p{font-size:12px;line-height:1.5;color:#b7dbd5;margin:12px 0 2px;text-align:center}
-@media(max-width:680px){.ems-learning-tools{padding:13px}.ems-training-gallery{margin-left:0}.ems-training-shot img{max-height:220px}}
-@media(prefers-reduced-motion:reduce){.ems-training-shot{transition:none}.ems-training-shot:hover{transform:none}.ems-training-lightbox::backdrop{backdrop-filter:none}}
-[data-motion=off] .ems-training-shot{transition:none}
-[data-motion=off] .ems-training-shot:hover{transform:none}
+/* EMS 3.12 — task-first Academy workspace. No dependency or nested vertical scroll. */
+.ems-learning{max-width:1420px;margin:14px auto 30px;display:grid;gap:15px;color:#e5f3f3}
+.ems-learning *, .ems-learning *::before, .ems-learning *::after{box-sizing:border-box}
+.ems-learning [hidden]{display:none!important}
+.ems-learning-head{padding:21px 25px 23px;border:1px solid #7cc9b44d;border-radius:14px;background:radial-gradient(ellipse at 82% 0,#3e9a8050,transparent 48%),linear-gradient(125deg,#182c38,#0d1b27 78%);box-shadow:inset 0 1px #ffffff0c}
+.ems-learning-head-grid{display:grid;grid-template-columns:minmax(0,1fr) 162px;align-items:center;gap:24px}
+.ems-learning-head h2{font-size:clamp(24px,2.3vw,32px);font-weight:790;line-height:1.15;margin:8px 0;color:#eefdfb;letter-spacing:-.6px;text-wrap:balance}
+.ems-learning-head p{color:#adc4ca;font-size:13px;line-height:1.6;margin:6px 0 0;max-width:68ch}
+.ems-learning-summary{background:#071c2980;border:1px solid #9ee4ce50;padding:13px 14px;border-radius:11px;display:grid;gap:6px}
+.ems-learning-summary>span{font-size:11px;color:#a8c5c3}
+.ems-learning-summary strong{font-size:23px;color:#defef4;font-variant-numeric:tabular-nums;font-weight:800}
+.ems-learning progress{display:block;width:100%;height:5px;appearance:none;border:0;border-radius:7px;overflow:hidden;background:#385363}
+.ems-learning progress::-webkit-progress-bar{background:#385363;border-radius:7px}
+.ems-learning progress::-webkit-progress-value{background:#8fe3c9;border-radius:7px;transition:width .16s ease}
+.ems-learning progress::-moz-progress-bar{background:#8fe3c9;border-radius:7px}
+.ems-learning-layout{display:grid;grid-template-columns:minmax(230px,290px) minmax(0,1fr);gap:16px;align-items:start}
+.ems-learning-index{background:#101f2c;border:1px solid #527c8552;border-radius:13px;min-width:0;overflow:hidden}
+.ems-learning-index-head{padding:18px 17px 12px;border-bottom:1px solid #8da8af28}
+.ems-learning-index-head h3{color:#f2fefa;font-size:16px;font-weight:780;margin:0}
+.ems-learning-index-head p{color:#98b4bb;font-size:11px;line-height:1.5;margin:5px 0 16px}
+.ems-learning-index-head label{display:block;font-size:11px;color:#c1ddd9;font-weight:700;margin:0 0 6px}
+.ems-learning-index-head input{display:block;width:100%;height:39px;border:1px solid #6ba09958;background:#091b27;color:#e6f9f2;border-radius:8px;padding:0 10px;font-size:12px;outline:none}
+.ems-learning-index-head input::placeholder{color:#8babb0}
+.ems-learning-index-head input:focus{border-color:#a1e9d4;box-shadow:0 0 0 2px #a1e9d422}
+.ems-learning-filters{display:flex;gap:5px;flex-wrap:wrap;padding:10px 12px 4px}
+.ems-learning-filters button{border:1px solid #5b808577;background:#1a3240;color:#bfd6d8;font-size:10px;line-height:1.25;padding:6px 9px;border-radius:5px;cursor:pointer;min-height:30px;transition:background .13s ease,border-color .13s ease}
+.ems-learning-filters button.is-active{background:#a4ead8;color:#072631;border-color:#a4ead8;font-weight:750}
+.ems-learning-results{font-size:10px;color:#92adb4;padding:3px 16px 10px;margin:0}
+.ems-learning-course-list{padding:0 8px 12px}
+.ems-learning-group{font-size:10px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;color:#92b3b7;margin:15px 8px 6px}
+.ems-learning-course-btn{display:flex;width:100%;gap:11px;text-align:left;align-items:center;padding:11px 10px;margin:2px 0;color:#c9dcdf;background:transparent;border:1px solid transparent;border-radius:8px;cursor:pointer;min-height:56px;transition:background .16s ease,border-color .16s ease}
+.ems-learning-course-btn:hover{background:#203747}
+.ems-learning-course-btn.is-active{background:#23463f;border-color:#94d8bd8c;color:#f3fefa}
+.ems-course-code{display:grid;place-items:center;width:33px;height:33px;flex:0 0 33px;border-radius:9px;background:#324756;color:#b3d9dc;font-size:11px;font-variant-numeric:tabular-nums;font-weight:750}
+.is-active .ems-course-code{background:#92e0c6;color:#0e2631}
+.ems-course-copy{display:grid;gap:4px;min-width:0;flex:1}
+.ems-course-copy strong{font-size:12px;line-height:1.35;font-weight:720;overflow-wrap:anywhere}
+.ems-course-copy small{color:#99bdbe;font-size:10px}
+.ems-course-copy progress{height:3px;margin-top:3px}
+.ems-learning-empty{color:#b8d6d4;font-size:12px;padding:12px 17px 18px}
+.ems-learning-workspace{min-width:0;container-type:inline-size}
+.ems-learning-card{background:linear-gradient(160deg,#172b36,#101f2b 68%);border:1px solid #668c9070;border-radius:13px;min-width:0;overflow:hidden}
+.ems-lesson-header{padding:22px 24px 16px;background:radial-gradient(ellipse at 90% -5%,#6cad8c2a,transparent 58%);border-bottom:1px solid #7daca438}
+.ems-lesson-topline{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:10px;color:#a2d5c8;letter-spacing:1px;font-weight:700}
+.ems-learning-completion{color:#bde3d9;border:1px solid #a0c5b743;background:#2b58462b;font-size:11px;padding:5px 9px;letter-spacing:0;border-radius:6px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ems-lesson-header h3{margin:12px 0 14px;color:#f6fffe;font-size:clamp(20px,2.1vw,28px);line-height:1.18;letter-spacing:-.45px;font-weight:790;text-wrap:balance}
+.ems-lesson-progress{height:5px!important}
+.ems-lesson-subtitle{color:#b0c7c9;font-size:11px;line-height:1.5;margin:12px 0 0}
+.ems-lesson-step-navigation{display:flex;align-items:center;gap:7px;padding:16px 24px 14px;flex-wrap:wrap;border-bottom:1px solid #67938d28}
+.ems-lesson-step-navigation button{width:37px;height:37px;border-radius:8px;border:1px solid #76999466;background:#182e3c;color:#bacfd2;font-size:12px;font-variant-numeric:tabular-nums;font-weight:780;cursor:pointer;transition:transform .14s ease,border-color .14s ease,background .14s ease}
+.ems-lesson-step-navigation button:hover{border-color:#a3ebd8}
+.ems-lesson-step-navigation button.is-complete:not(.is-active){color:#8ef0cf;border-color:#689e8677;background:#25443b}
+.ems-lesson-step-navigation button.is-active{background:#a0e8d5;border-color:#a0e8d5;color:#102b37}
+.ems-lesson-step-navigation button:active,.ems-learning-course-btn:active{transform:scale(.98)}
+.ems-lesson-step{padding:20px 24px 26px;outline:none}
+.ems-lesson-step-kicker{font-size:10px;font-weight:780;letter-spacing:1.2px;color:#93cdbd;margin:0 0 13px}
+.ems-lesson-step-kicker span{color:#f0fefa}
+.ems-lesson-stage{min-height:0}
+.ems-lesson-instructions h4{font-size:12px;letter-spacing:.4px;color:#a3c5c3;margin:0 0 12px;font-weight:750}
+.ems-lesson-instructions>p{color:#ecf8f7;font-size:clamp(14px,1.04vw,16px);font-weight:520;line-height:1.68;max-width:67ch;margin:0 0 18px}
+.ems-lesson-tip{padding:12px 14px;border-left:2px solid #91ddc8;background:#173a3c65;border-radius:0 7px 7px 0;margin:15px 0;color:#bddee0}
+.ems-lesson-tip strong{color:#bcebdc;font-size:11px;font-weight:760}
+.ems-lesson-tip p{margin:6px 0 0;font-size:12px;line-height:1.55}
+.ems-lesson-check{display:flex;align-items:center;gap:11px;padding:13px 14px;margin:16px 0 0;border:1px solid #78afa16e;border-radius:9px;background:#25584733;color:#e4fff6;cursor:pointer;font-size:12px;font-weight:740;max-width:360px;transition:border-color .15s ease,background .15s ease}
+.ems-lesson-check:hover{background:#2a5b4659;border-color:#9ae8ce}
+.ems-lesson-check input{width:19px;height:19px;flex:none;margin:0;accent-color:#8fe3c9;cursor:pointer}
+.ems-lesson-check:has(input:checked){background:#2d624750;color:#a5ebcb}
+.ems-lesson-visual{min-width:0;margin-top:18px}
+.ems-lesson-visual-label{color:#a1c8c7;letter-spacing:1px;font-size:10px;font-weight:780;margin-bottom:9px}
+.ems-training-gallery{display:grid;gap:9px;min-width:0}
+.ems-training-focus{position:relative;display:grid;gap:0;border:1px solid #6c999c88;background:#071822;color:#e8faf6;padding:0;text-align:left;width:100%;border-radius:10px;overflow:hidden;cursor:zoom-in;transition:border-color .15s ease}
+.ems-training-focus:hover{border-color:#a3e5d5}
+.ems-training-focus img{display:block;max-height:270px;min-height:150px;width:100%;object-fit:contain;background:#07151e}
+.ems-training-caption{display:block;min-height:36px;padding:11px 90px 12px 13px;color:#c6e0e0;font-size:11px;line-height:1.4}
+.ems-training-zoom{position:absolute;bottom:11px;right:12px;font-size:10px;font-weight:750;color:#91e4cd}
+.ems-training-thumbnails{display:flex;gap:8px;overflow-x:auto;max-width:100%;padding:3px 0 7px;scrollbar-width:thin}
+.ems-training-thumb{position:relative;display:block;flex:0 0 82px;height:62px;overflow:hidden;padding:0;border:1px solid #6389936e;border-radius:7px;background:#102632;cursor:pointer;transition:border-color .15s ease}
+.ems-training-thumb:hover{border-color:#95d3c6}
+.ems-training-thumb.is-active{border:2px solid #95e7d0}
+.ems-training-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.ems-training-thumb span{position:absolute;bottom:3px;right:4px;border-radius:4px;background:#071725d9;color:#daeee8;padding:1px 4px;font-size:10px}
+.ems-training-gallery-help{font-size:10px;line-height:1.4;color:#92b6b9;margin:0}
+.ems-lesson-footer{border-top:1px solid #7caaa53b;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 23px;background:#0a1a2670}
+.ems-lesson-step-status{font-size:11px;color:#a4c7c6;font-variant-numeric:tabular-nums}
+.ems-lesson-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.ems-lesson-actions button{padding:10px 15px;min-height:39px;border-radius:8px;border:1px solid #7daca167;background:#1b3543;color:#e1f2f0;font-size:12px;font-weight:750;cursor:pointer;transition:background .15s ease}
+.ems-lesson-actions button[data-academy-next]{background:#8bdbc5;border-color:#8bdbc5;color:#0a2833}
+.ems-lesson-actions button:hover:not(:disabled){filter:brightness(1.08)}
+.ems-lesson-actions button:disabled{opacity:.33;cursor:not-allowed}
+.ems-learning-links{border-top:1px solid #62928d28;padding:15px 24px 17px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:12px}
+.ems-learning-links strong{color:#bbd4d4}
+.ems-learning-links a{color:#9ae3d1;text-decoration:underline;text-underline-offset:3px}
+.ems-learning-disclaimer{color:#9db2bb;font-size:11px;line-height:1.55;padding:10px 0 0;margin:0;max-width:96ch}
+.ems-training-lightbox{width:min(95vw,1100px);max-height:94vh;background:#101e29;border:1px solid #7dbbb0;border-radius:12px;box-shadow:0 25px 80px #000a;padding:15px;color:#eafaf7}
+.ems-training-lightbox::backdrop{background:#06121cdb}
+.ems-training-lightbox>button{display:block;margin:0 0 10px auto;padding:8px 14px;background:#234b4c;color:#f0fffb;border:1px solid #78c6b5;border-radius:7px;cursor:pointer}
+.ems-training-lightbox img{display:block;max-width:100%;max-height:74vh;margin:auto;object-fit:contain}
+.ems-training-lightbox p{text-align:center;font-size:12px;line-height:1.5;color:#bed8d8}
+.ems-learning button:focus-visible,.ems-learning input:focus-visible{outline:2px solid #a4efdb;outline-offset:3px}
+@container (min-width:720px){.ems-lesson-stage.has-media{display:grid;grid-template-columns:minmax(0,.94fr) minmax(0,1.06fr);gap:20px;align-items:start}.ems-lesson-visual{margin-top:0}}
+@media(max-width:1250px){.ems-learning-layout{grid-template-columns:1fr}.ems-learning-index{padding-bottom:5px}.ems-learning-course-list{display:flex;overflow-x:auto;gap:10px;padding:5px 12px 14px;scrollbar-width:thin}.ems-learning-section{display:flex;gap:8px;align-items:center;flex:none}.ems-learning-group{display:none}.ems-learning-course-btn{min-width:190px;max-width:235px;margin:0;flex:none}.ems-learning-results{padding:6px 16px 2px}}
+@media(max-width:720px){.ems-learning-head{padding:17px}.ems-learning-head-grid{grid-template-columns:minmax(0,1fr)}.ems-learning-summary{display:flex;align-items:center;gap:11px;flex-wrap:wrap}.ems-learning-summary progress{flex:1;min-width:75px}.ems-learning-index-head{padding:13px}.ems-lesson-header,.ems-lesson-step{padding:16px}.ems-lesson-step-navigation{padding:12px 16px}.ems-lesson-footer{padding:14px 16px;align-items:flex-start}.ems-learning-links{padding:13px 16px}.ems-lesson-instructions>p{font-size:14px}.ems-training-focus img{max-height:230px}}
+@media(prefers-reduced-motion:reduce){.ems-learning *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+html[data-motion=off] .ems-learning *{animation:none!important;transition:none!important}
