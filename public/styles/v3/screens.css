@@ -44,6 +44,8 @@
 /* Details elements must retain intrinsic row heights; CSS grid compressed them in Chromium. */
 .v3-rule-list{display:flex;flex-direction:column;align-items:stretch;gap:8px}
 .v3-rule{flex:0 0 auto;min-height:56px}
+/* Chapters are content containers, not decorative 1px separators. */
+.v3-academy-panel details.v3-rule{height:auto;max-height:none;flex-shrink:0}
 
 /* Compact windows: keep the key action legible and never let the hero art cover the copy. */
 @media(max-width:560px){
