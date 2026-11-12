@@ -15,11 +15,13 @@ test('3.9.3 navigation puts daily tasks before service and admin tools',()=>{
  const worker=navigationForRole('user');
  assert.deepEqual(worker.map(g=>g.label),['МОЯ СЛУЖБА','СПРАВКА И СЕРВИСЫ']);
  assert.deepEqual(worker[0].items.map(i=>i.id),['home','shift','evidence','career']);
- assert.deepEqual(worker[1].items.map(i=>i.id),['academy','pro']);
+ assert.deepEqual(worker[1].items.map(i=>i.id),['academy','charter','pro']);
  assert.ok(!worker.some(g=>g.items.some(i=>i.id==='admin')));
  const reviewer=navigationForRole('reviewer');
  assert.equal(reviewer[2].items[0].id,'admin');
  assert.equal(navTitle('career'),'Повышение');
+ assert.equal(navTitle('academy'),'Обучение');
+ assert.equal(navTitle('charter'),'Устав и правила');
  assert.equal(navTitle('unknown'),'Обзор');
  assert.equal(NAV_SECTIONS.length,3);
  assert.match(app,/renderSidebarNavigation\(\)/);
