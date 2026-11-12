@@ -33,7 +33,9 @@ test('visual academy keeps course checkboxes compatible with existing stored pro
  assert.match(html,/id="ems-learning-search"/);
  assert.match(html,/data-academy-filter="Интернатура"/);
  assert.match(html,/id="ems-training-lightbox"/);
- assert.match(html,/data-academy-card/);
+ assert.match(html,/data-academy-panel="03"/);
+ assert.match(html,/data-academy-course="03"/);
+ assert.match(html,/data-academy-step-navigation|ems-lesson-step-navigation/);
  assert.match(html,/data-academy-section/);
  assert.match(html,/data-academy-complete/);
  assert.match(html,/плашке/);
