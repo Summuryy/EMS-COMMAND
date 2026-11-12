@@ -98,31 +98,64 @@ export const lessons = [
  'Все процедуры являются игровыми RP-механиками, не руководством к реальной медпомощи.'
  ]}
 ];
+// Compact course catalog + single visible learning stage.
+// Legacy ems-field-lessons keys remain unchanged across 3.11 -> 3.12.
+const categories=['Интернатура','Практика','Карьера','ОМП','Доказательства'];
+const courseId=lesson=>String(lesson.title).slice(0,2);
+const countFinished=(lesson,done)=>lesson.steps.filter((_,step)=>done[lesson.title+':'+step]).length;
+const stepTips={
+ '01':{3:'Удостоверение получают в Правительстве. Это отдельное требование — оно не заменяет инструктаж ОМП.'},
+ '02':{2:'Для отчётности нужны два скриншота из Discord: начало и конец инструктажа с временем, участниками и демонстрацией.'},
+ '03':{3:'Плашка о лечении, форма, красный индикатор боди-камеры и место выдачи должны попадать в полный кадр.'},
+ '04':{0:'На выезд без дефибриллятора нельзя. Запас медикаментов хранится только в инвентаре или рюкзаке.',5:'Нужен полный скриншот с игровой плашкой «Вы реанимировали…».'},
+ '05':{4:'Отчёт после отправки не редактируют. При отклонении создают новый по полной форме.'},
+ '06':{6:'Для отчёта на повышение ОПП минимум 80% ПМП должны быть выполнены вне больницы.'},
+ '07':{0:'До завершения стажировки самостоятельная проверка отчётов и собеседования запрещены.'},
+ '09':{2:'Наличие действующего дисциплинарного взыскания блокирует повышение.'},
+ '11':{0:'Фото с выключенной боди-камерой не засчитывается.'}
+};
 export function renderFieldTraining(user){
- const profile=(user&&user.id)||'local';
- const storageKey='ems-field-lessons:'+profile;
- let done={};
- try{done=JSON.parse(globalThis.localStorage?.getItem(storageKey)||'{}')||{}}catch{}
- const cats=['Интернатура','Практика','Карьера','ОМП','Доказательства'];
- const sum=lessons.reduce((n,l)=>n+l.steps.length,0);
- const completed=lessons.reduce((n,l)=>n+l.steps.filter((s,i)=>done[l.title+':'+i]).length,0);
- let out='<section class="ems-learning" aria-label="Пошаговое обучение"><header class="ems-learning-head"><div class="v3-panel-kicker">EMS ACADEMY / ПРАКТИЧЕСКИЕ МАРШРУТЫ</div><h2>Учись на реальных игровых ситуациях</h2><p>От первого удостоверения до ПМП, проверки отчётов и собеседований. У каждого шага — действие, визуальная подсказка и подтверждение результата. Отметки означают только личный прогресс, не допуск к повышению.</p><div class="ems-learning-summary" aria-live="polite">Выполнено <strong data-academy-complete="'+completed+'">'+completed+'</strong> из '+sum+' шагов</div></header>';
- out+='<div class="ems-learning-tools"><label for="ems-learning-search">Найти инструкцию</label><input type="search" class="field" id="ems-learning-search" placeholder="Например: ПМП, 204, таблетка, отчёт" autocomplete="off"><div class="ems-learning-filters" role="group" aria-label="Учебные направления"><button type="button" data-academy-filter="all" aria-pressed="true" class="is-active">Все</button>'+cats.map(cat=>'<button type="button" data-academy-filter="'+esc(cat)+'" aria-pressed="false">'+esc(cat)+'</button>').join('')+'</div><p class="ems-learning-results" id="ems-learning-results" aria-live="polite">'+lessons.length+' учебных маршрутов</p></div>';
- for(const cat of cats){
-  out+='<div class="ems-learning-section" data-academy-section="'+esc(cat)+'"><h3 class="ems-learning-group">'+esc(cat)+'</h3><div class="ems-learning-grid">';
+ const profile=String((user&&user.id)||'local');
+ let done={};let last={};
+ try{done=JSON.parse(globalThis.localStorage?.getItem('ems-field-lessons:'+profile)||'{}')||{}}catch{}
+ try{last=JSON.parse(globalThis.localStorage?.getItem('ems-academy-workspace:'+profile)||'{}')||{}}catch{}
+ const valid=lessons.some(l=>courseId(l)===last.course);
+ const currentCourse=valid?last.course:courseId(lessons[0]);
+ const currentLesson=lessons.find(l=>courseId(l)===currentCourse);
+ const firstUnfinished=currentLesson.steps.findIndex((_,i)=>!done[currentLesson.title+':'+i]);
+ const requestedStep=Number(last.step);
+ const currentStep=valid&&Number.isInteger(requestedStep)&&requestedStep>=0&&requestedStep<currentLesson.steps.length?requestedStep:Math.max(0,firstUnfinished);
+ const total=lessons.reduce((n,l)=>n+l.steps.length,0);
+ const completed=lessons.reduce((n,l)=>n+countFinished(l,done),0);
+ let out='<section class="ems-learning" aria-label="Академия EMS" data-academy-profile="'+esc(profile)+'" data-academy-current-course="'+esc(currentCourse)+'" data-academy-current-step="'+currentStep+'">';
+ out+='<header class="ems-learning-head"><div class="v3-panel-kicker">EMS ACADEMY / ОБУЧЕНИЕ НА ПРАКТИКЕ</div><div class="ems-learning-head-grid"><div><h2>От первого дня до уверенной смены</h2><p>Выберите маршрут, изучайте по одному шагу и смотрите, куда нажимать в игре. Без длинных списков и смешивания инструкций.</p></div><div class="ems-learning-summary" aria-live="polite"><span>Ваш прогресс</span><strong><span data-academy-complete>'+completed+'</span> / '+total+'</strong><progress data-academy-global-progress max="'+total+'" value="'+completed+'"></progress></div></div></header>';
+ out+='<div class="ems-learning-layout"><aside class="ems-learning-index" aria-label="Выбор учебного маршрута"><div class="ems-learning-index-head"><h3>Маршруты</h3><p>'+lessons.length+' курсов · от интерна до ОМП</p><label for="ems-learning-search">Поиск по темам и шагам</label><input id="ems-learning-search" type="search" placeholder="Например: ПМП, таблетки, К.А." autocomplete="off"></div>';
+ out+='<div class="ems-learning-filters" role="group" aria-label="Направление обучения"><button type="button" data-academy-filter="all" aria-pressed="true" class="is-active">Все</button>'+categories.map(cat=>'<button type="button" data-academy-filter="'+esc(cat)+'" aria-pressed="false">'+esc(cat)+'</button>').join('')+'</div>';
+ out+='<p class="ems-learning-results" id="ems-learning-results" aria-live="polite">'+lessons.length+' курсов доступно</p><nav class="ems-learning-course-list" aria-label="Курсы Академии">';
+ for(const cat of categories){
+  out+='<div class="ems-learning-section" data-academy-section="'+esc(cat)+'"><h4 class="ems-learning-group">'+esc(cat)+'</h4>';
   for(const l of lessons.filter(x=>x.category===cat)){
-   const doneCount=l.steps.filter((s,j)=>done[l.title+':'+j]).length;
-   out+='<details class="ems-learning-card" data-academy-card data-academy-category="'+esc(cat)+'"><summary><span>'+esc(l.title)+'</span><small class="ems-learning-completion">'+doneCount+'/'+l.steps.length+'</small></summary><div class="ems-learning-body"><p class="ems-training-lesson-intro">Следуйте шагам по порядку. Откройте изображение, чтобы рассмотреть игровой интерфейс.</p><ol>';
-   out+=l.steps.map((s,j)=>{const pics=renderTrainingStepMedia(l,j);return '<li><label class="ems-learning-step"><input type="checkbox" data-learn-key="'+esc(l.title+':'+j)+'" '+(done[l.title+':'+j]?'checked':'')+'><span>'+esc(s)+'</span></label>'+(pics?'<div class="ems-training-gallery">'+pics+'</div>':'')+'</li>';}).join('');
-   out+='</ol>';
-   if(l.links)out+='<p class="ems-learning-links">'+l.links.map(p=>'<a target="_blank" rel="noopener noreferrer" href="'+esc(p[1])+'">'+esc(p[0])+' ↗</a>').join(' · ')+'</p>';
-   if(!mediaForLesson(l).length)out+='<p class="ems-training-lesson-intro">Этот маршрут доступен в текстовом виде. Порядок действий и доказательства описаны выше.</p>';
-   out+='</div></details>';
+   const id=courseId(l),finished=countFinished(l,done),active=id===currentCourse;
+   out+='<button type="button" class="ems-learning-course-btn'+(active?' is-active':'')+'" data-academy-course="'+esc(id)+'" data-academy-category="'+esc(cat)+'" aria-current="'+(active?'true':'false')+'"><span class="ems-course-code">'+esc(id)+'</span><span class="ems-course-copy"><strong>'+esc(l.title.slice(5))+'</strong><small><span data-academy-count="'+esc(id)+'">'+finished+'</span> из '+l.steps.length+' шагов</small><progress data-academy-course-progress="'+esc(id)+'" value="'+finished+'" max="'+l.steps.length+'"></progress></span></button>';
   }
-  out+='</div></div>';
+  out+='</div>';
  }
- out+='<p class="ems-learning-empty" id="ems-learning-empty" hidden>Ничего не найдено. Попробуйте другое название действия.</p>';
- out+='<p class="ems-learning-disclaimer">Основано на присланных инструкциях больницы. Приоритет — действующий устав и закреплённые сообщения Discord. Не размещайте чужие профили и личные данные в общих отчётах. Скриншот должен соответствовать месту, плашке и дате последнего повышения. Приложение не одобряет отчёты и не повышает сотрудников автоматически.</p>';
+ out+='</nav><p class="ems-learning-empty" id="ems-learning-empty" hidden>Маршрут не найден. Попробуйте другое слово или раздел.</p></aside>';
+ out+='<div class="ems-learning-workspace" aria-label="Текущий урок">';
+ for(const l of lessons){
+  const id=courseId(l),active=id===currentCourse,doneCount=countFinished(l,done),stepActive=active?currentStep:0;
+  out+='<article class="ems-learning-card" data-academy-panel="'+esc(id)+'" '+(active?'':'hidden')+' aria-labelledby="ems-lesson-title-'+esc(id)+'">';
+  out+='<header class="ems-lesson-header"><div class="ems-lesson-topline"><span>'+esc(l.category)+' / КУРС '+esc(id)+'</span><span class="ems-learning-completion">'+doneCount+'/'+l.steps.length+' выполнено</span></div><h3 id="ems-lesson-title-'+esc(id)+'" tabindex="-1">'+esc(l.title.slice(5))+'</h3><progress class="ems-lesson-progress" data-academy-reader-progress="'+esc(id)+'" value="'+doneCount+'" max="'+l.steps.length+'"></progress><p class="ems-lesson-subtitle">Двигайтесь шаг за шагом. Отметка выполнения — только личный чек-лист, не официальное подтверждение.</p></header>';
+  out+='<div class="ems-lesson-step-navigation" role="group" aria-label="Выбрать шаг курса">'+l.steps.map((_,step)=>'<button type="button" data-academy-goto-step="'+step+'" class="'+(step===stepActive?'is-active':'')+(done[l.title+':'+step]?' is-complete':'')+'" aria-current="'+(step===stepActive?'step':'false')+'" aria-label="Шаг '+(step+1)+(done[l.title+':'+step]?' выполнен':'')+'">'+(step+1)+'</button>').join('')+'</div>';
+  for(const [step,txt] of l.steps.entries()){
+   const media=renderTrainingStepMedia(l,step),tip=stepTips[id]?.[step]||'';
+   out+='<section class="ems-lesson-step" data-academy-step="'+step+'" '+(step===stepActive?'':'hidden')+' aria-label="Шаг '+(step+1)+' из '+l.steps.length+'"><div class="ems-lesson-step-kicker">ШАГ <span>'+(step+1)+'</span> ИЗ '+l.steps.length+'</div><div class="ems-lesson-stage'+(media?' has-media':'')+'"><div class="ems-lesson-instructions"><h4>Что нужно сделать</h4><p>'+esc(txt)+'</p>'+(tip?'<aside class="ems-lesson-tip"><strong>На что обратить внимание</strong><p>'+esc(tip)+'</p></aside>':'')+'<label class="ems-lesson-check"><input type="checkbox" data-learn-key="'+esc(l.title+':'+step)+'" '+(done[l.title+':'+step]?'checked':'')+'><span>Я выполнил этот шаг</span></label></div>'+(media?'<div class="ems-lesson-visual"><div class="ems-lesson-visual-label">ПОСМОТРЕТЬ В ИГРЕ</div>'+media+'</div>':'')+'</div></section>';
+  }
+  out+='<footer class="ems-lesson-footer"><span class="ems-lesson-step-status" data-academy-step-position aria-live="polite">Шаг '+(stepActive+1)+' из '+l.steps.length+'</span><div class="ems-lesson-actions"><button type="button" data-academy-previous '+(stepActive===0?'disabled':'')+'>Назад</button><button type="button" data-academy-next '+(stepActive===l.steps.length-1?'disabled':'')+'>Следующий шаг <span aria-hidden="true">→</span></button></div></footer>';
+  if(l.links)out+='<div class="ems-learning-links"><strong>Полезные источники</strong>'+l.links.map(p=>'<a target="_blank" rel="noopener noreferrer" href="'+esc(p[1])+'">'+esc(p[0])+' ↗</a>').join('')+'</div>';
+  out+='</article>';
+ }
+ out+='</div></div><p class="ems-learning-disclaimer">Справочник основан на присланных игровых регламентах. Действующий устав и закреплённые сообщения Discord имеют приоритет. Приложение не одобряет отчёты и не повышает сотрудников автоматически.</p>';
  out+='<dialog class="ems-training-lightbox" id="ems-training-lightbox" aria-label="Увеличенный учебный скриншот"><button type="button" data-academy-close aria-label="Закрыть увеличенный скриншот">Закрыть ×</button><img id="ems-training-enlarged" alt=""><p id="ems-training-caption"></p></dialog></section>';
  return out;
 }
