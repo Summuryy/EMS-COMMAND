@@ -65,7 +65,7 @@ export function renderTrainingStepMedia(lesson,step,{active=true}={}){
  out+='<button type="button" class="ems-training-shot ems-training-focus" data-academy-open="'+esc(firstSrc)+'" data-academy-caption="'+esc(first.caption)+'" aria-label="Увеличить скриншот: '+esc(first.caption)+'"><img class="ems-training-image" '+imageAttribute+'="'+esc(firstSrc)+'" alt="'+esc(first.caption)+'" loading="lazy" decoding="async"><span class="ems-training-caption">'+esc(first.caption)+'</span><span class="ems-training-zoom">Увеличить ↗</span></button>';
  if(images.length>1){
   out+='<div class="ems-training-thumbnails" role="group" aria-label="Другие скриншоты к этому шагу">';
-  out+=images.map((item,i)=>{const src='/assets/training/'+item.file+'.webp';return '<button type="button" class="ems-training-thumb'+(i===0?' is-active':'')+'" data-academy-thumbnail="'+esc(src)+'" data-academy-caption="'+esc(item.caption)+'" aria-label="Показать: '+esc(item.caption)+'" aria-pressed="'+(i===0?'true':'false')+'"><img src="'+esc(src)+'" alt="" loading="lazy" decoding="async"><span>'+(i+1)+'</span></button>';}).join('');
+  out+=images.map((item,i)=>{const src='/assets/training/'+item.file+'.webp';return '<button type="button" class="ems-training-thumb'+(i===0?' is-active':'')+'" data-academy-thumbnail="'+esc(src)+'" data-academy-caption="'+esc(item.caption)+'" aria-label="Показать: '+esc(item.caption)+'" aria-pressed="'+(i===0?'true':'false')+'"><img '+imageAttribute+'="'+esc(src)+'" alt="" loading="lazy" decoding="async"><span>'+(i+1)+'</span></button>';}).join('');
   out+='</div><p class="ems-training-gallery-help">Выберите миниатюру или нажмите на большой кадр для увеличения.</p>';
  }
  return out+'</div>';
