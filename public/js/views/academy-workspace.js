@@ -3,6 +3,8 @@ import {mediaForLesson} from './training-media.js';
 // Academy UI controller: only local state. No game/API permissions.
 const normalized=value=>String(value||'').toLocaleLowerCase('ru').replaceAll('ё','е');
 const asArray=nodes=>Array.from(nodes||[]);
+let bookmarkListener=null;
+export function setAcademyBookmarkListener(listener){bookmarkListener=typeof listener==='function'?listener:null;}
 // Build once per app load, never scan every hidden course/step on each keystroke.
 const searchIndex=new Map(lessons.map(lesson=>[lesson.title.slice(0,2),normalized([lesson.category,lesson.title,...lesson.steps,...mediaForLesson(lesson).map(image=>image.caption)].join(' '))]));
 const localWebP=/^\/assets\/training\/[a-z][a-z0-9-]*\.webp$/;
@@ -53,6 +55,7 @@ export function academySelect(root,id,step=0,{focus=false,persist=true}={}){
  if(next)next.disabled=index===steps.length-1;
  if(persist){
   try{globalThis.localStorage?.setItem('ems-academy-workspace:'+root.dataset.academyProfile,JSON.stringify({course:id,step:index}))}catch{}
+  bookmarkListener?.({profile:root.dataset.academyProfile,course:id,step:index,root});
  }
  if(focus){
   const heading=panel.querySelector('h3');
