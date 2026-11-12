@@ -74,7 +74,7 @@ test('3.9.1 reduced motion, inactive-window pause and privacy are still respecte
 
 test('3.9.1 app version is isolated from release request pending CI',()=>{
  const pkg=JSON.parse(fs.readFileSync(new URL('../package.json',import.meta.url),'utf8'));
- assert.equal(pkg.version,'3.9.3');
+ assert.equal(pkg.version,'3.10.0');
  assert.match(app,/data-action="upload"/);
  assert.match(app,/data-action="logout"/);
  assert.match(renderShift(base),/data-action="start-shift"/);
