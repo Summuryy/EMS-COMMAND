@@ -1,7 +1,7 @@
 {
-  "version": "3.9.3",
+  "version": "3.10.0",
   "approvePublicClientCode": true,
   "distribution": "public-binary-only",
-  "note": "EMS COMMAND 3.9.3 preview: faster startup via isolated OCR worker, task-first navigation, restrained Motion/VFX, and removal of the decorative motion permission prompt. Windows release is gated by production tests and signed archive verification.",
+  "note": "EMS COMMAND 3.10.0 Academy preview: 12 practical EMS training lessons for internship, OMP, OPP, pills, PMP and evidence; per-user local step checklists; updated cross-chat knowledge base. Original user screenshots are archived separately pending approved binary integration. This is a preview, not an official public launch.",
   "attempt": 1
 }
